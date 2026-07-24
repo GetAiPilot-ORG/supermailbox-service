@@ -25,7 +25,7 @@ export interface ActivityLog {
   timestamp: string;
   recipient: string;
   type: 'Transactional' | 'Campaign';
-  provider: 'ZeptoMail' | 'SES' | 'Resend';
+  provider: string;
   status: 'Delivered' | 'Bounced' | 'Sent' | 'Queued' | 'Failed';
 }
 
@@ -124,7 +124,7 @@ export interface CampaignJobStats {
 }
 
 const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://localhost:5050/v1';
-const REQUEST_TIMEOUT_MS = 5000;
+const REQUEST_TIMEOUT_MS = 15000;
 
 const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {
   const controller = new AbortController();
@@ -302,7 +302,7 @@ export class ApiService {
 
   static async addSuppression(email: string, reason: SuppressionItem['reason']): Promise<SuppressionItem | null> {
     try {
-      const res = await fetch(`${API_BASE}/suppressions`, {
+      const res = await fetchWithTimeout(`${API_BASE}/suppressions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, reason })
@@ -323,7 +323,7 @@ export class ApiService {
 
   static async removeSuppression(id: string): Promise<boolean> {
     try {
-      const res = await fetch(`${API_BASE}/suppressions/${id}`, {
+      const res = await fetchWithTimeout(`${API_BASE}/suppressions/${id}`, {
         method: 'DELETE'
       });
       if (res.ok) return true;
@@ -338,7 +338,7 @@ export class ApiService {
 
   static async getBounceReports(): Promise<BounceReportItem[]> {
     try {
-      const res = await fetch(`${API_BASE}/bounce-reports`);
+      const res = await fetchWithTimeout(`${API_BASE}/bounce-reports`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data?.bounces)) return data.bounces;
