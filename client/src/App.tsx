@@ -6,17 +6,70 @@ import { Sidebar, type TabType } from './components/Sidebar';
 import { DashboardQueueMonitor } from './pages/DashboardQueueMonitor';
 import { ProjectLogsViewer } from './pages/ProjectLogsViewer';
 import { TemplateBuilder } from './pages/TemplateBuilder';
+import { TemplateManager } from './pages/TemplateManager';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
 import { ApiService } from './services/api';
 import type { MetricCardData, QueueJob, ActivityLog, Template, Campaign, SuppressionItem, BounceReportItem } from './services/api';
 import './App.css';
 
+const DEFAULT_TEMPLATES: Template[] = [
+  {
+    key: 'auth_welcome',
+    name: 'Welcome Email',
+    category: 'transactional',
+    versions: [
+      {
+        version: 'v1.0.0',
+        status: 'Live',
+        author: 'System',
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        subject: 'Welcome to GetAIPilot! 🚀',
+        html: '',
+        variables: ['name', 'otp_code']
+      }
+    ]
+  },
+  {
+    key: 'billing_receipt',
+    name: 'Payment Receipt',
+    category: 'transactional',
+    versions: [
+      {
+        version: 'v1.0.0',
+        status: 'Live',
+        author: 'System',
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        subject: 'Payment Confirmed - Receipt 💳',
+        html: '',
+        variables: ['name', 'invoice_id', 'amount']
+      }
+    ]
+  },
+  {
+    key: 'product_announcement',
+    name: 'Product Update',
+    category: 'marketing',
+    versions: [
+      {
+        version: 'v1.0.0',
+        status: 'Live',
+        author: 'System',
+        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+        subject: 'Exciting Update: New Features Live! ✨',
+        html: '',
+        variables: ['name']
+      }
+    ]
+  }
+];
+
 gsap.registerPlugin(useGSAP);
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.matchMedia('(max-width: 840px)').matches);
+  const [editingTemplateKey, setEditingTemplateKey] = useState<string | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -24,6 +77,7 @@ export const App: React.FC = () => {
     if (activeTab === 'templates') {
       setSidebarCollapsed(true);
     }
+    setEditingTemplateKey(null);
   }, [activeTab]);
 
   // App Data State
@@ -51,7 +105,7 @@ export const App: React.FC = () => {
       setMetrics(m);
       setJobs(j);
       setLogs(l);
-      setTemplates(t);
+      setTemplates(t && t.length > 0 ? t : DEFAULT_TEMPLATES);
       setCampaigns(c);
       setSuppressions(s);
       setBounceReports(b);
@@ -147,6 +201,12 @@ export const App: React.FC = () => {
     setTemplates((prev) => [newTmpl, ...prev]);
   };
 
+  const handleDeleteTemplate = async (templateKey: string) => {
+    if (window.confirm('Are you sure you want to delete this template?')) {
+      setTemplates((prev) => prev.filter(t => t.key !== templateKey));
+    }
+  };
+
   const handleLaunchCampaign = (name: string, templateKey: string, scheduledAt?: string) => {
     const newCamp: Campaign = {
       id: `camp_${Math.floor(100 + Math.random() * 900)}`,
@@ -226,12 +286,22 @@ export const App: React.FC = () => {
                 <ProjectLogsViewer />
               )}
               {activeTab === 'templates' && (
-                <TemplateBuilder
-                  templates={templates}
-                  onPromoteVersion={handlePromoteVersion}
-                  onSaveDraft={handleSaveDraft}
-                  onCreateTemplate={handleCreateTemplate}
-                />
+                editingTemplateKey ? (
+                  <TemplateBuilder
+                    templateKey={editingTemplateKey}
+                    templates={templates}
+                    onBack={() => setEditingTemplateKey(null)}
+                    onPromoteVersion={handlePromoteVersion}
+                    onSaveDraft={handleSaveDraft}
+                  />
+                ) : (
+                  <TemplateManager
+                    templates={templates}
+                    onEditTemplate={setEditingTemplateKey}
+                    onCreateTemplate={handleCreateTemplate}
+                    onDeleteTemplate={handleDeleteTemplate}
+                  />
+                )
               )}
               {activeTab === 'campaigns' && (
                 <SegmentBuilder
