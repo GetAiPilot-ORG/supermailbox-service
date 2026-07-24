@@ -4,9 +4,10 @@ import type { Template } from '../services/api';
 
 interface TemplateBuilderProps {
   templates: Template[];
+  templateKey: string;
+  onBack: () => void;
   onPromoteVersion?: (templateKey: string, versionName: string) => void;
   onSaveDraft?: (templateKey: string, subject: string, html: string) => void;
-  onCreateTemplate?: (newTemplate: Template) => void;
 }
 
 interface SimpleEmailContent {
@@ -67,28 +68,63 @@ const addResponsiveEmailFixes = (html: string) => {
 
 export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
   templates,
+  templateKey,
+  onBack,
   onSaveDraft,
-  onCreateTemplate,
 }) => {
-  const [selectedKey, setSelectedKey] = useState<string>(templates[0]?.key || 'auth_welcome');
-  const activeTemplate = templates.find((t) => t.key === selectedKey) || templates[0];
+  const activeTemplate = templates.find((t) => t.key === templateKey) || templates[0];
 
   const liveVersion = activeTemplate?.versions.find((v) => v.status === 'Live') || activeTemplate?.versions[0];
   const templateVariables = liveVersion?.variables?.length ? liveVersion.variables : ['name', 'otp_code', 'amount'];
   const templateStatus = liveVersion?.status || 'Draft';
   const [subject, setSubject] = useState(liveVersion?.subject || 'Welcome to GetAIPilot! 🚀');
 
-  const [accentColor, setAccentColor] = useState<string>('#0D4F3C');
+  const getInitialContent = (key: string): { color: string, content: SimpleEmailContent } => {
+    if (key.includes('billing') || key.includes('receipt') || key.includes('payment')) {
+      return {
+        color: '#24754E',
+        content: {
+          badgeText: 'PAYMENT CONFIRMED',
+          heading: 'Payment Received Successfully! 💳',
+          body: 'Hi {{name}}, we have processed your payment successfully. Here is your transaction summary:',
+          featureBox: 'receipt',
+          ctaLabel: 'Download Invoice PDF →',
+          ctaUrl: 'https://getaipilot.com/billing',
+          footerText: '© 2026 GetAIPilot Billing Services. All rights reserved.'
+        }
+      };
+    } else if (key.includes('welcome') || key.includes('auth')) {
+      return {
+        color: '#2357D8',
+        content: {
+          badgeText: 'ACCOUNT VERIFICATION',
+          heading: 'Welcome Aboard, {{name}}! 🎉',
+          body: 'We are thrilled to have you onboard. Please use the security verification code below to confirm your login session.',
+          featureBox: 'otp',
+          ctaLabel: 'Launch Dashboard →',
+          ctaUrl: 'https://getaipilot.com/app',
+          footerText: '© 2026 GetAIPilot Core Platform. All rights reserved.'
+        }
+      };
+    } else {
+      return {
+        color: '#0D4F3C',
+        content: {
+          badgeText: 'EXCITING NEWS',
+          heading: 'New Announcement for {{name}} 🚀',
+          body: 'We have launched new autonomous features to help you automate workflows and boost productivity.',
+          featureBox: 'none',
+          ctaLabel: 'Explore Features →',
+          ctaUrl: 'https://getaipilot.com/features',
+          footerText: '© 2026 GetAIPilot Core Platform. All rights reserved.'
+        }
+      };
+    }
+  };
 
-  const [content, setContent] = useState<SimpleEmailContent>({
-    badgeText: 'ACCOUNT VERIFICATION',
-    heading: 'Welcome Aboard, {"{{name}}"}! 🎉',
-    body: 'We are thrilled to have you onboard. Please use the verification code below to confirm your session.',
-    featureBox: 'otp',
-    ctaLabel: 'Launch Dashboard →',
-    ctaUrl: 'https://getaipilot.com/app',
-    footerText: '© 2026 GetAIPilot Core Platform. All rights reserved. You received this email because you registered on GetAIPilot.'
-  });
+  const initialSettings = getInitialContent(templateKey);
+  const [accentColor, setAccentColor] = useState<string>(initialSettings.color);
+  const [content, setContent] = useState<SimpleEmailContent>(initialSettings.content);
 
   const [mode, setMode] = useState<'simple' | 'ai'>('simple');
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile' | 'code'>(liveVersion?.html ? 'code' : 'desktop');
@@ -96,13 +132,6 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
   const [aiPrompt, setAiPrompt] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
-
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-  const [isTemplateMenuOpen, setIsTemplateMenuOpen] = useState(false);
-  const templateMenuRef = useRef<HTMLDivElement | null>(null);
-  const [newTmplName, setNewTmplName] = useState<string>('');
-  const [newTmplKey, setNewTmplKey] = useState<string>('');
-  const [newTmplCategory] = useState<string>('transactional');
 
   // Light Theme Compiled HTML
   const generateCompiledHtml = () => {
@@ -206,72 +235,9 @@ ${footerHtml}
     { state: editorHtml.includes(RESPONSIVE_EMAIL_STYLE_ID) ? 'pass' : 'fail', label: 'Responsive CSS', detail: editorHtml.includes(RESPONSIVE_EMAIL_STYLE_ID) ? 'Attached' : 'Not attached' },
   ];
 
-  useEffect(() => {
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!templateMenuRef.current?.contains(event.target as Node)) {
-        setIsTemplateMenuOpen(false);
-      }
-    };
+  // Removed event listeners for templateMenuRef
 
-    document.addEventListener('mousedown', handlePointerDown);
-    return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, []);
-
-  const handleTemplateSelect = (key: string) => {
-    setSelectedKey(key);
-    setIsTemplateMenuOpen(false);
-    const tmpl = templates.find((t) => t.key === key);
-    if (tmpl) {
-      const ver = tmpl.versions.find((v) => v.status === 'Live') || tmpl.versions[0];
-      setSubject(ver?.subject || '');
-      
-      if (ver?.html) {
-        setCustomHtml(ver.html);
-        setPreviewMode('code');
-      } else {
-        setCustomHtml(null);
-        setMode('simple');
-        setPreviewMode('desktop');
-      }
-
-      // Keep updating the form fallbacks just in case user switches to simple mode
-
-      if (key.includes('billing') || key.includes('receipt') || key.includes('payment')) {
-        setAccentColor('#24754E');
-        setContent({
-          badgeText: 'PAYMENT CONFIRMED',
-          heading: 'Payment Received Successfully! 💳',
-          body: 'Hi {{name}}, we have processed your payment successfully. Here is your transaction summary:',
-          featureBox: 'receipt',
-          ctaLabel: 'Download Invoice PDF →',
-          ctaUrl: 'https://getaipilot.com/billing',
-          footerText: '© 2026 GetAIPilot Billing Services. All rights reserved.'
-        });
-      } else if (key.includes('welcome') || key.includes('auth')) {
-        setAccentColor('#2357D8');
-        setContent({
-          badgeText: 'ACCOUNT VERIFICATION',
-          heading: 'Welcome Aboard, {{name}}! 🎉',
-          body: 'We are thrilled to have you onboard. Please use the security verification code below to confirm your login session.',
-          featureBox: 'otp',
-          ctaLabel: 'Launch Dashboard →',
-          ctaUrl: 'https://getaipilot.com/app',
-          footerText: '© 2026 GetAIPilot Core Platform. All rights reserved.'
-        });
-      } else {
-        setAccentColor('#0D4F3C');
-        setContent({
-          badgeText: 'EXCITING NEWS',
-          heading: 'New Announcement for {{name}} 🚀',
-          body: 'We have launched new autonomous features to help you automate workflows and boost productivity.',
-          featureBox: 'none',
-          ctaLabel: 'Explore Features →',
-          ctaUrl: 'https://getaipilot.com/features',
-          footerText: '© 2026 GetAIPilot Core Platform. All rights reserved.'
-        });
-      }
-    }
-  };
+  // Removed handleTemplateSelect
 
   const handleGenerateAi = (promptText: string) => {
     setIsGenerating(true);
@@ -326,33 +292,7 @@ ${footerHtml}
     setTimeout(() => setSaveSuccess(false), 2500);
   };
 
-  const handleCreateNewTemplate = () => {
-    if (!newTmplName.trim()) return;
-    const key = newTmplKey.trim() || newTmplName.toLowerCase().replace(/[^a-z0-9_]/g, '_');
-    const newTmpl: Template = {
-      key,
-      name: newTmplName,
-      category: (newTmplCategory === 'marketing' ? 'marketing' : 'transactional'),
-      versions: [
-        {
-          version: 'v1.0.0',
-          status: 'Live',
-          html: getActiveHtml(),
-          subject: subject,
-          author: 'Admin User',
-          date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-          variables: ['name', 'otp_code', 'amount']
-        }
-      ]
-    };
-    if (onCreateTemplate) {
-      onCreateTemplate(newTmpl);
-    }
-    setSelectedKey(key);
-    setShowCreateModal(false);
-    setNewTmplName('');
-    setNewTmplKey('');
-  };
+  // Removed handleCreateNewTemplate
 
   return (
     <div className={`template-workshop mode-${mode}`}>
@@ -363,7 +303,10 @@ ${footerHtml}
       }} />
 
       <header className="template-studio-command">
-        <div className="template-toolbar-title">
+        <div className="template-toolbar-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={onBack} className="btn-secondary" style={{ padding: '4px 12px', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            Back
+          </button>
           <span>Templates</span>
           <span style={{ color: 'var(--border-strong)', fontSize: '1rem', fontWeight: 300 }}>/</span>
           <strong>{activeTemplate?.name || 'Email builder'}</strong>
@@ -391,57 +334,7 @@ ${footerHtml}
       }}>
         
         {/* Template Selector Header */}
-        <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.7rem', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Template</span>
-            <button onClick={() => setShowCreateModal(true)} style={{ background: 'transparent', border: 'none', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', fontWeight: 500, cursor: 'pointer' }}>
-              <Plus size={14} /> New
-            </button>
-          </div>
-          <div className="template-select" ref={templateMenuRef}>
-            <button
-              type="button"
-              className="template-select-trigger"
-              aria-haspopup="listbox"
-              aria-expanded={isTemplateMenuOpen}
-              onClick={() => setIsTemplateMenuOpen((open) => !open)}
-              onKeyDown={(event) => {
-                if (event.key === 'Escape') setIsTemplateMenuOpen(false);
-                if (event.key === 'ArrowDown') setIsTemplateMenuOpen(true);
-              }}
-            >
-              <span>
-                <strong>{activeTemplate?.name || 'Select template'}</strong>
-                <small>{activeTemplate?.key || 'No template selected'}</small>
-              </span>
-              <ChevronDown size={17} className={isTemplateMenuOpen ? 'open' : undefined} />
-            </button>
-
-            {isTemplateMenuOpen && (
-              <div className="template-select-menu" role="listbox" aria-label="Templates">
-                {templates.map((template) => {
-                  const isSelected = selectedKey === template.key;
-                  return (
-                    <button
-                      key={template.key}
-                      type="button"
-                      role="option"
-                      aria-selected={isSelected}
-                      className={`template-select-option ${isSelected ? 'selected' : ''}`}
-                      onClick={() => handleTemplateSelect(template.key)}
-                    >
-                      <span>
-                        <strong>{template.name}</strong>
-                        <small>{template.category} / {template.key}</small>
-                      </span>
-                      {isSelected && <Check size={15} />}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Removed template selector */}
 
         {/* Tabbed Editor Modes */}
         <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)' }}>
@@ -584,7 +477,7 @@ ${footerHtml}
         <div className="template-inspector-block">
           <div className="template-inspector-row head">
             <span>Template meta</span>
-            <strong>{activeTemplate?.key || selectedKey}</strong>
+            <strong>{activeTemplate?.key || templateKey}</strong>
           </div>
           <div className="template-inspector-row">
             <span>Mode</span>
@@ -611,30 +504,7 @@ ${footerHtml}
         </div>
       </aside>
 
-      {/* Create Modal */}
-      {showCreateModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(4px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: '100%', maxWidth: '440px', background: '#FFFFFC', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', boxShadow: 'var(--shadow-dropdown)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-main)' }}>Create Template</h3>
-              <button onClick={() => setShowCreateModal(false)} style={{ background: 'var(--bg-subsurface)', border: '1px solid var(--border-color)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={16} /></button>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Template Name</label>
-                <input type="text" value={newTmplName} onChange={(e) => { setNewTmplName(e.target.value); setNewTmplKey(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '_')); }} placeholder="e.g. Monthly Newsletter" className="ui-input" style={{ width: '100%', boxShadow: 'none' }} />
-              </div>
-              <div>
-                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Unique Key</label>
-                <input type="text" value={newTmplKey} onChange={(e) => setNewTmplKey(e.target.value)} placeholder="e.g. monthly_newsletter" className="ui-input" style={{ width: '100%', fontFamily: 'var(--font-mono)', boxShadow: 'none' }} />
-              </div>
-            </div>
-            
-            <button onClick={handleCreateNewTemplate} className="btn-primary" style={{ width: '100%', padding: '12px', fontSize: '0.9375rem' }}>Create & Select</button>
-          </div>
-        </div>
-      )}
+      {/* Removed create modal */}
 
     </div>
   );
