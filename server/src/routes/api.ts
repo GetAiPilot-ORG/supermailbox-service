@@ -181,7 +181,8 @@ const fetchZeptoSuppressions = async () => {
     headers: {
       Authorization: authHeader,
       'Content-Type': 'application/json'
-    }
+    },
+    signal: AbortSignal.timeout(4000)
   });
 
   if (!response.ok) {
