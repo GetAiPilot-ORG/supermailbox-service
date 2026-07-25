@@ -341,43 +341,46 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
             
             <div className="campaign-segment-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
               {[
-                { label: 'All Users', count: totalCount, mode: 'all' },
-                { label: 'Pending Onboarding', count: pendingOnboardingCount, mode: 'pending_onboarding' },
-                { label: 'Unverified', count: unverifiedCount, mode: 'unverified' },
-                { label: 'Completed', count: completedOnboardingCount, mode: 'completed_onboarding' },
-              ].map(segment => (
-                <button
-                  key={segment.mode}
-                  onClick={() => setFilterMode(segment.mode as SegmentFilterMode)}
-                  style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: filterMode === segment.mode ? '2px solid #0D4F3C' : '1px solid var(--border)',
-                    background: filterMode === segment.mode ? '#F4F7F4' : '#FFFFFF',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    position: 'relative'
-                  }}
-                  aria-pressed={filterMode === segment.mode}
-                >
-                  <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>{segment.label}</span>
-                  <strong style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--ink)' }}>{segment.count}</strong>
-                  {filterMode === segment.mode && (
-                    <div style={{ position: 'absolute', top: '12px', right: '12px', width: '8px', height: '8px', borderRadius: '50%', background: '#0D4F3C' }} />
-                  )}
-                </button>
-              ))}
+                { label: 'All Users', count: totalCount, mode: 'all', activeBg: '#EAECE9', activeBorder: '#0D4F3C', dotColor: '#0D4F3C' },
+                { label: 'Pending Onboarding', count: pendingOnboardingCount, mode: 'pending_onboarding', activeBg: '#FEF3C7', activeBorder: '#D97706', dotColor: '#D97706' },
+                { label: 'Unverified', count: unverifiedCount, mode: 'unverified', activeBg: '#FEE2E2', activeBorder: '#DC2626', dotColor: '#DC2626' },
+                { label: 'Completed', count: completedOnboardingCount, mode: 'completed_onboarding', activeBg: '#DCFCE7', activeBorder: '#16A34A', dotColor: '#16A34A' },
+              ].map(segment => {
+                const isActive = filterMode === segment.mode;
+                return (
+                  <button
+                    key={segment.mode}
+                    onClick={() => setFilterMode(segment.mode as SegmentFilterMode)}
+                    style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: isActive ? `2px solid ${segment.activeBorder}` : '1px solid var(--border)',
+                      background: isActive ? segment.activeBg : '#FFFFFF',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      position: 'relative'
+                    }}
+                    aria-pressed={isActive}
+                  >
+                    <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: isActive ? '#0F172A' : 'var(--text-secondary)', marginBottom: '8px' }}>{segment.label}</span>
+                    <strong style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--ink)' }}>{segment.count}</strong>
+                    {isActive && (
+                      <div style={{ position: 'absolute', top: '12px', right: '12px', width: '8px', height: '8px', borderRadius: '50%', background: segment.dotColor }} />
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="campaign-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
               <div className="campaign-toolbar-actions" style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={selectVisible} className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.825rem' }}>Select Visible</button>
-                <button onClick={deselectAll} className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.825rem' }}>Clear All</button>
-                <button onClick={() => setShowAddEmailModal(true)} className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.825rem' }}>
+                <button onClick={selectVisible} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer' }}>Select Visible</button>
+                <button onClick={deselectAll} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer' }}>Clear All</button>
+                <button onClick={() => setShowAddEmailModal(true)} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer' }}>
                   + Add Email
                 </button>
-                <button onClick={fetchUsers} disabled={isLoadingUsers} className="btn-secondary" style={{ padding: '8px 14px', fontSize: '0.825rem' }}>
+                <button onClick={fetchUsers} disabled={isLoadingUsers} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   <RefreshCw size={12} className={isLoadingUsers ? 'spin-icon' : undefined} /> Refresh
                 </button>
               </div>
@@ -392,9 +395,9 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               </div>
             </div>
 
-            <div className="dashboard-table-wrap" style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+            <div className="dashboard-table-wrap" style={{ border: '1px solid var(--border)', borderRadius: '12px', maxHeight: '480px', overflowY: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
+                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: '#FAFAFA' }}>
                   <tr>
                     <th style={{ width: '44px', textAlign: 'center' }}></th>
                     <th>USER</th>
@@ -417,15 +420,23 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                         </td>
                         <td style={{ textAlign: 'center' }}>
                           {u.is_verified === false ? (
-                            <span className="badge-pill badge-neutral"><span className="dot"></span>Unverified</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#FEE2E2', color: '#991B1B', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#DC2626' }} />Unverified
+                            </span>
                           ) : u.onboarding_completed ? (
-                            <span className="badge-pill badge-success"><span className="dot"></span>Onboarded</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#DCFCE7', color: '#166534', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16A34A' }} />Onboarded
+                            </span>
                           ) : (
-                            <span className="badge-pill badge-neutral"><span className="dot"></span>{getOnboardingLabel(u)}</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#FEF3C7', color: '#92400E', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D97706' }} />{getOnboardingLabel(u)}
+                            </span>
                           )}
                         </td>
                         <td style={{ textAlign: 'center' }}>
-                          <span className="badge-pill badge-neutral">{u.account_type || 'Free'}</span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '6px', background: '#F1F5F9', color: '#475569', fontSize: '0.75rem', fontWeight: 600 }}>
+                            {u.account_type || 'Free'}
+                          </span>
                         </td>
                       </tr>
                     ))
