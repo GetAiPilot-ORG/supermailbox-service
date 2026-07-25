@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Send, CheckCircle2, Search, CheckSquare, Square, Settings, ExternalLink, X, Activity, UsersRound, Plus, RefreshCw, Mail, Clock, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, CheckCircle2, Search, CheckSquare, Square, Settings, ExternalLink, X, Activity, UsersRound, Plus, RefreshCw, Mail, Clock, AlertCircle, ChevronDown, Check } from 'lucide-react';
 import { ApiService, type Campaign, type Template, type GetAIPilotUser } from '../services/api';
 
 interface SegmentBuilderProps {
@@ -18,6 +18,21 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
   const [campaignName, setCampaignName] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.key || 'auth_welcome');
   const [scheduleDate, setScheduleDate] = useState('');
+
+  // Custom template dropdown state
+  const [isTemplateDropdownOpen, setIsTemplateDropdownOpen] = useState(false);
+  const [templateSearch, setTemplateSearch] = useState('');
+  const templateDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (templateDropdownRef.current && !templateDropdownRef.current.contains(event.target as Node)) {
+        setIsTemplateDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // GetAIPilot users state
   const [getAIPilotUsers, setGetAIPilotUsers] = useState<GetAIPilotUser[]>([]);
@@ -474,16 +489,128 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
 
               <div>
                 <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', letterSpacing: '0.04em' }}>EMAIL TEMPLATE</label>
-                <select
-                  value={selectedTemplate}
-                  onChange={(e) => setSelectedTemplate(e.target.value)}
-                  className="ui-input"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '0.9rem', cursor: 'pointer', backgroundColor: '#ffffff' }}
-                >
-                  {templates.map(t => (
-                    <option key={t.key} value={t.key}>{t.name} ({t.key})</option>
-                  ))}
-                </select>
+                <div ref={templateDropdownRef} style={{ position: 'relative' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsTemplateDropdownOpen(!isTemplateDropdownOpen)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      border: isTemplateDropdownOpen ? '2px solid #0D4F3C' : '1px solid var(--border)',
+                      background: '#ffffff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
+                      <Mail size={16} color="#0D4F3C" style={{ flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {templates.find((t) => t.key === selectedTemplate)?.name || selectedTemplate || 'Select Template'}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      size={16}
+                      color="var(--text-secondary)"
+                      style={{
+                        transition: 'transform 0.2s ease',
+                        transform: isTemplateDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        flexShrink: 0
+                      }}
+                    />
+                  </button>
+
+                  {isTemplateDropdownOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 6px)',
+                        left: 0,
+                        right: 0,
+                        background: '#ffffff',
+                        border: '1px solid var(--border)',
+                        borderRadius: '12px',
+                        boxShadow: '0 12px 32px rgba(0,0,0,0.15)',
+                        zIndex: 100,
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column'
+                      }}
+                    >
+                      <div style={{ padding: '8px', borderBottom: '1px solid var(--border)', background: '#FAFAFA' }}>
+                        <div className="search-shell" style={{ margin: 0, width: '100%' }}>
+                          <Search size={14} color="var(--text-secondary)" />
+                          <input
+                            type="text"
+                            placeholder="Filter templates..."
+                            value={templateSearch}
+                            onChange={(e) => setTemplateSearch(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      <div style={{ maxHeight: '240px', overflowY: 'auto', padding: '6px' }}>
+                        {templates
+                          .filter((t) =>
+                            !templateSearch ||
+                            t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                            t.key.toLowerCase().includes(templateSearch.toLowerCase())
+                          )
+                          .map((t) => {
+                            const isSelected = selectedTemplate === t.key;
+                            return (
+                              <div
+                                key={t.key}
+                                onClick={() => {
+                                  setSelectedTemplate(t.key);
+                                  setIsTemplateDropdownOpen(false);
+                                  setTemplateSearch('');
+                                }}
+                                style={{
+                                  padding: '10px 12px',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  background: isSelected ? '#F4F7F4' : 'transparent',
+                                  marginBottom: '2px',
+                                  transition: 'background 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!isSelected) e.currentTarget.style.background = '#F8FAFC';
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!isSelected) e.currentTarget.style.background = 'transparent';
+                                }}
+                              >
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: isSelected ? '#0D4F3C' : 'var(--ink)' }}>
+                                    {t.name}
+                                  </div>
+                                  <div style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                                    {t.key}
+                                  </div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: t.category === 'marketing' ? '#EFF6FF' : '#F1F5F9', color: t.category === 'marketing' ? '#1D4ED8' : '#475569', textTransform: 'uppercase', fontWeight: 700 }}>
+                                    {t.category || 'tx'}
+                                  </span>
+                                  {isSelected && <Check size={16} color="#16A34A" />}
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
