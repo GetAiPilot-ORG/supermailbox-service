@@ -162,7 +162,17 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
       }
     };
     
-    unlayer.loadDesign(skeletonDesign as any);
+    if (liveVersion?.design) {
+      try {
+        const d = typeof liveVersion.design === 'string' ? JSON.parse(liveVersion.design) : liveVersion.design;
+        unlayer.loadDesign(d);
+      } catch (e) {
+        console.error('Error parsing template design JSON:', e);
+        unlayer.loadDesign(skeletonDesign as any);
+      }
+    } else {
+      unlayer.loadDesign(skeletonDesign as any);
+    }
   };
 
   const handleSave = () => {

@@ -1,3 +1,4 @@
+// GetAiPilot & SocialPilot Main Application
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
@@ -6,7 +7,7 @@ import { Sidebar, type TabType } from './components/Sidebar';
 import { DashboardQueueMonitor } from './pages/DashboardQueueMonitor';
 import { ProjectLogsViewer } from './pages/ProjectLogsViewer';
 import { TemplateBuilder } from './pages/TemplateBuilder';
-import { TemplateManager } from './pages/TemplateManager';
+import { TemplateManager } from './pages/TemplateManager.tsx';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
 import { ApiService } from './services/api';
@@ -130,7 +131,7 @@ export const App: React.FC = () => {
     );
   };
 
-  const handleSaveDraft = async (templateKey: string, subject: string, html: string) => {
+  const handleSaveDraft = async (templateKey: string, subject: string, html: string, design?: any) => {
     const tmpl = templates.find(t => t.key === templateKey);
     if (tmpl) {
       await ApiService.saveTemplate({
@@ -138,7 +139,8 @@ export const App: React.FC = () => {
         name: tmpl.name,
         category: tmpl.category,
         html,
-        subject
+        subject,
+        design
       });
       
       const freshTemplates = await ApiService.getTemplates();

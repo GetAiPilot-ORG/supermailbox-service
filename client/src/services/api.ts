@@ -37,6 +37,7 @@ export interface TemplateVersion {
   date: string;
   subject: string;
   html: string;
+  design?: any;
   variables: string[];
 }
 
@@ -216,7 +217,7 @@ export class ApiService {
     return [];
   }
 
-  static async saveTemplate(data: { key: string; name?: string; category?: string; html: string; subject: string }): Promise<boolean> {
+  static async saveTemplate(data: { key: string; name?: string; category?: string; html: string; subject: string; design?: any }): Promise<boolean> {
     try {
       const res = await fetchWithTimeout(`${API_BASE}/templates`, {
         method: 'POST',

@@ -377,7 +377,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
 
       const { data: versionsData, error: vError } = await supabase
         .from('template_versions')
-        .select('template_id, version_number, subject, html_source, status, created_at, created_by');
+        .select('template_id, version_number, subject, html_source, mjml_source, status, created_at, created_by');
 
       if (vError) throw vError;
 
@@ -396,6 +396,10 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
           date: new Date(v.created_at).toISOString().replace('T', ' ').substring(0, 16),
           subject: v.subject,
           html: v.html_source,
+          design: (() => {
+            if (!v.mjml_source) return null;
+            try { return JSON.parse(v.mjml_source); } catch (e) { return v.mjml_source; }
+          })(),
           variables: [] // Variables could be parsed from HTML if needed
         })).sort((a: any, b: any) => b.version.localeCompare(a.version))
         };
@@ -410,8 +414,9 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
     
   fastify.post('/v1/templates', async (request: FastifyRequest<{ Body: any }>, reply) => {
     try {
-      const { key, name, category, html, subject } = request.body as any;
+      const { key, name, category, html, subject, design } = request.body as any;
       const responsiveHtml = addResponsiveEmailFixes(html || '');
+      const designString = design ? (typeof design === 'string' ? design : JSON.stringify(design)) : null;
       
       let { data: product } = await supabase.from('products').select('id').eq('code', 'getaipilot').single();
       
@@ -435,6 +440,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
         version_number: nextVersion,
         subject: subject,
         html_source: responsiveHtml,
+        mjml_source: designString,
         status: 'live',
         created_by: 'Admin'
       }).select('id').single();
