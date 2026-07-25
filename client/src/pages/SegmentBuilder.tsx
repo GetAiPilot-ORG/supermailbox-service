@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Send, CheckCircle2, Search, CheckSquare, Square, Settings, ExternalLink, X, Activity, UsersRound, Plus, RefreshCw } from 'lucide-react';
+import { Send, CheckCircle2, Search, CheckSquare, Square, Settings, ExternalLink, X, Activity, UsersRound, Plus, RefreshCw, Mail, Clock, AlertCircle } from 'lucide-react';
 import { ApiService, type Campaign, type Template, type GetAIPilotUser } from '../services/api';
 
 interface SegmentBuilderProps {
@@ -237,7 +237,6 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
     }
   };
 
-  return (
   return (
     <div className="screen-page campaign-screen fade-in">
       <div className="screen-hero campaign-meta-hero" style={{ background: '#ffffff url(/bg2.jpg) no-repeat center center', backgroundSize: 'cover' }}>
