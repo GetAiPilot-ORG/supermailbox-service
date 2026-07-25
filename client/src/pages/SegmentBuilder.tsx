@@ -19,20 +19,9 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.key || 'auth_welcome');
   const [scheduleDate, setScheduleDate] = useState('');
 
-  // Custom template dropdown state
-  const [isTemplateDropdownOpen, setIsTemplateDropdownOpen] = useState(false);
+  // Template Modal dialog state
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [templateSearch, setTemplateSearch] = useState('');
-  const templateDropdownRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (templateDropdownRef.current && !templateDropdownRef.current.contains(event.target as Node)) {
-        setIsTemplateDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   // GetAIPilot users state
   const [getAIPilotUsers, setGetAIPilotUsers] = useState<GetAIPilotUser[]>([]);
@@ -489,128 +478,33 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
 
               <div>
                 <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', letterSpacing: '0.04em' }}>EMAIL TEMPLATE</label>
-                <div ref={templateDropdownRef} style={{ position: 'relative' }}>
-                  <button
-                    type="button"
-                    onClick={() => setIsTemplateDropdownOpen(!isTemplateDropdownOpen)}
-                    style={{
-                      width: '100%',
-                      padding: '12px 14px',
-                      borderRadius: '8px',
-                      border: isTemplateDropdownOpen ? '2px solid #0D4F3C' : '1px solid var(--border)',
-                      background: '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
-                      <Mail size={16} color="#0D4F3C" style={{ flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {templates.find((t) => t.key === selectedTemplate)?.name || selectedTemplate || 'Select Template'}
-                      </span>
-                    </div>
-                    <ChevronDown
-                      size={16}
-                      color="var(--text-secondary)"
-                      style={{
-                        transition: 'transform 0.2s ease',
-                        transform: isTemplateDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        flexShrink: 0
-                      }}
-                    />
-                  </button>
-
-                  {isTemplateDropdownOpen && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: 'calc(100% + 6px)',
-                        left: 0,
-                        right: 0,
-                        background: '#ffffff',
-                        border: '1px solid var(--border)',
-                        borderRadius: '12px',
-                        boxShadow: '0 12px 32px rgba(0,0,0,0.15)',
-                        zIndex: 100,
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column'
-                      }}
-                    >
-                      <div style={{ padding: '8px', borderBottom: '1px solid var(--border)', background: '#FAFAFA' }}>
-                        <div className="search-shell" style={{ margin: 0, width: '100%' }}>
-                          <Search size={14} color="var(--text-secondary)" />
-                          <input
-                            type="text"
-                            placeholder="Filter templates..."
-                            value={templateSearch}
-                            onChange={(e) => setTemplateSearch(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                            autoFocus
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ maxHeight: '240px', overflowY: 'auto', padding: '6px' }}>
-                        {templates
-                          .filter((t) =>
-                            !templateSearch ||
-                            t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||
-                            t.key.toLowerCase().includes(templateSearch.toLowerCase())
-                          )
-                          .map((t) => {
-                            const isSelected = selectedTemplate === t.key;
-                            return (
-                              <div
-                                key={t.key}
-                                onClick={() => {
-                                  setSelectedTemplate(t.key);
-                                  setIsTemplateDropdownOpen(false);
-                                  setTemplateSearch('');
-                                }}
-                                style={{
-                                  padding: '10px 12px',
-                                  borderRadius: '8px',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'space-between',
-                                  background: isSelected ? '#F4F7F4' : 'transparent',
-                                  marginBottom: '2px',
-                                  transition: 'background 0.15s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (!isSelected) e.currentTarget.style.background = '#F8FAFC';
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (!isSelected) e.currentTarget.style.background = 'transparent';
-                                }}
-                              >
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
-                                  <div style={{ fontSize: '0.85rem', fontWeight: 600, color: isSelected ? '#0D4F3C' : 'var(--ink)' }}>
-                                    {t.name}
-                                  </div>
-                                  <div style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
-                                    {t.key}
-                                  </div>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: t.category === 'marketing' ? '#EFF6FF' : '#F1F5F9', color: t.category === 'marketing' ? '#1D4ED8' : '#475569', textTransform: 'uppercase', fontWeight: 700 }}>
-                                    {t.category || 'tx'}
-                                  </span>
-                                  {isSelected && <Check size={16} color="#16A34A" />}
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowTemplateModal(true)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)',
+                    background: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
+                    <Mail size={16} color="#0D4F3C" style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {templates.find((t) => t.key === selectedTemplate)?.name || selectedTemplate || 'Select Template'}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: '#F1F5F9', color: '#475569', fontWeight: 700, textTransform: 'uppercase', flexShrink: 0 }}>
+                    Change
+                  </span>
+                </button>
               </div>
 
               <div>
@@ -711,6 +605,189 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               </div>
               <button type="submit" className="btn-primary" style={{ marginTop: '8px' }}>Add & Select</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Template Picker Dialog Modal */}
+      {showTemplateModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.45)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+          onClick={() => setShowTemplateModal(false)}
+        >
+          <div
+            style={{
+              background: '#ffffff',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '600px',
+              maxHeight: '85vh',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              border: '1px solid var(--border)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: '#FAFAFA'
+              }}
+            >
+              <div>
+                <span className="screen-kicker" style={{ fontSize: '0.7rem', color: '#0D4F3C', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
+                  <Mail size={12} /> SELECT TEMPLATE
+                </span>
+                <h3 style={{ margin: '4px 0 0', fontSize: '1.25rem', fontWeight: 700, color: 'var(--ink)' }}>
+                  Email Templates
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowTemplateModal(false)}
+                style={{
+                  background: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  cursor: 'pointer',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <div style={{ padding: '16px 24px 12px', borderBottom: '1px solid var(--border)' }}>
+              <div className="search-shell" style={{ margin: 0, width: '100%', padding: '10px 14px' }}>
+                <Search size={16} color="var(--text-secondary)" />
+                <input
+                  type="text"
+                  placeholder="Search templates by name, key, or category..."
+                  value={templateSearch}
+                  onChange={(e) => setTemplateSearch(e.target.value)}
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Template List */}
+            <div style={{ padding: '16px 24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {templates
+                .filter((t) =>
+                  !templateSearch ||
+                  t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                  t.key.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                  (t.category && t.category.toLowerCase().includes(templateSearch.toLowerCase()))
+                )
+                .map((t) => {
+                  const isSelected = selectedTemplate === t.key;
+                  return (
+                    <div
+                      key={t.key}
+                      onClick={() => {
+                        setSelectedTemplate(t.key);
+                        setShowTemplateModal(false);
+                        setTemplateSearch('');
+                      }}
+                      style={{
+                        padding: '14px 16px',
+                        borderRadius: '12px',
+                        border: isSelected ? '2px solid #0D4F3C' : '1px solid var(--border)',
+                        background: isSelected ? '#F4F7F4' : '#FFFFFF',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) e.currentTarget.style.background = '#F8FAFC';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) e.currentTarget.style.background = '#FFFFFF';
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            width: '38px',
+                            height: '38px',
+                            borderRadius: '10px',
+                            background: isSelected ? '#0D4F3C' : '#F1F5F9',
+                            color: isSelected ? '#FFFFFF' : '#475569',
+                            display: 'grid',
+                            placeItems: 'center',
+                            flexShrink: 0
+                          }}
+                        >
+                          <Mail size={18} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 600, color: isSelected ? '#0D4F3C' : 'var(--ink)' }}>
+                            {t.name}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                            key: {t.key}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            background: t.category === 'marketing' ? '#EFF6FF' : '#F1F5F9',
+                            color: t.category === 'marketing' ? '#1D4ED8' : '#475569',
+                            textTransform: 'uppercase',
+                            fontWeight: 700,
+                            letterSpacing: '0.03em'
+                          }}
+                        >
+                          {t.category || 'transactional'}
+                        </span>
+                        {isSelected ? (
+                          <div
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '50%',
+                              background: '#16A34A',
+                              color: '#FFFFFF',
+                              display: 'grid',
+                              placeItems: 'center'
+                            }}
+                          >
+                            <Check size={14} />
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         </div>
       )}
