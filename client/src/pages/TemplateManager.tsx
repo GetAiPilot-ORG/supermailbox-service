@@ -340,6 +340,10 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
   const [gallerySearch, setGallerySearch] = useState<string>('');
   const [selectedPrebuilt, setSelectedPrebuilt] = useState<any | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const getPlatform = (t: Template): 'getaipilot' | 'socialpilot' | 'whatsapp' | 'general' => {
     const k = (t.key || '').toLowerCase();
     const n = (t.name || '').toLowerCase();
@@ -379,6 +383,10 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
 
     return matchesSearch && matchesPlatform && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedTemplates = filteredTemplates.slice(startIndex, startIndex + itemsPerPage);
 
   const handleCreateNewTemplate = () => {
     if (!newTmplName.trim()) return;
@@ -591,7 +599,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
         </div>
 
         {/* Table */}
-        <div style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '40px' }}>
+        <div style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '24px' }}>
           {/* Table Header */}
           <div style={{ 
             display: 'grid', 
@@ -601,6 +609,10 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
             fontSize: '0.75rem',
             fontWeight: 600,
             color: 'var(--text-secondary)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            background: 'var(--surface-muted)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>Template name <span style={{ fontSize: '0.6rem' }}>↑</span></div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>Category <span style={{ fontSize: '0.6rem' }}>↑</span></div>
@@ -610,11 +622,11 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
             <div style={{ textAlign: 'right' }}>Actions</div>
           </div>
 
-          {/* Table Body */}
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {filteredTemplates.map((template, index) => {
+          {/* Table Body Container with internal scroll limit */}
+          <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 380px)', overflowY: 'auto' }}>
+            {paginatedTemplates.map((template, index) => {
               const liveVersion = template.versions.find(v => v.status === 'Live') || template.versions[0];
-              const isLast = index === filteredTemplates.length - 1;
+              const isLast = index === paginatedTemplates.length - 1;
               
               return (
                 <div 
@@ -705,10 +717,51 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
                 </div>
               );
             })}
+          </div>
 
-            <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border)', fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between', background: 'var(--surface-muted)' }}>
-              <div>{filteredTemplates.length} templates shown</div>
-              <div>Ready for Broadcast</div>
+          {/* Table Footer with Pagination Controls */}
+          <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border)', fontSize: '0.8125rem', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-muted)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div>
+                Showing {filteredTemplates.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredTemplates.length)} of {filteredTemplates.length} templates
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '0.75rem' }}>Per page:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  style={{ padding: '3px 8px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--surface)', fontSize: '0.75rem', cursor: 'pointer', color: 'var(--ink)' }}
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Pagination buttons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+                style={{ padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--surface)', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1, fontSize: '0.78rem', fontWeight: 600, color: 'var(--ink)' }}
+              >
+                Previous
+              </button>
+              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--ink)' }}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                style={{ padding: '4px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--surface)', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', opacity: currentPage === totalPages ? 0.5 : 1, fontSize: '0.78rem', fontWeight: 600, color: 'var(--ink)' }}
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
