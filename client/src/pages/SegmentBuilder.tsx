@@ -239,16 +239,15 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
 
   return (
     <div className="screen-page campaign-screen fade-in" style={{ backgroundColor: '#ffffff', width: '100%', maxWidth: '100%' }}>
-      <div className="screen-hero campaign-meta-hero">
+      <div className="screen-hero campaign-meta-hero" style={{ background: '#ffffff url(/bg2.jpg) no-repeat center center', backgroundSize: 'cover' }}>
         <div className="hero-content">
-          <span className="screen-kicker"><UsersRound size={14} /> AUDIENCE LAUNCHPAD</span>
-          <h2 style={{ fontSize: '32px', letterSpacing: '-0.5px' }}>
+          <span className="screen-kicker" style={{ color: '#60a5fa' }}><UsersRound size={14} /> AUDIENCE LAUNCHPAD</span>
+          <h2 style={{ fontSize: '32px', letterSpacing: '-0.5px', color: '#ffffff' }}>
             Campaigns & Segments
           </h2>
-          <p>Build precise audiences from your synced user list and launch queued email campaigns<br/>through SuperMailBox.</p>
+          <p style={{ color: 'rgba(255,255,255,0.85)' }}>Build precise audiences from your synced user list and launch queued email campaigns through SuperMailBox.</p>
         </div>
         <div className="hero-action-area">
-          <div className="hero-grid-bg"></div>
           <button onClick={() => setShowSettingsModal(true)} className="btn-secondary smtp-btn">
             <Settings size={14} /> SMTP Config
           </button>
