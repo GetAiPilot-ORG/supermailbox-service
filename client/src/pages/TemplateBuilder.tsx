@@ -27,7 +27,47 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
   const emailEditorRef = useRef<EditorRef>(null);
 
   const onReady: EmailEditorProps['onReady'] = (unlayer) => {
-    // A basic starter skeleton design
+    // Register image upload callback with Cloudinary support
+    unlayer.registerCallback('image', async (file: any, done: Function) => {
+      const uploadFile = file.attachments[0];
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+      const fallbackToBase64 = () => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          done({ progress: 100, url: e.target?.result });
+        };
+        reader.readAsDataURL(uploadFile);
+      };
+
+      if (cloudName && uploadPreset) {
+        const formData = new FormData();
+        formData.append('file', uploadFile);
+        formData.append('upload_preset', uploadPreset);
+
+        try {
+          const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: 'POST',
+            body: formData,
+          });
+          const data = await res.json();
+          if (data.secure_url) {
+            done({ progress: 100, url: data.secure_url });
+          } else {
+            console.error('Cloudinary upload failed:', data);
+            fallbackToBase64();
+          }
+        } catch (error) {
+          console.error('Error uploading to Cloudinary:', error);
+          fallbackToBase64();
+        }
+      } else {
+        fallbackToBase64();
+      }
+    });
+
+    // A robust skeleton design matching standard newsletter layout
     const skeletonDesign = {
       body: {
         rows: [
@@ -37,9 +77,32 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
               {
                 contents: [
                   {
+                    type: "image",
+                    values: {
+                      src: {
+                        url: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=600&h=200&fit=crop",
+                        width: 600,
+                        height: 200
+                      },
+                      padding: "0px",
+                      textAlign: "center"
+                    }
+                  },
+                  {
+                    type: "heading",
+                    values: {
+                      headingType: "h1",
+                      text: "Welcome to the Platform",
+                      textAlign: "center",
+                      color: "#111111",
+                      padding: "30px 20px 10px 20px"
+                    }
+                  },
+                  {
                     type: "text",
                     values: {
-                      text: "<h1 style=\"text-align: center; color: #333;\">Your Awesome Email</h1><p style=\"text-align: center; color: #555;\">Start customizing this skeleton template.</p>"
+                      text: "<p style=\"text-align: center; color: #555555; font-size: 16px; line-height: 1.6;\">This is a great starting point for your email. You can easily drag and drop new blocks from the right panel, edit this text, or replace the header image.</p>",
+                      padding: "10px 30px"
                     }
                   },
                   {
@@ -52,16 +115,34 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
                         hoverColor: "#FFFFFF",
                         hoverBackgroundColor: "#1a46b3"
                       },
-                      padding: "12px 24px",
+                      padding: "20px",
                       borderRadius: "6px",
                       textAlign: "center"
+                    }
+                  },
+                  {
+                    type: "divider",
+                    values: {
+                      width: "100%",
+                      borderSize: "1px",
+                      borderStyle: "solid",
+                      borderColor: "#EEEEEE",
+                      padding: "20px"
+                    }
+                  },
+                  {
+                    type: "social",
+                    values: {
+                      textAlign: "center",
+                      padding: "10px 20px 30px 20px"
                     }
                   }
                 ],
                 values: {
                   backgroundColor: "#ffffff",
-                  padding: "40px",
-                  borderRadius: "8px"
+                  padding: "0px",
+                  borderRadius: "12px",
+                  overflow: "hidden"
                 }
               }
             ],
@@ -81,7 +162,6 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
       }
     };
     
-    // Load the skeleton design
     unlayer.loadDesign(skeletonDesign as any);
   };
 
@@ -101,42 +181,64 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
   };
 
   return (
-    <div className="template-workshop" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="template-workshop" style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 24px)', padding: 0, gap: 0, overflow: 'hidden' }}>
       
-      <header className="template-studio-command" style={{ margin: '0 24px', flexShrink: 0 }}>
+      <header className="template-studio-command" style={{ 
+        margin: 0, 
+        padding: '0 24px', 
+        flexShrink: 0, 
+        background: '#ffffff', 
+        borderBottom: '1px solid #e1e1e1',
+        minHeight: '60px'
+      }}>
         <div className="template-toolbar-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button onClick={onBack} className="btn-secondary" style={{ padding: '4px 12px', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <button onClick={onBack} className="btn-secondary" style={{ padding: '6px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '6px' }}>
             Back
           </button>
           <span>Templates</span>
           <span style={{ color: 'var(--border-strong)', fontSize: '1rem', fontWeight: 300 }}>/</span>
-          <strong>{activeTemplate?.name || 'Email builder'}</strong>
+          <strong style={{ fontSize: '0.95rem' }}>{activeTemplate?.name || 'Email builder'}</strong>
         </div>
-        <div className="template-toolbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="template-toolbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <input 
             type="text" 
             value={subject} 
             onChange={(e) => setSubject(e.target.value)} 
             placeholder="Email Subject Line"
             className="ui-input" 
-            style={{ width: '320px', fontWeight: 500, margin: 0, padding: '8px 12px', height: 'auto', fontSize: '14px', boxShadow: 'none' }} 
+            style={{ width: '320px', fontWeight: 500, margin: 0, padding: '8px 14px', height: 'auto', fontSize: '14px', boxShadow: 'none', borderRadius: '6px' }} 
           />
           <span className={`template-status-badge status-${templateStatus.toLowerCase()}`}>
             <ShieldCheck size={14} /> {templateStatus}
           </span>
-          <button type="button" className="primary" onClick={handleSave}>
-            {saveSuccess ? <Check size={14} /> : <Save size={14} />}
+          <button type="button" className="primary" onClick={handleSave} style={{ padding: '8px 18px', borderRadius: '6px' }}>
+            {saveSuccess ? <Check size={16} /> : <Save size={16} />}
             {saveSuccess ? 'Saved' : 'Save'}
           </button>
         </div>
       </header>
 
-      <div style={{ flex: 1, display: 'flex', minHeight: 0, position: 'relative', borderTop: '1px solid var(--border-color)' }}>
+      <div style={{ flex: 1, display: 'flex', minHeight: 0, position: 'relative' }}>
         <EmailEditor 
           ref={emailEditorRef} 
           onReady={onReady} 
           minHeight="100%"
           style={{ flex: 1, display: 'flex', height: '100%' }}
+          options={{
+            customFonts: [
+              {
+                label: "Body Font",
+                value: "'Host Grotesk', sans-serif",
+                url: "https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@300;400;500;600;700;800&display=swap"
+              },
+              { label: "Arial", value: "arial,helvetica,sans-serif" },
+              { label: "Courier New", value: "'courier new',courier,monospace" },
+              { label: "Georgia", value: "georgia,palatino,serif" },
+              { label: "Helvetica", value: "helvetica,arial,sans-serif" },
+              { label: "Times New Roman", value: "'times new roman',times,serif" },
+              { label: "Verdana", value: "verdana,geneva,sans-serif" }
+            ]
+          }}
         />
       </div>
 
