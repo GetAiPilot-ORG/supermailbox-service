@@ -238,7 +238,7 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
               { label: "Times New Roman", value: "'times new roman',times,serif" },
               { label: "Verdana", value: "verdana,geneva,sans-serif" }
             ]
-          }}
+          } as any}
         />
       </div>
 

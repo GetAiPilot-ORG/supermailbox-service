@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Send, CheckCircle2, Search, CheckSquare, Square, Settings, ExternalLink, X, Activity, UsersRound, Plus, RefreshCw, Mail, Clock, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, CheckCircle2, Search, CheckSquare, Square, Settings, ExternalLink, X, Activity, UsersRound, Plus, RefreshCw, Mail, Clock, AlertCircle, ChevronDown, Check } from 'lucide-react';
 import { ApiService, type Campaign, type Template, type GetAIPilotUser } from '../services/api';
 
 interface SegmentBuilderProps {
@@ -19,6 +19,10 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.key || 'auth_welcome');
   const [scheduleDate, setScheduleDate] = useState('');
 
+  // Template Modal dialog state
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [templateSearch, setTemplateSearch] = useState('');
+
   // GetAIPilot users state
   const [getAIPilotUsers, setGetAIPilotUsers] = useState<GetAIPilotUser[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
@@ -32,8 +36,6 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
   const [jobStats, setJobStats] = useState<any | null>(null);
   const [customTestEmail, setCustomTestEmail] = useState('');
   const [showAddEmailModal, setShowAddEmailModal] = useState(false);
-  const [showLaunchModal, setShowLaunchModal] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleAddCustomEmail = (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,7 +207,6 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
       setCampaignName('');
       setScheduleDate('');
       setSelectedEmails({});
-      setShowLaunchModal(false);
     } catch (err) {
       console.error('Broadcast failed:', err);
       setBroadcastSuccessMessage(`Broadcast failed: ${err instanceof Error ? err.message : 'Please check the server logs.'}`);
@@ -241,43 +242,36 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
   };
 
   return (
-    <div className="screen-page fade-in" style={{ backgroundColor: '#F8FAFC', width: '100%', minHeight: '100vh', paddingBottom: '40px' }}>
-      
-      {/* Sleek Modern Header */}
-      <div style={{ background: '#ffffff', borderBottom: '1px solid #e2e8f0', padding: '32px 40px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <div style={{ background: '#eff6ff', padding: '6px', borderRadius: '8px', color: '#3b82f6' }}>
-              <UsersRound size={16} strokeWidth={2.5} />
-            </div>
-            <span style={{ color: '#3b82f6', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.05em' }}>AUDIENCE LAUNCHPAD</span>
-          </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', margin: 0 }}>
+    <div className="screen-page campaign-screen fade-in">
+      <div className="screen-hero campaign-meta-hero" style={{ background: '#ffffff url(/bg2.jpg) no-repeat center center', backgroundSize: 'cover' }}>
+        <div className="hero-content">
+          <span className="screen-kicker" style={{ color: '#60a5fa' }}><UsersRound size={14} /> AUDIENCE LAUNCHPAD</span>
+          <h2 style={{ fontSize: '32px', letterSpacing: '-0.5px', color: '#ffffff' }}>
             Campaigns & Segments
           </h2>
-          <p style={{ color: '#64748b', fontSize: '1.05rem', marginTop: '6px' }}>Build precise audiences from your synced user list and launch queued email campaigns.</p>
+          <p style={{ color: 'rgba(255,255,255,0.85)' }}>Build precise audiences from your synced user list and launch queued email campaigns through SuperMailBox.</p>
         </div>
-        <div>
-          <button onClick={() => setShowSettingsModal(true)} style={{ background: '#ffffff', border: '1px solid #e2e8f0', padding: '10px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600, color: '#475569', cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', transition: 'all 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.background = '#ffffff'}>
-            <Settings size={16} /> SMTP Config
+        <div className="hero-action-area">
+          <button onClick={() => setShowSettingsModal(true)} className="btn-secondary smtp-btn" style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #ffffff', color: '#0f172a' }}>
+            <Settings size={14} /> SMTP Config
           </button>
         </div>
       </div>
 
       {settingsSavedMessage && (
-        <div style={{ background: 'var(--success-light)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 16px', color: 'var(--success)', fontWeight: 500, fontSize: '0.875rem', marginBottom: '24px' }}>
+        <div style={{ background: '#dcfce7', border: '1px solid #86efac', borderRadius: 'var(--radius-md)', padding: '12px 16px', color: '#166534', fontWeight: 500, fontSize: '0.875rem', marginBottom: '20px' }}>
           ✓ SMTP Provider settings updated successfully.
         </div>
       )}
 
       {broadcastSuccessMessage && (
-        <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <CheckCircle2 size={24} color="var(--primary)" />
+            <CheckCircle2 size={24} color="#0D4F3C" />
             <div>
-              <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--text-main)' }}>{broadcastSuccessMessage}</div>
+              <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--ink)' }}>{broadcastSuccessMessage}</div>
               {providerUsed && (
-                <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Provider: <strong>{providerUsed}</strong>
                 </div>
               )}
@@ -293,7 +287,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
 
       {jobStats && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Total emails</span>
               <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'transparent', border: '1px solid var(--border)', display: 'grid', placeItems: 'center' }}>
@@ -303,30 +297,30 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
             <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ink)' }}>{jobStats.queued + jobStats.sent + jobStats.failed + jobStats.suppressed}</div>
           </div>
           
-          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Sent or delivered</span>
-              <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#10b981', display: 'grid', placeItems: 'center' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#24754E', display: 'grid', placeItems: 'center' }}>
                 <CheckCircle2 size={16} color="#ffffff" />
               </div>
             </div>
             <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ink)' }}>{jobStats.sent}</div>
           </div>
           
-          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Queued</span>
-              <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#f59e0b', display: 'grid', placeItems: 'center' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#d97706', display: 'grid', placeItems: 'center' }}>
                 <Clock size={16} color="#ffffff" />
               </div>
             </div>
             <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--ink)' }}>{jobStats.queued}</div>
           </div>
           
-          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Failed or bounced</span>
-              <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#ef4444', display: 'grid', placeItems: 'center' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#dc2626', display: 'grid', placeItems: 'center' }}>
                 <AlertCircle size={16} color="#ffffff" />
               </div>
             </div>
@@ -335,68 +329,67 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
         </div>
       )}
 
-      {/* SINGLE COLUMN AUDIENCE PANEL */}
-      <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* TWO COLUMN LAYOUT */}
+      <div className="campaign-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: '20px', alignItems: 'start' }}>
         
-        <div style={{ borderRadius: '24px', background: '#ffffff', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}>
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.02em' }}>Target Audience</h3>
+        {/* LEFT COLUMN: Configuration */}
+        <div className="campaign-left">
+          
+          <div className="dashboard-panel" style={{ background: 'var(--surface)', padding: '24px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
+            <div className="dashboard-table-header compact" style={{ marginBottom: '20px' }}>
+              <div>
+                <span>SEGMENT CONTROLS</span>
+                <h2>Target Audience</h2>
+              </div>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+            <div className="campaign-segment-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
               {[
-                { label: 'All Users', count: totalCount, mode: 'all' },
-                { label: 'Pending Onboarding', count: pendingOnboardingCount, mode: 'pending_onboarding' },
-                { label: 'Unverified', count: unverifiedCount, mode: 'unverified' },
-                { label: 'Completed', count: completedOnboardingCount, mode: 'completed_onboarding' },
-              ].map(segment => (
-                <button
-                  key={segment.mode}
-                  onClick={() => setFilterMode(segment.mode as SegmentFilterMode)}
-                  style={{
-                    position: 'relative',
-                    background: filterMode === segment.mode ? '#f8fafc' : '#ffffff',
-                    border: filterMode === segment.mode ? '2px solid #3b82f6' : '1px solid #e2e8f0',
-                    borderRadius: '16px',
-                    padding: '20px',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: filterMode === segment.mode ? '0 10px 15px -3px rgba(59, 130, 246, 0.1)' : '0 1px 3px rgba(0,0,0,0.02)',
-                    transform: filterMode === segment.mode ? 'translateY(-2px)' : 'none'
-                  }}
-                >
-                  <span style={{ display: 'block', color: '#64748b', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>{segment.label}</span>
-                  <strong style={{ display: 'block', fontSize: '1.75rem', color: '#0f172a', fontWeight: 800 }}>{segment.count}</strong>
-                  {filterMode === segment.mode && (
-                    <div style={{ position: 'absolute', top: '20px', right: '20px', width: '10px', height: '10px', borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 10px rgba(59, 130, 246, 0.6)' }} />
-                  )}
-                </button>
-              ))}
+                { label: 'All Users', count: totalCount, mode: 'all', activeBg: '#EAECE9', activeBorder: '#0D4F3C', dotColor: '#0D4F3C' },
+                { label: 'Pending Onboarding', count: pendingOnboardingCount, mode: 'pending_onboarding', activeBg: '#FEF3C7', activeBorder: '#D97706', dotColor: '#D97706' },
+                { label: 'Unverified', count: unverifiedCount, mode: 'unverified', activeBg: '#FEE2E2', activeBorder: '#DC2626', dotColor: '#DC2626' },
+                { label: 'Completed', count: completedOnboardingCount, mode: 'completed_onboarding', activeBg: '#DCFCE7', activeBorder: '#16A34A', dotColor: '#16A34A' },
+              ].map(segment => {
+                const isActive = filterMode === segment.mode;
+                return (
+                  <button
+                    key={segment.mode}
+                    onClick={() => setFilterMode(segment.mode as SegmentFilterMode)}
+                    style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: isActive ? `2px solid ${segment.activeBorder}` : '1px solid var(--border)',
+                      background: isActive ? segment.activeBg : '#FFFFFF',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      position: 'relative'
+                    }}
+                    aria-pressed={isActive}
+                  >
+                    <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: isActive ? '#0F172A' : 'var(--text-secondary)', marginBottom: '8px' }}>{segment.label}</span>
+                    <strong style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--ink)' }}>{segment.count}</strong>
+                    {isActive && (
+                      <div style={{ position: 'absolute', top: '12px', right: '12px', width: '8px', height: '8px', borderRadius: '50%', background: segment.dotColor }} />
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
-            <div className="campaign-toolbar">
-              <div className="campaign-toolbar-actions">
-                {activeSelectedCount > 0 && (
-                  <button 
-                    onClick={() => setShowLaunchModal(true)} 
-                    className="btn-primary" 
-                    style={{ background: 'var(--primary)', boxShadow: '0 0 10px rgba(37, 99, 235, 0.4)', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    Setup & Launch <Send size={14} />
-                  </button>
-                )}
-                <button onClick={selectVisible} className="meta-toolbar-btn">Select Visible</button>
-                <button onClick={deselectAll} className="meta-toolbar-btn">Clear All</button>
-                <button onClick={() => setShowAddEmailModal(true)} className="meta-toolbar-btn">
+            <div className="campaign-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+              <div className="campaign-toolbar-actions" style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={selectVisible} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer' }}>Select Visible</button>
+                <button onClick={deselectAll} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer' }}>Clear All</button>
+                <button onClick={() => setShowAddEmailModal(true)} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer' }}>
                   + Add Email
                 </button>
-                <button onClick={fetchUsers} disabled={isLoadingUsers} className="meta-toolbar-btn">
+                <button onClick={fetchUsers} disabled={isLoadingUsers} style={{ border: 'none', background: '#EAE6DF', color: 'var(--ink)', padding: '8px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                   <RefreshCw size={12} className={isLoadingUsers ? 'spin-icon' : undefined} /> Refresh
                 </button>
               </div>
               <div className="search-shell">
-                <Search size={14} color="var(--text-muted)" />
+                <Search size={14} color="var(--text-secondary)" />
                 <input
                   type="text"
                   placeholder="Search users..."
@@ -406,11 +399,11 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               </div>
             </div>
 
-            <div className="campaign-table-shell">
-              <table style={{ width: '100%', borderCollapse: 'collapse' }} className="meta-table">
-                <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+            <div className="dashboard-table-wrap" style={{ border: '1px solid var(--border)', borderRadius: '12px', maxHeight: '480px', overflowY: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: '#FAFAFA' }}>
                   <tr>
-                    <th style={{ width: '40px', textAlign: 'center' }}></th>
+                    <th style={{ width: '44px', textAlign: 'center' }}></th>
                     <th>USER</th>
                     <th style={{ textAlign: 'center' }}>STATUS</th>
                     <th style={{ textAlign: 'center' }}>PLAN</th>
@@ -418,28 +411,36 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                 </thead>
                 <tbody>
                   {filteredUsers.length === 0 ? (
-                    <tr><td colSpan={4} style={{ padding: '48px', textAlign: 'center', color: '#94a3b8', fontSize: '1rem' }}>No users found in this segment.</td></tr>
+                    <tr><td colSpan={4} style={{ padding: '32px', textAlign: 'center', color: 'var(--text-secondary)' }}>No users found</td></tr>
                   ) : (
                     filteredUsers.map(u => (
-                      <tr key={u.id} style={{ cursor: 'pointer', transition: 'background-color 0.15s ease', borderBottom: '1px solid #f1f5f9' }} onClick={() => toggleSelectEmail(u.email)} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f8fafc'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                        <td style={{ textAlign: 'center', padding: '16px 8px' }}>
-                          {selectedEmails[u.email] ? <CheckSquare size={18} color="#3b82f6" /> : <Square size={18} color="#cbd5e1" />}
+                      <tr key={u.id} style={{ cursor: 'pointer' }} onClick={() => toggleSelectEmail(u.email)}>
+                        <td style={{ textAlign: 'center' }}>
+                          {selectedEmails[u.email] ? <CheckSquare size={16} color="#0D4F3C" /> : <Square size={16} color="var(--border)" />}
                         </td>
-                        <td style={{ padding: '16px 8px' }}>
-                          <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.95rem' }}>{u.full_name}</div>
-                          <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>{u.email}</div>
+                        <td>
+                          <div style={{ fontWeight: 600, color: 'var(--ink)' }}>{u.full_name}</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{u.email}</div>
                         </td>
-                        <td style={{ textAlign: 'center', padding: '16px 8px' }}>
+                        <td style={{ textAlign: 'center' }}>
                           {u.is_verified === false ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '99px', background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 600 }}><div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ca8a04' }}/>Unverified</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#FEE2E2', color: '#991B1B', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#DC2626' }} />Unverified
+                            </span>
                           ) : u.onboarding_completed ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '99px', background: '#dcfce7', color: '#166534', fontSize: '0.75rem', fontWeight: 600 }}><div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }}/>Onboarded</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#DCFCE7', color: '#166534', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16A34A' }} />Onboarded
+                            </span>
                           ) : (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '99px', background: '#e0e7ff', color: '#3730a3', fontSize: '0.75rem', fontWeight: 600 }}><div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#6366f1' }}/>{getOnboardingLabel(u)}</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#FEF3C7', color: '#92400E', fontSize: '0.78rem', fontWeight: 600 }}>
+                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D97706' }} />{getOnboardingLabel(u)}
+                            </span>
                           )}
                         </td>
-                        <td style={{ textAlign: 'center', padding: '16px 8px' }}>
-                          <span style={{ display: 'inline-flex', padding: '4px 10px', borderRadius: '6px', background: '#f1f5f9', color: '#475569', fontSize: '0.75rem', fontWeight: 600 }}>{u.account_type || 'Free'}</span>
+                        <td style={{ textAlign: 'center' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '6px', background: '#F1F5F9', color: '#475569', fontSize: '0.75rem', fontWeight: 600 }}>
+                            {u.account_type || 'Free'}
+                          </span>
                         </td>
                       </tr>
                     ))
@@ -448,162 +449,100 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               </table>
             </div>
           </div>
+          
         </div>
 
-      {/* Launch Setup Modal */}
-      {showLaunchModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: '100%', maxWidth: '480px', background: '#ffffff', borderRadius: '24px', padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', border: '1px solid rgba(255,255,255,0.2)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        {/* RIGHT COLUMN: Sticky Summary */}
+        <div className="campaign-summary" style={{ position: 'sticky', top: '20px' }}>
+          
+          <div className="dashboard-panel" style={{ background: 'var(--surface)', padding: '24px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
+            <div className="dashboard-table-header compact" style={{ marginBottom: '20px' }}>
               <div>
-                <span style={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6' }}>LAUNCH SETUP</span>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.5px', marginTop: '4px', color: '#0f172a' }}>Campaign Details</h3>
+                <span>LAUNCH SETUP</span>
+                <h2>Campaign Details</h2>
               </div>
-              <button onClick={() => setShowLaunchModal(false)} style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}><X size={18} /></button>
             </div>
             
-            <form onSubmit={handleLaunch} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <form onSubmit={handleLaunch} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '8px' }}>CAMPAIGN NAME</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', letterSpacing: '0.04em' }}>CAMPAIGN NAME</label>
                 <input
                   type="text"
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
                   placeholder="e.g. Q4 Black Friday Promo"
                   className="ui-input"
-                  style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', fontSize: '0.95rem' }}
-                  autoFocus
+                  style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '0.9rem' }}
                 />
               </div>
 
-              <div style={{ position: 'relative' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '8px' }}>EMAIL TEMPLATE</label>
-                
-                <div 
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  style={{ 
-                    width: '100%', 
-                    padding: '12px 16px', 
-                    background: '#ffffff', 
-                    border: '1px solid #e2e8f0', 
-                    borderRadius: '12px',
-                    cursor: 'pointer',
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', letterSpacing: '0.04em' }}>EMAIL TEMPLATE</label>
+                <button
+                  type="button"
+                  onClick={() => setShowTemplateModal(true)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)',
+                    background: '#ffffff',
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                    color: 'var(--text-main)',
-                    fontSize: '0.95rem'
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  {templates.find(t => t.key === selectedTemplate)?.name || 'Select a template...'}
-                  <div style={{ transition: 'transform 0.2s', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', overflow: 'hidden' }}>
+                    <Mail size={16} color="#0D4F3C" style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {templates.find((t) => t.key === selectedTemplate)?.name || selectedTemplate || 'Select Template'}
+                    </span>
                   </div>
-                </div>
-
-                {isDropdownOpen && (
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: 'calc(100% + 8px)', 
-                    left: 0, 
-                    right: 0, 
-                    background: '#ffffff', 
-                    border: '1px solid #e2e8f0', 
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                    zIndex: 110,
-                    maxHeight: '240px',
-                    overflowY: 'auto',
-                    padding: '8px',
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none'
-                  }}>
-                    <style>{`
-                      div::-webkit-scrollbar {
-                        display: none;
-                      }
-                    `}</style>
-                    {templates.map(t => (
-                      <div 
-                        key={t.key}
-                        onClick={() => {
-                          setSelectedTemplate(t.key);
-                          setIsDropdownOpen(false);
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                        style={{ 
-                          padding: '10px 12px', 
-                          cursor: 'pointer',
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          color: selectedTemplate === t.key ? 'var(--primary)' : 'var(--text-main)',
-                          fontWeight: selectedTemplate === t.key ? 600 : 400,
-                          backgroundColor: 'transparent',
-                          transition: 'background-color 0.15s ease'
-                        }}
-                      >
-                        {t.name}
-                        {selectedTemplate === t.key && <CheckCircle2 size={16} />}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '4px', background: '#F1F5F9', color: '#475569', fontWeight: 700, textTransform: 'uppercase', flexShrink: 0 }}>
+                    Change
+                  </span>
+                </button>
               </div>
 
               <div>
-                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '8px' }}>SCHEDULE SEND (OPTIONAL)</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', letterSpacing: '0.04em' }}>SCHEDULE SEND (OPTIONAL)</label>
                 <input
                   type="datetime-local"
                   value={scheduleDate}
                   onChange={(e) => setScheduleDate(e.target.value)}
                   className="ui-input"
-                  style={{ width: '100%', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', fontSize: '0.95rem', color: scheduleDate ? '#0f172a' : '#94a3b8' }}
+                  style={{ width: '100%', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '0.9rem' }}
                 />
               </div>
 
-              <div style={{ marginTop: '8px', paddingTop: '24px', borderTop: '1px solid #f1f5f9' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#64748b' }}>Recipients Selected</span>
-                  <div style={{ background: '#eff6ff', color: '#2563eb', padding: '6px 12px', borderRadius: '20px', fontSize: '1rem', fontWeight: 700 }}>
-                    {activeSelectedCount} users
-                  </div>
+              <div style={{ marginTop: '12px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Recipients Selected</span>
+                  <span className="badge-pill badge-neutral" style={{ fontSize: '1rem', fontWeight: 700, padding: '4px 12px' }}>{activeSelectedCount}</span>
                 </div>
                 
                 <button
                   type="submit"
                   disabled={activeSelectedCount === 0 || !campaignName || isBroadcasting}
-                  style={{ 
-                    width: '100%', 
-                    padding: '16px', 
-                    fontSize: '1.05rem', 
-                    fontWeight: 600,
-                    borderRadius: '14px',
-                    background: (activeSelectedCount === 0 || !campaignName || isBroadcasting) ? '#cbd5e1' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                    color: '#ffffff',
-                    border: 'none',
-                    cursor: (activeSelectedCount === 0 || !campaignName || isBroadcasting) ? 'not-allowed' : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    boxShadow: (activeSelectedCount === 0 || !campaignName || isBroadcasting) ? 'none' : '0 10px 15px -3px rgba(37, 99, 235, 0.3)'
-                  }}
+                  className="btn-primary"
+                  style={{ width: '100%', padding: '14px', fontSize: '0.95rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
                   {isBroadcasting ? (
-                    <>Processing <Activity size={20} className="spin-loader" style={{border: 'none', animation: 'spin 1s linear infinite'}} /></>
+                    <>Processing <Activity size={18} className="spin-loader" style={{border: 'none', animation: 'spin 1s linear infinite'}} /></>
                   ) : (
-                    <>Launch Campaign 🚀</>
+                    <>Launch Campaign <Send size={16} /></>
                   )}
                 </button>
               </div>
             </form>
           </div>
+
         </div>
-      )}
+
+      </div>
 
       {/* SMTP Config Modal */}
       {showSettingsModal && (
@@ -666,6 +605,189 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               </div>
               <button type="submit" className="btn-primary" style={{ marginTop: '8px' }}>Add & Select</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Template Picker Dialog Modal */}
+      {showTemplateModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.45)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+          onClick={() => setShowTemplateModal(false)}
+        >
+          <div
+            style={{
+              background: '#ffffff',
+              borderRadius: '16px',
+              width: '100%',
+              maxWidth: '600px',
+              maxHeight: '85vh',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              border: '1px solid var(--border)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: '#FAFAFA'
+              }}
+            >
+              <div>
+                <span className="screen-kicker" style={{ fontSize: '0.7rem', color: '#0D4F3C', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
+                  <Mail size={12} /> SELECT TEMPLATE
+                </span>
+                <h3 style={{ margin: '4px 0 0', fontSize: '1.25rem', fontWeight: 700, color: 'var(--ink)' }}>
+                  Email Templates
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowTemplateModal(false)}
+                style={{
+                  background: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  cursor: 'pointer',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <div style={{ padding: '16px 24px 12px', borderBottom: '1px solid var(--border)' }}>
+              <div className="search-shell" style={{ margin: 0, width: '100%', padding: '10px 14px' }}>
+                <Search size={16} color="var(--text-secondary)" />
+                <input
+                  type="text"
+                  placeholder="Search templates by name, key, or category..."
+                  value={templateSearch}
+                  onChange={(e) => setTemplateSearch(e.target.value)}
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* Template List */}
+            <div style={{ padding: '16px 24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {templates
+                .filter((t) =>
+                  !templateSearch ||
+                  t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                  t.key.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                  (t.category && t.category.toLowerCase().includes(templateSearch.toLowerCase()))
+                )
+                .map((t) => {
+                  const isSelected = selectedTemplate === t.key;
+                  return (
+                    <div
+                      key={t.key}
+                      onClick={() => {
+                        setSelectedTemplate(t.key);
+                        setShowTemplateModal(false);
+                        setTemplateSearch('');
+                      }}
+                      style={{
+                        padding: '14px 16px',
+                        borderRadius: '12px',
+                        border: isSelected ? '2px solid #0D4F3C' : '1px solid var(--border)',
+                        background: isSelected ? '#F4F7F4' : '#FFFFFF',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'all 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) e.currentTarget.style.background = '#F8FAFC';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) e.currentTarget.style.background = '#FFFFFF';
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            width: '38px',
+                            height: '38px',
+                            borderRadius: '10px',
+                            background: isSelected ? '#0D4F3C' : '#F1F5F9',
+                            color: isSelected ? '#FFFFFF' : '#475569',
+                            display: 'grid',
+                            placeItems: 'center',
+                            flexShrink: 0
+                          }}
+                        >
+                          <Mail size={18} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: 600, color: isSelected ? '#0D4F3C' : 'var(--ink)' }}>
+                            {t.name}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', fontFamily: 'monospace', color: 'var(--text-secondary)' }}>
+                            key: {t.key}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                        <span
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            background: t.category === 'marketing' ? '#EFF6FF' : '#F1F5F9',
+                            color: t.category === 'marketing' ? '#1D4ED8' : '#475569',
+                            textTransform: 'uppercase',
+                            fontWeight: 700,
+                            letterSpacing: '0.03em'
+                          }}
+                        >
+                          {t.category || 'transactional'}
+                        </span>
+                        {isSelected ? (
+                          <div
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '50%',
+                              background: '#16A34A',
+                              color: '#FFFFFF',
+                              display: 'grid',
+                              placeItems: 'center'
+                            }}
+                          >
+                            <Check size={14} />
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         </div>
       )}

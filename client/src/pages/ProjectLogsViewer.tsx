@@ -185,7 +185,7 @@ export const ProjectLogsViewer: React.FC = () => {
                           </span>
                         </td>
                         <td>
-                          <span className="project-logs-recipient">{log.recipient}</span>
+                          <span className="project-logs-recipient">{log.recipient ? log.recipient.replace(/^camp_[a-z0-9]+_/i, '') : ''}</span>
                         </td>
                         <td><span className="project-logs-type">{log.type}</span></td>
                         <td className="project-logs-muted">{log.provider}</td>
