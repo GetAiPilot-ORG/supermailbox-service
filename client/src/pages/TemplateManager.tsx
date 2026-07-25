@@ -72,16 +72,53 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
   onDeleteTemplate,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'getaipilot' | 'socialpilot' | 'whatsapp' | 'general'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'transactional' | 'marketing'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [newTmplName, setNewTmplName] = useState('');
   const [newTmplKey, setNewTmplKey] = useState('');
   const [newTmplCategory, setNewTmplCategory] = useState('transactional');
 
-  const filteredTemplates = templates.filter(t => 
-    t.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    t.key.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const getPlatform = (t: Template): 'getaipilot' | 'socialpilot' | 'whatsapp' | 'general' => {
+    const k = (t.key || '').toLowerCase();
+    const n = (t.name || '').toLowerCase();
+    if (
+      k.includes('whatsapp') || n.includes('whatsapp') ||
+      k === 'broadcast_success' || k === 'broadcast_failed' || k === 'team_invite'
+    ) return 'whatsapp';
+    if (
+      k.includes('getaipilot') || n.includes('getaipilot') ||
+      k === 'billing_receipt' || k === 'product_announcement'
+    ) return 'getaipilot';
+    if (
+      k.includes('socialpilot') || n.includes('socialpilot') ||
+      k.includes('quickpost') || n.includes('quickpost') ||
+      k === 'broadcast_notification' || k === 'auth_welcome' ||
+      k === 'automation_created' || k === 'account_connected'
+    ) return 'socialpilot';
+    return 'general';
+  };
+
+  const platformCounts = {
+    all: templates.length,
+    getaipilot: templates.filter(t => getPlatform(t) === 'getaipilot').length,
+    socialpilot: templates.filter(t => getPlatform(t) === 'socialpilot').length,
+    whatsapp: templates.filter(t => getPlatform(t) === 'whatsapp').length,
+    general: templates.filter(t => getPlatform(t) === 'general').length,
+  };
+
+  const filteredTemplates = templates.filter(t => {
+    const matchesSearch = 
+      t.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      t.key.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const platform = getPlatform(t);
+    const matchesPlatform = selectedPlatform === 'all' || platform === selectedPlatform;
+    const matchesCategory = selectedCategory === 'all' || t.category === selectedCategory;
+
+    return matchesSearch && matchesPlatform && matchesCategory;
+  });
 
   const handleCreateNewTemplate = () => {
     if (!newTmplName.trim()) return;
@@ -146,7 +183,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
           <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--ink)', margin: 0 }}>Message Templates</h1>
             <p style={{ color: 'var(--text-secondary)', margin: '4px 0 0 0', fontSize: '0.875rem' }}>
-              Manage your email message templates
+              Manage and organize email broadcast templates by platform & category
             </p>
           </div>
           <button onClick={() => setShowCreateModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '0.875rem', fontWeight: 500, background: 'var(--primary)', color: 'white', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}>
@@ -156,51 +193,144 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
       </div>
 
       <div style={{ maxWidth: '1600px', margin: '0 auto', width: '100%', padding: '0 48px' }}>
-        {/* Toolbar */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            <input 
-              type="text" 
+        
+        {/* Platform Tabs & Toolbar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+          
+          {/* Platform Filter Tabs */}
+          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
+            <button 
+              onClick={() => setSelectedPlatform('all')}
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.8125rem',
+                fontWeight: selectedPlatform === 'all' ? 600 : 400,
+                borderRadius: 'var(--radius-md)',
+                border: 'none',
+                background: selectedPlatform === 'all' ? 'var(--primary)' : 'var(--surface-muted)',
+                color: selectedPlatform === 'all' ? '#FFFFFF' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              All Platforms ({platformCounts.all})
+            </button>
+            <button 
+              onClick={() => setSelectedPlatform('getaipilot')}
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.8125rem',
+                fontWeight: selectedPlatform === 'getaipilot' ? 600 : 400,
+                borderRadius: 'var(--radius-md)',
+                border: 'none',
+                background: selectedPlatform === 'getaipilot' ? 'var(--primary)' : 'var(--surface-muted)',
+                color: selectedPlatform === 'getaipilot' ? '#FFFFFF' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              ⚡ GetAiPilot ({platformCounts.getaipilot})
+            </button>
+            <button 
+              onClick={() => setSelectedPlatform('socialpilot')}
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.8125rem',
+                fontWeight: selectedPlatform === 'socialpilot' ? 600 : 400,
+                borderRadius: 'var(--radius-md)',
+                border: 'none',
+                background: selectedPlatform === 'socialpilot' ? 'var(--primary)' : 'var(--surface-muted)',
+                color: selectedPlatform === 'socialpilot' ? '#FFFFFF' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              📢 QuickPost & SocialPilot ({platformCounts.socialpilot})
+            </button>
+            <button 
+              onClick={() => setSelectedPlatform('whatsapp')}
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.8125rem',
+                fontWeight: selectedPlatform === 'whatsapp' ? 600 : 400,
+                borderRadius: 'var(--radius-md)',
+                border: 'none',
+                background: selectedPlatform === 'whatsapp' ? 'var(--primary)' : 'var(--surface-muted)',
+                color: selectedPlatform === 'whatsapp' ? '#FFFFFF' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              💬 GAP WhatsApp ({platformCounts.whatsapp})
+            </button>
+            <button 
+              onClick={() => setSelectedPlatform('general')}
+              style={{
+                padding: '6px 14px',
+                fontSize: '0.8125rem',
+                fontWeight: selectedPlatform === 'general' ? 600 : 400,
+                borderRadius: 'var(--radius-md)',
+                border: 'none',
+                background: selectedPlatform === 'general' ? 'var(--primary)' : 'var(--surface-muted)',
+                color: selectedPlatform === 'general' ? '#FFFFFF' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              ✉️ SuperMailBox / General ({platformCounts.general})
+            </button>
+          </div>
+
+          {/* Search Bar & Category Filter */}
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input 
+                type="text" 
+                className="ui-input"
+                placeholder="Search by template name, key, or details..." 
+                style={{ 
+                  width: '100%', 
+                  padding: '8px 12px 8px 36px',
+                  fontSize: '0.875rem',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--surface-muted)',
+                  boxSizing: 'border-box'
+                }} 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value as any)}
               className="ui-input"
-              placeholder="Search template name or message..." 
-              style={{ 
-                width: '100%', 
-                padding: '8px 12px 8px 36px',
+              style={{
+                padding: '8px 12px',
                 fontSize: '0.875rem',
                 borderRadius: 'var(--radius-md)',
                 background: 'var(--surface-muted)',
-                boxSizing: 'border-box'
-              }} 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                minWidth: '170px'
+              }}
+            >
+              <option value="all">All Categories</option>
+              <option value="transactional">Transactional</option>
+              <option value="marketing">Marketing</option>
+            </select>
           </div>
-          <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '0.875rem', color: 'var(--text-secondary)', background: 'var(--surface-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}>
-            <Layers size={16} color="var(--text-secondary)" /> All Templates
-          </button>
-          <div style={{ display: 'flex', alignItems: 'center', padding: '0 16px', background: 'var(--surface-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem', color: 'var(--text-secondary)', gap: '12px' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> 5</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--warning)' }}><Clock size={14} /> 5</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><FileText size={14} /> 0</span>
-          </div>
-          <button style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', fontSize: '0.875rem', color: 'var(--text-secondary)', background: 'var(--surface-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}>
-            <Clock size={16} /> Sync Status
-          </button>
-        </div>
-
-        {/* Banner */}
-        <div style={{ background: 'var(--warning-light)', border: '1px solid var(--warning)', borderRadius: 'var(--radius-md)', padding: '16px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-            <div style={{ color: 'var(--warning)', marginTop: '2px' }}><Clock size={18} /></div>
-            <div>
-              <h4 style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--ink)', margin: '0 0 4px 0' }}>Template approval taking longer?</h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>Check content, category, account health and Meta review steps.</p>
-            </div>
-          </div>
-          <button style={{ fontSize: '0.75rem', color: 'var(--ink)', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            8 checks <Clock size={12} style={{ transform: 'rotate(90deg)' }} />
-          </button>
         </div>
 
         {/* Table */}
@@ -248,9 +378,20 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
                   
                   {/* Name & Key */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingRight: '16px' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--ink)' }}>
-                      {template.name || template.key}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--ink)' }}>
+                        {template.name || template.key}
+                      </span>
+                      {getPlatform(template) === 'whatsapp' ? (
+                        <span style={{ fontSize: '0.6875rem', padding: '2px 7px', borderRadius: '4px', background: 'rgba(37, 211, 102, 0.15)', color: '#16a34a', fontWeight: 600 }}>💬 WhatsApp</span>
+                      ) : getPlatform(template) === 'socialpilot' ? (
+                        <span style={{ fontSize: '0.6875rem', padding: '2px 7px', borderRadius: '4px', background: 'rgba(79, 70, 229, 0.15)', color: '#6366f1', fontWeight: 600 }}>📢 SocialPilot</span>
+                      ) : getPlatform(template) === 'getaipilot' ? (
+                        <span style={{ fontSize: '0.6875rem', padding: '2px 7px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.15)', color: '#2563eb', fontWeight: 600 }}>⚡ GetAiPilot</span>
+                      ) : (
+                        <span style={{ fontSize: '0.6875rem', padding: '2px 7px', borderRadius: '4px', background: 'var(--border)', color: 'var(--text-secondary)', fontWeight: 500 }}>📧 Email</span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Category */}
@@ -310,7 +451,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
 
             <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border)', fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between', background: 'var(--surface-muted)' }}>
               <div>{filteredTemplates.length} templates shown</div>
-              <div>Live from Meta</div>
+              <div>Ready for Broadcast</div>
             </div>
           </div>
         </div>

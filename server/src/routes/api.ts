@@ -7,10 +7,12 @@ import { addSuppression, removeSuppression } from '../services/suppression.js';
 
 const normalizeProjectCode = (value?: string | null) => {
   if (!value) return 'unknown';
-  const normalized = value.trim();
-  if (!normalized) return 'unknown';
-  if (normalized.toLowerCase() === 'socialpilot') return 'socialpilot';
-  return normalized;
+  const val = value.trim().toLowerCase();
+  if (!val) return 'unknown';
+  if (val === 'socialpilot' || val === 'quickpost') return 'socialpilot';
+  if (val === 'gap_whatsapp' || val === 'gap whatsapp' || val === 'whatsapp') return 'GAP_WHATSAPP';
+  if (val === 'getaipilot' || val.includes('getaipilot')) return 'getaipilot';
+  return value.trim();
 };
 
 const extractEmailFromIdempotencyKey = (idempotencyKey?: string | null) => {
@@ -21,18 +23,20 @@ const extractEmailFromIdempotencyKey = (idempotencyKey?: string | null) => {
     .filter((part) => part.includes('@'));
 
   const candidate = emailParts.find((part) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(part));
-  if (candidate) return candidate;
+  if (candidate) return candidate.replace(/^camp_[a-z0-9]+_/i, '');
 
   const match = idempotencyKey.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-  return match?.[0]?.replace(/^camp_\d+_/i, '') || null;
+  return match?.[0]?.replace(/^camp_[a-z0-9]+_/i, '') || null;
 };
 
 const extractProjectFromIdempotencyKey = (idempotencyKey?: string | null) => {
   if (!idempotencyKey) return 'unknown';
   const bracketMatch = idempotencyKey.match(/^\[([^\]]+)\]/);
   if (bracketMatch?.[1]) return normalizeProjectCode(bracketMatch[1]);
-  if (idempotencyKey.toLowerCase().includes('socialpilot')) return 'socialpilot';
-  if (idempotencyKey.toUpperCase().includes('GAP_WHATSAPP')) return 'GAP_WHATSAPP';
+  const lower = idempotencyKey.toLowerCase();
+  if (lower.includes('socialpilot') || lower.includes('quickpost')) return 'socialpilot';
+  if (lower.includes('gap_whatsapp') || lower.includes('whatsapp') || lower.includes('wap')) return 'GAP_WHATSAPP';
+  if (lower.includes('getaipilot')) return 'getaipilot';
   return 'unknown';
 };
 
@@ -621,8 +625,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
         .limit(50);
 
       let logs = (recentJobs || []).map((j: any) => {
-        const emailMatch = j.idempotency_key?.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-        const extractedEmail = emailMatch ? emailMatch[1] : 'unknown@recipient.com';
+        const extractedEmail = extractEmailFromIdempotencyKey(j.idempotency_key) || 'unknown@recipient.com';
         const formattedTime = new Date(j.created_at).toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -633,6 +636,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
 
         return {
           id: j.id,
+          createdAt: j.created_at,
           timestamp: formattedTime,
           recipient: extractedEmail,
           type: j.type === 'campaign' ? 'Campaign' : 'Transactional',

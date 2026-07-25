@@ -22,6 +22,7 @@ export interface QueueJob {
 
 export interface ActivityLog {
   id: string;
+  createdAt?: string;
   timestamp: string;
   recipient: string;
   type: 'Transactional' | 'Campaign';

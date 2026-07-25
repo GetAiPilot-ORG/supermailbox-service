@@ -13,56 +13,7 @@ import { ApiService } from './services/api';
 import type { MetricCardData, QueueJob, ActivityLog, Template, Campaign, SuppressionItem, BounceReportItem } from './services/api';
 import './App.css';
 
-const DEFAULT_TEMPLATES: Template[] = [
-  {
-    key: 'auth_welcome',
-    name: 'Welcome Email',
-    category: 'transactional',
-    versions: [
-      {
-        version: 'v1.0.0',
-        status: 'Live',
-        author: 'System',
-        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-        subject: 'Welcome to GetAIPilot! 🚀',
-        html: '',
-        variables: ['name', 'otp_code']
-      }
-    ]
-  },
-  {
-    key: 'billing_receipt',
-    name: 'Payment Receipt',
-    category: 'transactional',
-    versions: [
-      {
-        version: 'v1.0.0',
-        status: 'Live',
-        author: 'System',
-        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-        subject: 'Payment Confirmed - Receipt 💳',
-        html: '',
-        variables: ['name', 'invoice_id', 'amount']
-      }
-    ]
-  },
-  {
-    key: 'product_announcement',
-    name: 'Product Update',
-    category: 'marketing',
-    versions: [
-      {
-        version: 'v1.0.0',
-        status: 'Live',
-        author: 'System',
-        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
-        subject: 'Exciting Update: New Features Live! ✨',
-        html: '',
-        variables: ['name']
-      }
-    ]
-  }
-];
+
 
 gsap.registerPlugin(useGSAP);
 
@@ -105,7 +56,7 @@ export const App: React.FC = () => {
       setMetrics(m);
       setJobs(j);
       setLogs(l);
-      setTemplates(t && t.length > 0 ? t : DEFAULT_TEMPLATES);
+      setTemplates(t || []);
       setCampaigns(c);
       setSuppressions(s);
       setBounceReports(b);
@@ -207,19 +158,9 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleLaunchCampaign = (name: string, templateKey: string, scheduledAt?: string) => {
-    const newCamp: Campaign = {
-      id: `camp_${Math.floor(100 + Math.random() * 900)}`,
-      name,
-      templateKey,
-      audienceCount: 1840,
-      sentCount: scheduledAt ? 0 : 1840,
-      deliveredRate: scheduledAt ? 0 : 99.2,
-      openRate: scheduledAt ? 0 : 12.5,
-      status: scheduledAt ? 'scheduled' : 'active',
-      scheduledAt
-    };
-    setCampaigns([newCamp, ...campaigns]);
+  const handleLaunchCampaign = async (_name: string, _templateKey: string, _scheduledAt?: string) => {
+    const freshCampaigns = await ApiService.getCampaigns();
+    if (freshCampaigns) setCampaigns(freshCampaigns);
   };
 
   const handleAddSuppression = async (email: string, reason: SuppressionItem['reason']) => {
