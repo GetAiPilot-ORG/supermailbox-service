@@ -659,6 +659,10 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
   const [gallerySearch, setGallerySearch] = useState<string>('');
   const [selectedPrebuilt, setSelectedPrebuilt] = useState<any | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const getPlatform = (t: Template): 'getaipilot' | 'socialpilot' | 'whatsapp' | 'general' => {
     const k = (t.key || '').toLowerCase();
     const n = (t.name || '').toLowerCase();
@@ -698,6 +702,10 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
 
     return matchesSearch && matchesPlatform && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedTemplates = filteredTemplates.slice(startIndex, startIndex + itemsPerPage);
 
   const handleCreateNewTemplate = () => {
     if (!newTmplName.trim()) return;
@@ -905,6 +913,10 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
             textTransform: 'uppercase',
             letterSpacing: '0.04em',
             color: 'var(--text-secondary)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            background: 'var(--surface-muted)'
           }}>
             <div>Template Name</div>
             <div>Category</div>
@@ -914,9 +926,9 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
             <div style={{ textAlign: 'right' }}>Actions</div>
           </div>
 
-          {/* Table Body */}
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {filteredTemplates.map((template, index) => {
+          {/* Table Body Container with internal scroll limit */}
+          <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 'calc(100vh - 380px)', overflowY: 'auto' }}>
+            {paginatedTemplates.map((template, index) => {
               const liveVersion = template.versions.find(v => v.status === 'Live') || template.versions[0];
               const isLast = index === filteredTemplates.length - 1;
               const platform = getPlatform(template);
@@ -1023,6 +1035,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
                 </div>
               );
             })}
+          </div>
 
             {/* Table Footer */}
             <div style={{ padding: '14px 28px', borderTop: '1px solid var(--border)', fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between', background: 'var(--surface-muted)' }}>
