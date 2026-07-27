@@ -424,15 +424,15 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                         </td>
                         <td style={{ textAlign: 'center' }}>
                           {u.is_verified === false ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#FEE2E2', color: '#991B1B', fontSize: '0.78rem', fontWeight: 600 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '3px 8px', borderRadius: '4px', background: '#FEE2E2', color: '#991B1B', fontSize: '0.75rem', fontWeight: 600 }}>
                               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#DC2626' }} />Unverified
                             </span>
                           ) : u.onboarding_completed ? (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#DCFCE7', color: '#166534', fontSize: '0.78rem', fontWeight: 600 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '3px 8px', borderRadius: '4px', background: '#DCFCE7', color: '#166534', fontSize: '0.75rem', fontWeight: 600 }}>
                               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16A34A' }} />Onboarded
                             </span>
                           ) : (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: '#FEF3C7', color: '#92400E', fontSize: '0.78rem', fontWeight: 600 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '3px 8px', borderRadius: '4px', background: '#FEF3C7', color: '#92400E', fontSize: '0.75rem', fontWeight: 600 }}>
                               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D97706' }} />{getOnboardingLabel(u)}
                             </span>
                           )}
