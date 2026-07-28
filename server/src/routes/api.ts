@@ -7,10 +7,12 @@ import { addSuppression, removeSuppression } from '../services/suppression.js';
 
 const normalizeProjectCode = (value?: string | null) => {
   if (!value) return 'unknown';
-  const normalized = value.trim();
-  if (!normalized) return 'unknown';
-  if (normalized.toLowerCase() === 'socialpilot') return 'socialpilot';
-  return normalized;
+  const val = value.trim().toLowerCase();
+  if (!val) return 'unknown';
+  if (val === 'socialpilot' || val === 'quickpost') return 'socialpilot';
+  if (val === 'gap_whatsapp' || val === 'gap whatsapp' || val === 'whatsapp') return 'GAP_WHATSAPP';
+  if (val === 'getaipilot' || val.includes('getaipilot')) return 'getaipilot';
+  return value.trim();
 };
 
 const extractEmailFromIdempotencyKey = (idempotencyKey?: string | null) => {
@@ -21,18 +23,20 @@ const extractEmailFromIdempotencyKey = (idempotencyKey?: string | null) => {
     .filter((part) => part.includes('@'));
 
   const candidate = emailParts.find((part) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(part));
-  if (candidate) return candidate;
+  if (candidate) return candidate.replace(/^camp_[a-z0-9]+_/i, '');
 
   const match = idempotencyKey.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-  return match?.[0]?.replace(/^camp_\d+_/i, '') || null;
+  return match?.[0]?.replace(/^camp_[a-z0-9]+_/i, '') || null;
 };
 
 const extractProjectFromIdempotencyKey = (idempotencyKey?: string | null) => {
   if (!idempotencyKey) return 'unknown';
   const bracketMatch = idempotencyKey.match(/^\[([^\]]+)\]/);
   if (bracketMatch?.[1]) return normalizeProjectCode(bracketMatch[1]);
-  if (idempotencyKey.toLowerCase().includes('socialpilot')) return 'socialpilot';
-  if (idempotencyKey.toUpperCase().includes('GAP_WHATSAPP')) return 'GAP_WHATSAPP';
+  const lower = idempotencyKey.toLowerCase();
+  if (lower.includes('socialpilot') || lower.includes('quickpost')) return 'socialpilot';
+  if (lower.includes('gap_whatsapp') || lower.includes('whatsapp') || lower.includes('wap')) return 'GAP_WHATSAPP';
+  if (lower.includes('getaipilot')) return 'getaipilot';
   return 'unknown';
 };
 
@@ -181,7 +185,8 @@ const fetchZeptoSuppressions = async () => {
     headers: {
       Authorization: authHeader,
       'Content-Type': 'application/json'
-    }
+    },
+    signal: AbortSignal.timeout(4000)
   });
 
   if (!response.ok) {
@@ -372,7 +377,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
 
       const { data: versionsData, error: vError } = await supabase
         .from('template_versions')
-        .select('template_id, version_number, subject, html_source, status, created_at, created_by');
+        .select('template_id, version_number, subject, html_source, mjml_source, status, created_at, created_by');
 
       if (vError) throw vError;
 
@@ -391,6 +396,10 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
           date: new Date(v.created_at).toISOString().replace('T', ' ').substring(0, 16),
           subject: v.subject,
           html: v.html_source,
+          design: (() => {
+            if (!v.mjml_source) return null;
+            try { return JSON.parse(v.mjml_source); } catch (e) { return v.mjml_source; }
+          })(),
           variables: [] // Variables could be parsed from HTML if needed
         })).sort((a: any, b: any) => b.version.localeCompare(a.version))
         };
@@ -405,8 +414,9 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
     
   fastify.post('/v1/templates', async (request: FastifyRequest<{ Body: any }>, reply) => {
     try {
-      const { key, name, category, html, subject } = request.body as any;
+      const { key, name, category, html, subject, design } = request.body as any;
       const responsiveHtml = addResponsiveEmailFixes(html || '');
+      const designString = design ? (typeof design === 'string' ? design : JSON.stringify(design)) : null;
       
       let { data: product } = await supabase.from('products').select('id').eq('code', 'getaipilot').single();
       
@@ -430,6 +440,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
         version_number: nextVersion,
         subject: subject,
         html_source: responsiveHtml,
+        mjml_source: designString,
         status: 'live',
         created_by: 'Admin'
       }).select('id').single();
@@ -615,28 +626,57 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
       const { count: totalCampaigns } = await supabase.from('campaigns').select('*', { count: 'exact', head: true });
       const { data: recentJobs } = await supabase
         .from('email_jobs')
-        .select(`
-          id, type, provider, status, created_at, idempotency_key,
-          campaigns ( product_id, products ( code ) ),
-          contacts ( primary_email )
-        `)
+        .select('id, type, provider, status, created_at, idempotency_key')
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(50);
 
-      const logs = (recentJobs || []).map((j: any) => {
-        const extractedEmail = j.contacts?.primary_email || extractEmailFromIdempotencyKey(j.idempotency_key) || 'unknown@recipient.com';
-        const projectCode = normalizeProjectCode(j.campaigns?.products?.code) !== 'unknown'
-          ? normalizeProjectCode(j.campaigns?.products?.code)
-          : extractProjectFromIdempotencyKey(j.idempotency_key);
+      let logs = (recentJobs || []).map((j: any) => {
+        const extractedEmail = extractEmailFromIdempotencyKey(j.idempotency_key) || 'unknown@recipient.com';
+        const formattedTime = new Date(j.created_at).toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+
         return {
           id: j.id,
-          timestamp: new Date(j.created_at).toLocaleTimeString(),
+          createdAt: j.created_at,
+          timestamp: formattedTime,
           recipient: extractedEmail,
           type: j.type === 'campaign' ? 'Campaign' : 'Transactional',
-          provider: `${j.provider || 'ZeptoMail'}${projectCode !== 'unknown' ? ` (${projectCode})` : ''}`,
-          status: j.status === 'delivered' ? 'Delivered' : (j.status === 'failed' ? 'Failed' : 'Sent')
+          provider: j.provider || 'ZeptoMail (.IN API)',
+          status: j.status === 'sent' || j.status === 'delivered' ? 'Delivered' : (j.status === 'bounced' ? 'Bounced' : 'Failed')
         };
       });
+
+      if (logs.length === 0) {
+        const { data: webhookLogs } = await supabase
+          .from('webhook_logs')
+          .select('id, provider, raw_payload, received_at')
+          .order('received_at', { ascending: false })
+          .limit(10);
+
+        if (webhookLogs && webhookLogs.length > 0) {
+          logs = webhookLogs.flatMap((wl: any) => {
+            const records = Array.isArray(wl.raw_payload?.records)
+              ? wl.raw_payload.records
+              : Array.isArray(wl.raw_payload)
+              ? wl.raw_payload
+              : [wl.raw_payload];
+
+            return records.slice(0, 5).map((r: any, idx: number) => ({
+              id: `${wl.id}_${idx}`,
+              timestamp: new Date(r.processed_at || r.bounced_at || wl.received_at).toLocaleTimeString(),
+              recipient: r.email_address || r.email || r.recipient || 'contact@metabull.com',
+              type: 'Transactional',
+              provider: 'ZeptoMail (Metabull)',
+              status: r.bounce_type || r.bounced_at ? 'Bounced' : 'Delivered'
+            }));
+          });
+        }
+      }
 
       // Fetch aggregate stats
       const { count: totalSent } = await supabase.from('email_jobs').select('*', { count: 'exact', head: true }).in('status', ['sent', 'delivered']);

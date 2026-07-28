@@ -32,38 +32,22 @@ import {
 } from 'recharts';
 import type { ActivityLog, MetricCardData, QueueJob } from '../services/api';
 
-const fallbackTrendData = [
-  { name: 'Mon', volume: 4180, delivered: 4012, failed: 38 },
-  { name: 'Tue', volume: 3620, delivered: 3474, failed: 31 },
-  { name: 'Wed', volume: 5290, delivered: 5082, failed: 47 },
-  { name: 'Thu', volume: 4880, delivered: 4679, failed: 52 },
-  { name: 'Fri', volume: 6120, delivered: 5894, failed: 41 },
-  { name: 'Sat', volume: 3860, delivered: 3712, failed: 29 },
-  { name: 'Sun', volume: 4520, delivered: 4355, failed: 33 },
-];
-
-const fallbackProviderData = [
-  { name: 'ZeptoMail', value: 54 },
-  { name: 'SES', value: 31 },
-  { name: 'Resend', value: 15 },
-];
-
-const fallbackTypeData = [
-  { name: 'Transactional', value: 68 },
-  { name: 'Campaign', value: 32 },
-];
-
 const statusColors: Record<string, string> = {
-  Delivered: '#769181',
-  Sent: '#89A595',
-  Queued: '#F1E9D8',
-  Bounced: '#D96767',
-  Failed: '#D96767',
+  Delivered: '#24754E',
+  Sent: '#0D4F3C',
+  Queued: '#F5E6C8',
+  Bounced: '#A43A32',
+  Failed: '#A43A32',
 };
 
-const pieColors = ['#769181', '#89A595', '#DFE9E3', '#F1E9D8'];
+const pieColors = ['#0D4F3C', '#24754E', '#DDECE4', '#F5E6C8'];
 
 const formatPercent = (value: number) => `${value.toFixed(1)}%`;
+
+const cleanRecipient = (email?: string) => {
+  if (!email) return '';
+  return email.replace(/^camp_[a-z0-9]+_/i, '');
+};
 
 const toNumber = (value: string | number | undefined) => {
   if (typeof value === 'number') return value;
@@ -73,22 +57,62 @@ const toNumber = (value: string | number | undefined) => {
 };
 
 const buildTrendData = (logs: ActivityLog[]) => {
-  if (logs.length === 0) return fallbackTrendData;
+  if (logs.length === 0) return [];
+
+  const currentYear = new Date().getFullYear();
+  const parsedLogs = logs
+    .map((log) => {
+      let raw = log.createdAt || log.timestamp;
+      let date = new Date(raw);
+      if (Number.isNaN(date.getTime())) {
+        date = new Date(`${log.timestamp} ${currentYear}`);
+      }
+      return { ...log, date };
+    })
+    .filter((log) => !Number.isNaN(log.date.getTime()));
+
+  if (parsedLogs.length === 0) return [];
+
+  parsedLogs.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const firstDate = parsedLogs[0].date;
+  const lastDate = parsedLogs[parsedLogs.length - 1].date;
+  const isSameDay = firstDate.toDateString() === lastDate.toDateString();
 
   const buckets = new Map<string, { name: string; volume: number; delivered: number; failed: number }>();
-  const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'short' });
 
-  logs.forEach((log) => {
-    const parsed = new Date(log.timestamp);
-    const name = Number.isNaN(parsed.getTime()) ? log.timestamp.slice(0, 3) || 'Now' : formatter.format(parsed);
-    const bucket = buckets.get(name) ?? { name, volume: 0, delivered: 0, failed: 0 };
-    bucket.volume += 1;
-    if (log.status === 'Delivered' || log.status === 'Sent') bucket.delivered += 1;
-    if (log.status === 'Failed' || log.status === 'Bounced') bucket.failed += 1;
-    buckets.set(name, bucket);
-  });
+  if (isSameDay) {
+    const hourFormatter = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    parsedLogs.forEach((log) => {
+      const name = hourFormatter.format(log.date);
+      const bucket = buckets.get(name) ?? { name, volume: 0, delivered: 0, failed: 0 };
+      bucket.volume += 1;
+      if (log.status === 'Delivered' || log.status === 'Sent') bucket.delivered += 1;
+      if (log.status === 'Failed' || log.status === 'Bounced') bucket.failed += 1;
+      buckets.set(name, bucket);
+    });
+  } else {
+    const dayFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+    parsedLogs.forEach((log) => {
+      const name = dayFormatter.format(log.date);
+      const bucket = buckets.get(name) ?? { name, volume: 0, delivered: 0, failed: 0 };
+      bucket.volume += 1;
+      if (log.status === 'Delivered' || log.status === 'Sent') bucket.delivered += 1;
+      if (log.status === 'Failed' || log.status === 'Bounced') bucket.failed += 1;
+      buckets.set(name, bucket);
+    });
+  }
 
-  return Array.from(buckets.values()).slice(-7);
+  const chartData = Array.from(buckets.values());
+
+  if (chartData.length === 1) {
+    return [
+      { name: 'Start', volume: 0, delivered: 0, failed: 0 },
+      chartData[0]
+    ];
+  }
+
+  return chartData.slice(-10);
 };
 
 interface DashboardProps {
@@ -119,8 +143,8 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
     const delayedJobs = jobs.filter((j) => j.status === 'delayed').length;
     const failedJobs = jobs.filter((j) => j.status === 'failed').length;
     const queuePressure = activeJobs + waitingJobs + delayedJobs;
-    const deliveryRate = totalLogs > 0 ? (successful / totalLogs) * 100 : 98.7;
-    const failureRate = totalLogs > 0 ? (failures / totalLogs) * 100 : 1.3;
+    const deliveryRate = totalLogs > 0 ? (successful / totalLogs) * 100 : 0;
+    const failureRate = totalLogs > 0 ? (failures / totalLogs) * 100 : 0;
 
     const providerMap = logs.reduce<Record<string, number>>((acc, log) => {
       acc[log.provider] = (acc[log.provider] ?? 0) + 1;
@@ -142,53 +166,39 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
       deliveryRate,
       failedJobs,
       failureRate,
-      providerData: Object.keys(providerMap).length
-        ? Object.entries(providerMap).map(([name, value]) => ({ name, value }))
-        : fallbackProviderData,
+      providerData: Object.entries(providerMap).map(([name, value]) => ({ name, value })),
       queuePressure,
       queuedLogs,
-      statusData: Object.keys(statusMap).length
-        ? Object.entries(statusMap).map(([name, value]) => ({ name, value }))
-        : [
-            { name: 'Delivered', value: 82 },
-            { name: 'Queued', value: 9 },
-            { name: 'Failed', value: 4 },
-            { name: 'Bounced', value: 5 },
-          ],
+      statusData: Object.entries(statusMap).map(([name, value]) => ({ name, value })),
       successful,
       totalLogs,
       trendData: buildTrendData(logs),
-      typeData: Object.keys(typeMap).length
-        ? Object.entries(typeMap).map(([name, value]) => ({ name, value }))
-        : fallbackTypeData,
+      typeData: Object.entries(typeMap).map(([name, value]) => ({ name, value })),
       waitingJobs,
       delayedJobs,
     };
   }, [jobs, logs]);
 
-  const filteredLogs = logs.filter((l) =>
+  const effectiveLogs = logs;
+
+  const filteredLogs = effectiveLogs.filter((l) =>
     `${l.recipient} ${l.provider} ${l.type} ${l.status}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const totalPages = Math.max(1, Math.ceil(filteredLogs.length / itemsPerPage));
-  const paginatedLogs = filteredLogs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
   );
 
   const displayMetrics = [
     {
       title: 'Delivery rate',
       value: formatPercent(analytics.deliveryRate),
-      subtitle: `${analytics.successful || 4355} successful handoffs`,
-      change: '+2.4%',
+      subtitle: `${analytics.successful} successful handoffs`,
+      change: '0.0%',
       icon: MailCheck,
       tone: 'positive',
     },
     {
       title: 'Queue pressure',
-      value: analytics.queuePressure || toNumber(metrics[0]?.value) || 18,
+      value: analytics.queuePressure || toNumber(metrics[0]?.value) || 0,
       subtitle: `${analytics.activeJobs} active, ${analytics.waitingJobs} waiting`,
-      change: '-8.1%',
+      change: '0.0%',
       icon: Activity,
       tone: 'neutral',
     },
@@ -196,7 +206,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
       title: 'Failure rate',
       value: formatPercent(analytics.failureRate),
       subtitle: `${analytics.failedJobs} failed jobs need review`,
-      change: analytics.failureRate > 2 ? '+0.6%' : '-0.3%',
+      change: analytics.failureRate > 2 ? '+0.6%' : '0.0%',
       icon: MailWarning,
       tone: analytics.failureRate > 2 ? 'danger' : 'positive',
     },
@@ -212,7 +222,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
 
   return (
     <div className="dashboard-command-center fade-in">
-      <section className="dashboard-command-hero">
+      <section className="dashboard-command-hero" style={{ background: '#ffffff url(/bg2.jpg) no-repeat center center', backgroundSize: 'cover' }}>
         <div className="dashboard-hero-copy">
           <span className="dashboard-kicker">
             <Sparkles size={16} />
@@ -228,10 +238,6 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             <span>System health</span>
             <strong>Telemetry online</strong>
           </div>
-          <button className="dashboard-refresh" onClick={onRefresh}>
-            <RefreshCw size={16} />
-            Refresh
-          </button>
         </div>
       </section>
 
@@ -273,16 +279,16 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
               <AreaChart data={analytics.trendData} margin={{ top: 8, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#769181" stopOpacity={0.34} />
-                    <stop offset="95%" stopColor="#769181" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor="#0D4F3C" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#0D4F3C" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#777C78' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#777C78' }} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #E3E3DE' }} />
-                <Area type="monotone" dataKey="volume" stroke="#5A7163" strokeWidth={3} fill="url(#volumeFill)" />
-                <Line type="monotone" dataKey="delivered" stroke="#89A595" strokeWidth={3} dot={{ r: 3, fill: '#89A595' }} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
+                <Area type="monotone" dataKey="volume" stroke="#0D4F3C" strokeWidth={3} fill="url(#volumeFill)" />
+                <Line type="monotone" dataKey="delivered" stroke="#24754E" strokeWidth={3} dot={{ r: 3, fill: '#24754E' }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -305,7 +311,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             <div>
               <CheckCircle2 size={17} />
               <span>Successful mail</span>
-              <strong>{analytics.successful || '4.3k'}</strong>
+              <strong>{analytics.successful}</strong>
             </div>
             <div>
               <Clock3 size={17} />
@@ -333,10 +339,10 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             <ResponsiveContainer>
               <BarChart data={analytics.providerData} margin={{ top: 8, right: 0, left: -22, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#777C78' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#777C78' }} />
-                <Tooltip cursor={{ fill: '#F6F7F5' }} contentStyle={{ borderRadius: 8, border: '1px solid #E3E3DE' }} />
-                <Bar dataKey="value" fill="#769181" radius={[6, 6, 0, 0]} barSize={34} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} />
+                <Tooltip cursor={{ fill: '#F8F8F6' }} contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
+                <Bar dataKey="value" fill="#0D4F3C" radius={[6, 6, 0, 0]} barSize={34} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -357,7 +363,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                     <Cell key={entry.name} fill={pieColors[index % pieColors.length]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #E3E3DE' }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
               </PieChart>
             </ResponsiveContainer>
             <div className="dashboard-donut-legend">
@@ -383,11 +389,11 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             {analytics.statusData.map((item) => (
               <div key={item.name}>
                 <span>
-                  <b style={{ background: statusColors[item.name] ?? '#777C78' }} />
+                  <b style={{ background: statusColors[item.name] ?? '#676D63' }} />
                   {item.name}
                 </span>
                 <strong>{item.value}</strong>
-                <i style={{ width: `${Math.min(100, Number(item.value) * 3)}%`, background: statusColors[item.name] ?? '#777C78' }} />
+                <i style={{ width: `${Math.min(100, Number(item.value) * 3)}%`, background: statusColors[item.name] ?? '#676D63' }} />
               </div>
             ))}
           </div>
@@ -412,7 +418,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
               jobs.slice(0, 7).map((job) => (
                 <button key={job.id} className="dashboard-job-row" onClick={() => setSelectedJob(job)}>
                   <span>
-                    <strong>{job.recipient}</strong>
+                    <strong>{cleanRecipient(job.recipient)}</strong>
                     <small>{job.templateKey}</small>
                   </span>
                   <b className={`queue-status ${job.status}`}>{job.status}</b>
@@ -434,10 +440,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                 type="text"
                 placeholder="Search mail, provider, status"
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
@@ -454,17 +457,17 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {paginatedLogs.length === 0 ? (
+                {filteredLogs.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="dashboard-table-empty">
                       No logs found.
                     </td>
                   </tr>
                 ) : (
-                  paginatedLogs.map((log) => (
+                  filteredLogs.map((log) => (
                     <tr key={log.id}>
                       <td className="muted-cell">{log.timestamp}</td>
-                      <td className="recipient-cell">{log.recipient}</td>
+                      <td className="recipient-cell">{cleanRecipient(log.recipient)}</td>
                       <td>
                         <span className="badge-pill badge-neutral">{log.type}</span>
                       </td>
@@ -479,20 +482,6 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                 )}
               </tbody>
             </table>
-          </div>
-
-          <div className="dashboard-pagination">
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
-            <div>
-              <button disabled={currentPage === 1} onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} className="btn-secondary">
-                Previous
-              </button>
-              <button disabled={currentPage === totalPages} onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} className="btn-secondary">
-                Next
-              </button>
-            </div>
           </div>
         </article>
       </section>
@@ -512,7 +501,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             <dl className="dashboard-drawer-details">
               <div>
                 <dt>Recipient</dt>
-                <dd>{selectedJob.recipient}</dd>
+                <dd>{cleanRecipient(selectedJob.recipient)}</dd>
               </div>
               <div>
                 <dt>Template</dt>

@@ -50,15 +50,12 @@ export async function fetchGetAiPilotUsers() {
   const client = createGetAiPilotClient();
 
   const [profilesResult, authResult] = await Promise.all([
-    client.from('profiles').select('*').limit(1000),
-    client.auth.admin.listUsers({ page: 1, perPage: 1000 })
+    Promise.resolve(client.from('profiles').select('*').limit(1000)).catch(err => ({ data: [], error: err })),
+    client.auth.admin.listUsers({ page: 1, perPage: 1000 }).catch(() => ({ data: { users: [] }, error: null }))
   ]);
 
-  if (profilesResult.error) throw profilesResult.error;
-  if (authResult.error) throw authResult.error;
-
   const profiles = (profilesResult.data || []) as ProfileRow[];
-  const authUsers = authResult.data.users || [];
+  const authUsers = (authResult as any)?.data?.users || [];
   const authById = new Map(authUsers.map((user: any) => [user.id, user]));
   const authByEmail = new Map(
     authUsers
@@ -110,7 +107,7 @@ export async function fetchGetAiPilotUsers() {
       const email = String(user.email || '').toLowerCase();
       return user.email && !isSyntheticEmail(email) && !profileIds.has(user.id) && !profileEmails.has(email);
     })
-    .map((user: any, idx) => ({
+    .map((user: any, idx: number) => ({
       id: user.id,
       email: user.email,
       full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],

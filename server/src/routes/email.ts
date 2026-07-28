@@ -398,7 +398,15 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
       });
     }
 
-    const resolvedProductCode = productCode || variables?.productCode || 'socialpilot';
+    let resolvedProductCode = productCode || variables?.productCode;
+    if (!resolvedProductCode) {
+      const tk = String(templateKey || '').toLowerCase();
+      if (tk.includes('whatsapp') || tk.includes('wap_') || tk === 'broadcast_success') {
+        resolvedProductCode = 'gap_whatsapp';
+      } else {
+        resolvedProductCode = 'socialpilot';
+      }
+    }
     const finalIdempotencyKey = idempotencyKey || `[${resolvedProductCode}]_${to}_${Date.now()}`;
     let dbEmailJobId = finalIdempotencyKey;
     let jobId = `tx_${Date.now()}_${Math.floor(Math.random() * 1000)}`;

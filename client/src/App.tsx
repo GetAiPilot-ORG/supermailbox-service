@@ -1,17 +1,36 @@
-import React, { useState, useEffect } from 'react';
+// GetAiPilot & SocialPilot Main Application
+import React, { useState, useEffect, useRef } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { Sidebar, type TabType } from './components/Sidebar';
 import { DashboardQueueMonitor } from './pages/DashboardQueueMonitor';
 import { ProjectLogsViewer } from './pages/ProjectLogsViewer';
 import { TemplateBuilder } from './pages/TemplateBuilder';
+import { TemplateManager } from './pages/TemplateManager.tsx';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
 import { ApiService } from './services/api';
 import type { MetricCardData, QueueJob, ActivityLog, Template, Campaign, SuppressionItem, BounceReportItem } from './services/api';
 import './App.css';
 
+
+
+gsap.registerPlugin(useGSAP);
+
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.matchMedia('(max-width: 840px)').matches);
+  const [editingTemplateKey, setEditingTemplateKey] = useState<string | null>(null);
+  const mainRef = useRef<HTMLElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (activeTab === 'templates') {
+      setSidebarCollapsed(true);
+    }
+    setEditingTemplateKey(null);
+  }, [activeTab]);
 
   // App Data State
   const [metrics, setMetrics] = useState<MetricCardData[]>([]);
@@ -38,7 +57,7 @@ export const App: React.FC = () => {
       setMetrics(m);
       setJobs(j);
       setLogs(l);
-      setTemplates(t);
+      setTemplates(t || []);
       setCampaigns(c);
       setSuppressions(s);
       setBounceReports(b);
@@ -52,6 +71,51 @@ export const App: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  useGSAP(() => {
+    const root = mainRef.current;
+    if (!root || shouldReduceMotion) return;
+
+    const targets = root.querySelectorAll('.dashboard-command-hero, .screen-hero, .project-logs-hero, .dashboard-kpi-card');
+    if (targets.length === 0) return;
+
+    gsap.fromTo(
+      targets,
+      { autoAlpha: 0, y: 10 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.28,
+        ease: 'power3.out',
+        stagger: 0.035,
+        overwrite: true,
+      }
+    );
+
+    return () => gsap.killTweensOf(targets);
+  }, { scope: mainRef, dependencies: [activeTab, loading, shouldReduceMotion], revertOnUpdate: true });
+
+  useEffect(() => {
+    const root = mainRef.current;
+    if (!root || shouldReduceMotion) return;
+
+    const items = root.querySelectorAll<HTMLElement>(
+      '.dashboard-status-stack > div, .dashboard-health-list > div, .dashboard-job-row, tbody tr'
+    );
+    items.forEach((item) => item.classList.add('io-reveal'));
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    items.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
+  }, [activeTab, loading, shouldReduceMotion]);
 
   const handlePromoteVersion = (templateKey: string, versionName: string) => {
     setTemplates((prev) =>
@@ -67,7 +131,7 @@ export const App: React.FC = () => {
     );
   };
 
-  const handleSaveDraft = async (templateKey: string, subject: string, html: string) => {
+  const handleSaveDraft = async (templateKey: string, subject: string, html: string, design?: any) => {
     const tmpl = templates.find(t => t.key === templateKey);
     if (tmpl) {
       await ApiService.saveTemplate({
@@ -75,7 +139,8 @@ export const App: React.FC = () => {
         name: tmpl.name,
         category: tmpl.category,
         html,
-        subject
+        subject,
+        design
       });
       
       const freshTemplates = await ApiService.getTemplates();
@@ -89,19 +154,15 @@ export const App: React.FC = () => {
     setTemplates((prev) => [newTmpl, ...prev]);
   };
 
-  const handleLaunchCampaign = (name: string, templateKey: string, scheduledAt?: string) => {
-    const newCamp: Campaign = {
-      id: `camp_${Math.floor(100 + Math.random() * 900)}`,
-      name,
-      templateKey,
-      audienceCount: 1840,
-      sentCount: scheduledAt ? 0 : 1840,
-      deliveredRate: scheduledAt ? 0 : 99.2,
-      openRate: scheduledAt ? 0 : 12.5,
-      status: scheduledAt ? 'scheduled' : 'active',
-      scheduledAt
-    };
-    setCampaigns([newCamp, ...campaigns]);
+  const handleDeleteTemplate = async (templateKey: string) => {
+    if (window.confirm('Are you sure you want to delete this template?')) {
+      setTemplates((prev) => prev.filter(t => t.key !== templateKey));
+    }
+  };
+
+  const handleLaunchCampaign = async (_name: string, _templateKey: string, _scheduledAt?: string) => {
+    const freshCampaigns = await ApiService.getCampaigns();
+    if (freshCampaigns) setCampaigns(freshCampaigns);
   };
 
   const handleAddSuppression = async (email: string, reason: SuppressionItem['reason']) => {
@@ -140,14 +201,22 @@ export const App: React.FC = () => {
       <div className="app-workspace">
 
         {/* Dynamic Screen Viewport */}
-        <main className="app-main">
+        <main className="app-main" ref={mainRef}>
           {loading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '16px' }}>
-              <div className="spin-loader" style={{ width: '40px', height: '40px' }} />
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Synchronizing CPaaS data streams...</p>
+            <div className="app-loading">
+              <div className="spin-loader" />
+              <p>Synchronizing CPaaS data streams...</p>
             </div>
           ) : (
-            <>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                className="app-page-motion"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: [0.16, 1, 0.3, 1] }}
+              >
               {activeTab === 'dashboard' && (
                 <DashboardQueueMonitor
                   metrics={metrics}
@@ -160,12 +229,22 @@ export const App: React.FC = () => {
                 <ProjectLogsViewer />
               )}
               {activeTab === 'templates' && (
-                <TemplateBuilder
-                  templates={templates}
-                  onPromoteVersion={handlePromoteVersion}
-                  onSaveDraft={handleSaveDraft}
-                  onCreateTemplate={handleCreateTemplate}
-                />
+                editingTemplateKey ? (
+                  <TemplateBuilder
+                    templateKey={editingTemplateKey}
+                    templates={templates}
+                    onBack={() => setEditingTemplateKey(null)}
+                    onPromoteVersion={handlePromoteVersion}
+                    onSaveDraft={handleSaveDraft}
+                  />
+                ) : (
+                  <TemplateManager
+                    templates={templates}
+                    onEditTemplate={setEditingTemplateKey}
+                    onCreateTemplate={handleCreateTemplate}
+                    onDeleteTemplate={handleDeleteTemplate}
+                  />
+                )
               )}
               {activeTab === 'campaigns' && (
                 <SegmentBuilder
@@ -182,7 +261,8 @@ export const App: React.FC = () => {
                   onRemoveSuppression={handleRemoveSuppression}
                 />
               )}
-            </>
+              </motion.div>
+            </AnimatePresence>
           )}
         </main>
       </div>
