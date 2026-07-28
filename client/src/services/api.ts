@@ -125,7 +125,7 @@ export interface CampaignJobStats {
   suppressed: number;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://localhost:5050/v1';
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://127.0.0.1:5050/v1';
 const REQUEST_TIMEOUT_MS = 15000;
 
 const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {

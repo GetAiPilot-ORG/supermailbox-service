@@ -9,9 +9,10 @@ import {
   Megaphone,
   ShieldCheck,
   UserRound,
+  Layers,
 } from 'lucide-react';
 
-export type TabType = 'dashboard' | 'project_logs' | 'templates' | 'campaigns' | 'contacts';
+export type TabType = 'dashboard' | 'project_logs' | 'templates' | 'brand_library' | 'campaigns' | 'contacts';
 
 interface SidebarProps {
   activeTab: TabType;
@@ -41,6 +42,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'templates' as TabType,
       label: 'Templates',
       icon: FileText,
+    },
+    {
+      id: 'brand_library' as TabType,
+      label: 'Brand & Media',
+      icon: Layers,
     },
     {
       id: 'campaigns' as TabType,

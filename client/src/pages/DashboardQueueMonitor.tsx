@@ -12,7 +12,6 @@ import {
   Search,
   ServerCog,
   ShieldCheck,
-  Sparkles,
   X,
 } from 'lucide-react';
 import {
@@ -225,7 +224,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
       <section className="dashboard-command-hero" style={{ background: '#ffffff url(/bg2.jpg) no-repeat center center', backgroundSize: 'cover' }}>
         <div className="dashboard-hero-copy">
           <span className="dashboard-kicker">
-            <Sparkles size={16} />
+            <Activity size={16} />
             SupermailBox analytics
           </span>
           <h2>Delivery command center</h2>

@@ -12,10 +12,27 @@ const fastify = Fastify({
   disableRequestLogging: true,
 });
 
+fastify.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
+  try {
+    const str = typeof body === 'string' ? body.trim() : '';
+    const json = str ? JSON.parse(str) : {};
+    done(null, json);
+  } catch (err: any) {
+    err.statusCode = 400;
+    done(err, undefined);
+  }
+});
+
 import { registerEmailRoutes } from './routes/email.js';
 import { registerWebhookRoutes } from './routes/webhooks.js';
 import { registerApiRoutes } from './routes/api.js';
+import { registerTemplateRoutes } from './routes/templates.js';
+import { registerBrandRoutes } from './routes/brand.js';
 import { initCampaignWorker } from './workers/campaignWorker.js';
+import { createBullBoard } from '@bull-board/api';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { FastifyAdapter } from '@bull-board/fastify';
+import { campaignQueue, transactionalQueue } from './queues/campaignQueue.js';
 
 const allowedOrigins = [
   'http://localhost:5173',
@@ -44,12 +61,9 @@ await fastify.register(cors, {
 
 await registerEmailRoutes(fastify);
 await registerWebhookRoutes(fastify);
+await registerTemplateRoutes(fastify);
 await registerApiRoutes(fastify);
-
-import { createBullBoard } from '@bull-board/api';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-import { FastifyAdapter } from '@bull-board/fastify';
-import { campaignQueue, transactionalQueue } from './queues/campaignQueue.js';
+await registerBrandRoutes(fastify);
 
 // Initialize worker if Redis is alive
 try {
