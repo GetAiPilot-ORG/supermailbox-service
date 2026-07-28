@@ -1,4 +1,5 @@
 // GetAiPilot & SocialPilot Main Application
+// GetAiPilot & SocialPilot Main Application
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
@@ -6,8 +7,12 @@ import { useGSAP } from '@gsap/react';
 import { Sidebar, type TabType } from './components/Sidebar';
 import { DashboardQueueMonitor } from './pages/DashboardQueueMonitor';
 import { ProjectLogsViewer } from './pages/ProjectLogsViewer';
-import { TemplateBuilder } from './pages/TemplateBuilder';
-import { TemplateManager } from './pages/TemplateManager.tsx';
+import { BrandLibraryPage } from './features/brand-library';
+import { TemplateManagerPage } from './features/email-templates/pages/TemplateManagerPage';
+import { TemplateGalleryPage } from './features/email-templates/pages/TemplateGalleryPage';
+import { TemplateBuilderPage } from './features/email-templates/pages/TemplateBuilderPage';
+import { ReactEmailEditorPoc } from './features/email-templates/poc/ReactEmailEditorPoc';
+import { EasyEmailEditorPoc } from './features/email-templates/poc/EasyEmailEditorPoc';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
 import { ApiService } from './services/api';
@@ -19,9 +24,20 @@ import './App.css';
 gsap.registerPlugin(useGSAP);
 
 export const App: React.FC = () => {
+  if (window.location.pathname === '/dev/email-editor/react-email') return <ReactEmailEditorPoc />;
+  if (window.location.pathname === '/dev/email-editor/easy-email') return <EasyEmailEditorPoc />;
+  return <DashboardApp />;
+};
+
+const DashboardApp: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.matchMedia('(max-width: 840px)').matches);
-  const [editingTemplateKey, setEditingTemplateKey] = useState<string | null>(null);
+  const [templateRoute, setTemplateRoute] = useState<{ page: 'manager' | 'gallery' | 'builder'; templateId?: string }>(() => {
+    const match = window.location.pathname.match(/^\/dashboard\/templates\/([^/]+)\/edit$/);
+    if (match) return { page: 'builder', templateId: match[1] };
+    if (window.location.pathname === '/dashboard/templates/new') return { page: 'gallery' };
+    return { page: 'manager' };
+  });
   const mainRef = useRef<HTMLElement | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -29,8 +45,18 @@ export const App: React.FC = () => {
     if (activeTab === 'templates') {
       setSidebarCollapsed(true);
     }
-    setEditingTemplateKey(null);
   }, [activeTab]);
+
+  useEffect(() => {
+    const readTemplateRoute = () => {
+      const match = window.location.pathname.match(/^\/dashboard\/templates\/([^/]+)\/edit$/);
+      if (match) return setTemplateRoute({ page: 'builder', templateId: match[1] });
+      if (window.location.pathname === '/dashboard/templates/new') return setTemplateRoute({ page: 'gallery' });
+      if (window.location.pathname === '/dashboard/templates') return setTemplateRoute({ page: 'manager' });
+    };
+    window.addEventListener('popstate', readTemplateRoute);
+    return () => window.removeEventListener('popstate', readTemplateRoute);
+  }, []);
 
   // App Data State
   const [metrics, setMetrics] = useState<MetricCardData[]>([]);
@@ -117,47 +143,14 @@ export const App: React.FC = () => {
     return () => observer.disconnect();
   }, [activeTab, loading, shouldReduceMotion]);
 
-  const handlePromoteVersion = (templateKey: string, versionName: string) => {
-    setTemplates((prev) =>
-      prev.map((t) => {
-        if (t.key !== templateKey) return t;
-        const updatedVer = t.versions.map((v) =>
-          v.version === versionName
-            ? { ...v, status: 'Live' as const }
-            : { ...v, status: v.status === 'Live' ? ('Approved' as const) : v.status }
-        );
-        return { ...t, versions: updatedVer };
-      })
-    );
-  };
-
-  const handleSaveDraft = async (templateKey: string, subject: string, html: string, design?: any) => {
-    const tmpl = templates.find(t => t.key === templateKey);
-    if (tmpl) {
-      await ApiService.saveTemplate({
-        key: templateKey,
-        name: tmpl.name,
-        category: tmpl.category,
-        html,
-        subject,
-        design
-      });
-      
-      const freshTemplates = await ApiService.getTemplates();
-      if (freshTemplates && freshTemplates.length > 0) {
-        setTemplates(freshTemplates);
-      }
-    }
-  };
-
-  const handleCreateTemplate = (newTmpl: Template) => {
-    setTemplates((prev) => [newTmpl, ...prev]);
-  };
-
-  const handleDeleteTemplate = async (templateKey: string) => {
-    if (window.confirm('Are you sure you want to delete this template?')) {
-      setTemplates((prev) => prev.filter(t => t.key !== templateKey));
-    }
+  const navigateTemplateRoute = (route: { page: 'manager' | 'gallery' | 'builder'; templateId?: string }) => {
+    setTemplateRoute(route);
+    const path = route.page === 'gallery'
+      ? '/dashboard/templates/new'
+      : route.page === 'builder' && route.templateId
+        ? `/dashboard/templates/${route.templateId}/edit`
+        : '/dashboard/templates';
+    window.history.pushState(null, '', path);
   };
 
   const handleLaunchCampaign = async (_name: string, _templateKey: string, _scheduledAt?: string) => {
@@ -192,7 +185,10 @@ export const App: React.FC = () => {
       {/* Collapsible Sidebar */}
       <Sidebar
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={(tab) => {
+          setActiveTab(tab);
+          if (tab === 'templates') navigateTemplateRoute({ page: 'manager' });
+        }}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
@@ -229,22 +225,26 @@ export const App: React.FC = () => {
                 <ProjectLogsViewer />
               )}
               {activeTab === 'templates' && (
-                editingTemplateKey ? (
-                  <TemplateBuilder
-                    templateKey={editingTemplateKey}
-                    templates={templates}
-                    onBack={() => setEditingTemplateKey(null)}
-                    onPromoteVersion={handlePromoteVersion}
-                    onSaveDraft={handleSaveDraft}
+                templateRoute.page === 'builder' && templateRoute.templateId ? (
+                  <TemplateBuilderPage
+                    templateId={templateRoute.templateId}
+                    onBack={() => navigateTemplateRoute({ page: 'manager' })}
+                    onSavedExit={() => navigateTemplateRoute({ page: 'manager' })}
+                  />
+                ) : templateRoute.page === 'gallery' ? (
+                  <TemplateGalleryPage
+                    onBack={() => navigateTemplateRoute({ page: 'manager' })}
+                    onOpenBuilder={(templateId) => navigateTemplateRoute({ page: 'builder', templateId })}
                   />
                 ) : (
-                  <TemplateManager
-                    templates={templates}
-                    onEditTemplate={setEditingTemplateKey}
-                    onCreateTemplate={handleCreateTemplate}
-                    onDeleteTemplate={handleDeleteTemplate}
+                  <TemplateManagerPage
+                    onCreate={() => navigateTemplateRoute({ page: 'gallery' })}
+                    onEdit={(templateId) => navigateTemplateRoute({ page: 'builder', templateId })}
                   />
                 )
+              )}
+              {activeTab === 'brand_library' && (
+                <BrandLibraryPage />
               )}
               {activeTab === 'campaigns' && (
                 <SegmentBuilder
