@@ -6,9 +6,10 @@ import type { BrandSocialProfile } from '../types/brand.types';
 
 interface SocialProfileManagerProps {
   brandId?: string;
+  onRefreshStats?: () => void;
 }
 
-export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ brandId }) => {
+export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ brandId, onRefreshStats }) => {
   const [profiles, setProfiles] = useState<BrandSocialProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isAdding, setIsAdding] = useState<boolean>(false);
@@ -60,6 +61,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
       setUrl('https://');
       setIsAdding(false);
       await fetchProfiles();
+      if (onRefreshStats) onRefreshStats();
     } catch (err: any) {
       setError(err.message || 'Failed to save social profile.');
     } finally {
@@ -71,6 +73,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
     try {
       await brandService.deleteSocialProfile(id);
       setProfiles(prev => prev.filter(p => p.id !== id));
+      if (onRefreshStats) onRefreshStats();
     } catch (err) {
       console.error('Failed to delete social profile:', err);
     }
@@ -94,7 +97,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
           >
             <Plus className="w-4 h-4" /> Add Social Account
           </button>
@@ -103,9 +106,9 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
 
       {/* Add Form */}
       {isAdding && (
-        <form onSubmit={handleSave} className="bg-blue-50/50 border border-blue-200 rounded-2xl p-5 space-y-4 animate-slideDown">
+        <form onSubmit={handleSave} className="bg-indigo-50/50 border border-indigo-200 rounded-2xl p-5 space-y-4 animate-slideDown">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-blue-800">Connect Social Profile</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-800">Connect Social Profile</h4>
             <button type="button" onClick={() => setIsAdding(false)} className="text-xs text-slate-500 hover:text-slate-800">
               Cancel
             </button>
@@ -118,7 +121,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Platform</label>
               <select
@@ -134,7 +137,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
                   if (val === 'GitHub') setUrl('https://github.com/');
                   setDisplayLabel(`Follow on ${val}`);
                 }}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="LinkedIn">LinkedIn</option>
                 <option value="X / Twitter">X (Twitter)</option>
@@ -147,17 +150,6 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Username / Handle</label>
-              <input
-                type="text"
-                placeholder="e.g. @supermailbox"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
             <div className="md:col-span-2">
               <label className="block text-xs font-bold text-slate-700 mb-1">Full Profile URL</label>
               <input
@@ -165,7 +157,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
                 placeholder="https://linkedin.com/company/supermailbox"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -175,7 +167,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
             >
               <Check className="w-3.5 h-3.5" />
               <span>{saving ? 'Saving...' : 'Save Profile'}</span>
@@ -196,7 +188,7 @@ export const SocialProfileManager: React.FC<SocialProfileManagerProps> = ({ bran
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" /> Add Social Profile
           </button>

@@ -112,7 +112,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
           >
             <Plus className="w-4 h-4" /> New Snippet
           </button>
@@ -121,9 +121,9 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
 
       {/* Add Form */}
       {isAdding && (
-        <form onSubmit={handleSave} className="bg-amber-50/50 border border-amber-200 rounded-2xl p-5 space-y-4 animate-slideDown">
+        <form onSubmit={handleSave} className="bg-indigo-50/50 border border-indigo-200 rounded-2xl p-5 space-y-4 animate-slideDown">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-900">Create Reusable Snippet</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-900">Create Reusable Snippet</h4>
             <button type="button" onClick={() => setIsAdding(false)} className="text-xs text-slate-500 hover:text-slate-800">
               Cancel
             </button>
@@ -142,7 +142,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as any)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="welcome">Welcome & Intro Text</option>
                 <option value="legal">Legal Disclaimer & Compliance</option>
@@ -162,7 +162,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
                 placeholder="e.g. Standard GDPR Disclaimer"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -174,7 +174,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
                 placeholder="gdpr, legal, footer..."
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
@@ -186,7 +186,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
               placeholder="e.g. You are receiving this email because you opted in at SuperMail Box. To manage your preferences, visit our subscription center."
               value={plainText}
               onChange={(e) => setPlainText(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono leading-relaxed"
+              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono leading-relaxed"
               required
             />
           </div>
@@ -197,7 +197,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
                 type="checkbox"
                 checked={isFavourite}
                 onChange={(e) => setIsFavourite(e.target.checked)}
-                className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               />
               <span className="flex items-center gap-1">Mark as Favorite <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /></span>
             </label>
@@ -205,7 +205,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
             >
               <Check className="w-3.5 h-3.5" />
               <span>{saving ? 'Saving...' : 'Save Snippet'}</span>
@@ -226,7 +226,7 @@ export const SnippetManager: React.FC<SnippetManagerProps> = ({ brandId, onRefre
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" /> Create First Snippet
           </button>

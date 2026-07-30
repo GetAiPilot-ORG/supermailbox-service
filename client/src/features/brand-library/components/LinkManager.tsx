@@ -101,7 +101,7 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
           >
             <Plus className="w-4 h-4" /> Add New URL
           </button>
@@ -110,9 +110,9 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
 
       {/* Add Form */}
       {isAdding && (
-        <form onSubmit={handleSave} className="bg-purple-50/50 border border-purple-200 rounded-2xl p-5 space-y-4 animate-slideDown">
+        <form onSubmit={handleSave} className="bg-indigo-50/50 border border-indigo-200 rounded-2xl p-5 space-y-4 animate-slideDown">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-purple-800">Add Validated Brand URL</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-800">Add Validated Brand URL</h4>
             <button
               type="button"
               onClick={() => setIsAdding(false)}
@@ -144,7 +144,7 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
                     if (val === 'privacy_policy') setLabel('Privacy Policy & GDPR');
                   }
                 }}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="website">Official Main Website</option>
                 <option value="unsubscribe">Mandatory 1-Click Unsubscribe Link</option>
@@ -167,21 +167,33 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
                 placeholder="e.g. Official Home Page"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Target URL (MUST start with https://)</label>
-              <input
-                type="url"
-                placeholder="https://supermailbox.in/unsubscribe"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
-                required
-              />
+              <div className="relative flex items-center">
+                <input
+                  type="url"
+                  placeholder="https://supermailbox.in/unsubscribe"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-9"
+                  required
+                />
+                {url && url.length > 8 && (
+                  <div className="absolute right-2.5 flex items-center gap-1 bg-slate-100 px-1.5 py-1 rounded-lg border border-slate-200" title="Auto-fetched Website Favicon">
+                    <img 
+                      src={`https://www.google.com/s2/favicons?domain=${url.replace(/^https?:\/\//, '').split('/')[0]}&sz=64`}
+                      alt="Favicon"
+                      className="w-4 h-4 rounded object-contain shrink-0"
+                      onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -192,7 +204,7 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
               placeholder="e.g. Include this link in all automated billing receipts"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -202,7 +214,7 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
                 type="checkbox"
                 checked={isDefault}
                 onChange={(e) => setIsDefault(e.target.checked)}
-                className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               />
               <span>Set as default URL for this category</span>
             </label>
@@ -210,7 +222,7 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
             >
               <Check className="w-3.5 h-3.5" />
               <span>{saving ? 'Saving...' : 'Save URL Link'}</span>
@@ -231,7 +243,7 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" /> Add First URL
           </button>
@@ -244,9 +256,15 @@ export const LinkManager: React.FC<LinkManagerProps> = ({ brandId, onRefreshStat
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
+                      <img 
+                        src={`https://www.google.com/s2/favicons?domain=${link.url.replace(/^https?:\/\//, '').split('/')[0]}&sz=64`}
+                        alt=""
+                        className="w-4 h-4 rounded object-contain shrink-0 bg-white p-0.5 border border-slate-200"
+                        onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                      />
                       <h4 className="text-sm font-bold text-slate-900">{link.label}</h4>
                       {link.is_default && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">
                           Default
                         </span>
                       )}

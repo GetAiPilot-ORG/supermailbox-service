@@ -10,6 +10,7 @@ interface AssetUploadDialogProps {
   activeBrandId?: string;
   defaultFolderId?: string;
   onUploadComplete?: (asset: BrandAsset) => void;
+  initialFile?: File | null;
 }
 
 export const AssetUploadDialog: React.FC<AssetUploadDialogProps> = ({
@@ -19,6 +20,7 @@ export const AssetUploadDialog: React.FC<AssetUploadDialogProps> = ({
   activeBrandId,
   defaultFolderId,
   onUploadComplete,
+  initialFile,
 }) => {
   if (!isOpen) return null;
 
@@ -32,6 +34,12 @@ export const AssetUploadDialog: React.FC<AssetUploadDialogProps> = ({
   const [altText, setAltText] = useState<string>('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (initialFile) {
+      handleFileSelect(initialFile);
+    }
+  }, [initialFile]);
 
   const handleFileSelect = (file: File) => {
     setValidationError(null);

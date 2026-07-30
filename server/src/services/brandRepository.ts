@@ -105,17 +105,19 @@ export const brandRepository = {
     try {
       const bId = brandId || (await this.getPrimaryBrand()).id;
 
-      const [assetsRes, linksRes, snippetsRes, contactsRes] = await Promise.all([
-        supabase.from('brand_assets').select('id, asset_type, bytes, is_favourite, created_at').eq('brand_id', bId).is('deleted_at', null),
+      const [assetsRes, linksRes, snippetsRes, contactsRes, socialRes] = await Promise.all([
+        supabase.from('brand_assets').select('*').eq('brand_id', bId).is('deleted_at', null).order('created_at', { ascending: false }),
         supabase.from('brand_links').select('id, link_type, usage_count, is_active').eq('brand_id', bId).is('deleted_at', null),
         supabase.from('brand_snippets').select('id, category, usage_count').eq('brand_id', bId).is('deleted_at', null),
         supabase.from('brand_contacts').select('id, contact_type, label, value').eq('brand_id', bId).is('deleted_at', null),
+        supabase.from('brand_social_profiles').select('id, platform').eq('brand_id', bId).is('deleted_at', null),
       ]);
 
       const assets = assetsRes.data || [];
       const links = linksRes.data || [];
       const snippets = snippetsRes.data || [];
       const contacts = contactsRes.data || [];
+      const social = socialRes.data || [];
 
       const totalStorageBytes = assets.reduce((acc, curr) => acc + (curr.bytes || 0), 0);
       const logosCount = assets.filter(a => a.asset_type === 'logo').length;
@@ -129,6 +131,7 @@ export const brandRepository = {
         linksCount: links.length,
         snippetsCount: snippets.length,
         contactsCount: contacts.length,
+        socialProfilesCount: social.length,
         favouritesCount,
         totalStorageBytes,
         storageFormatted: (totalStorageBytes / (1024 * 1024)).toFixed(2) + ' MB',

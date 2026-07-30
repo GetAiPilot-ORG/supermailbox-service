@@ -247,7 +247,18 @@ export const TemplateBuilder: React.FC<TemplateBuilderProps> = ({
               { label: "Helvetica", value: "helvetica,arial,sans-serif" },
               { label: "Times New Roman", value: "'times new roman',times,serif" },
               { label: "Verdana", value: "verdana,geneva,sans-serif" }
-            ]
+            ],
+            tools: {
+              image: {
+                properties: {
+                  src: {
+                    value: {
+                      url: '',
+                    }
+                  }
+                }
+              }
+            }
           } as any}
         />
       </div>

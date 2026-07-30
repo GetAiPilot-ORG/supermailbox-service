@@ -1,7 +1,7 @@
 export type TemplateStatus = 'draft' | 'published' | 'archived';
 export type TemplateVisibility = 'private' | 'shared' | 'system';
 export type SaveState = 'idle' | 'saving' | 'saved' | 'dirty' | 'failed';
-export type PreviewDevice = 'desktop' | 'mobile';
+export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
 
 export type EmailTemplateDocument = {
   schemaVersion: 1;
