@@ -85,16 +85,17 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
 
       if (prodData?.id) {
         let templateId = null;
-        const { data: tmplData } = await supabase
-          .from('email_templates')
-          .select('id')
-          .eq('key', templateKey || 'getaipilot_welcome')
-          .single();
-        if (tmplData?.id) {
-          templateId = tmplData.id;
+        const { data: byId } = await supabase.from('email_templates').select('id').eq('id', templateKey).maybeSingle();
+        if (byId?.id) {
+          templateId = byId.id;
         } else {
-          const { data: anyTmpl } = await supabase.from('email_templates').select('id').limit(1).single();
-          templateId = anyTmpl?.id || null;
+          const { data: byKey } = await supabase.from('email_templates').select('id').eq('key', templateKey || 'getaipilot_welcome').maybeSingle();
+          if (byKey?.id) {
+            templateId = byKey.id;
+          } else {
+            const { data: anyTmpl } = await supabase.from('email_templates').select('id').limit(1).single();
+            templateId = anyTmpl?.id || null;
+          }
         }
 
         if (templateId) {

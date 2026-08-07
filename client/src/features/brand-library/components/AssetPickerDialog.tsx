@@ -186,7 +186,7 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
                 Banners
               </button>
 
-              <div style={{ width: '1px', height: '20px', background: '#cbd5e1', margin: '0 4px', selfAlign: 'center' }} />
+              <div style={{ width: '1px', height: '20px', background: '#cbd5e1', margin: '0 4px', alignSelf: 'center' }} />
 
               <button
                 onClick={() => setActiveTab('contacts')}
@@ -267,7 +267,7 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '14px' }}>
                   {filteredContacts.map((c) => (
-                    <div key={c.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', gap: '10px' }}>
+                    <div key={c.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '10px' }}>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#6366f1', background: '#e0e7ff', padding: '2px 6px', borderRadius: '4px' }}>{c.contact_type}</span>
@@ -308,7 +308,7 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '14px' }}>
                   {filteredLinks.map((l) => (
-                    <div key={l.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', gap: '10px' }}>
+                    <div key={l.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '10px' }}>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#8b5cf6', background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px' }}>{l.link_type}</span>
@@ -361,7 +361,7 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
                     const token = `{{brand.social.${platformSlug}}}`;
 
                     return (
-                      <div key={sp.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', gap: '10px' }}>
+                      <div key={sp.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '10px' }}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#4f46e5', background: '#e0e7ff', padding: '2px 6px', borderRadius: '4px' }}>{sp.platform}</span>
@@ -406,7 +406,7 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
                     const token = `{{brand.snippets.${cleanSlug}}}`;
 
                     return (
-                      <div key={s.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', gap: '10px' }}>
+                      <div key={s.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '10px' }}>
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                             <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#d97706', background: '#fef3c7', padding: '2px 6px', borderRadius: '4px' }}>{s.category}</span>
@@ -451,7 +451,7 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="bl-modal-footer" style={{ display: 'flex', alignItems: 'center', justifyBetween: 'space-between' }}>
+          <div className="bl-modal-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: '12px', color: '#64748b' }}>
               Select any media image or click <strong>Use URL / Use Value</strong> on Contacts, Links, & Social Profiles to insert them into your email template.
             </span>

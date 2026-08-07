@@ -1,9 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { BuilderBlocksPanel } from './BuilderBlocksPanel';
-import { BuilderCanvas } from './BuilderCanvas';
-import { BuilderSettingsPanel } from './BuilderSettingsPanel';
 import { BuilderToolbar } from './BuilderToolbar';
-import { BuilderLayersPanel } from './BuilderLayersPanel';
 import { useEmailEditor } from './hooks/useEmailEditor';
 import { useTemplateAutosave } from './hooks/useTemplateAutosave';
 import { useUnsavedChanges } from './hooks/useUnsavedChanges';
@@ -12,6 +8,7 @@ import { TemplateQualityPanel } from '../components/TemplateQualityPanel';
 import { TemplateExportDialog } from '../components/TemplateExportDialog';
 import { TemplateVersionDialog } from '../components/TemplateVersionDialog';
 import { AssetPickerDialog, ResourcePickerDialog, brandService } from '../../brand-library';
+import { CustomBuilderCanvas } from '../../email-builder';
 import { HtmlSourcePanel } from './HtmlSourcePanel';
 import { evaluateQualityChecks } from '../utils/qualityChecks';
 import { templateService } from '../services/template.service';
@@ -55,7 +52,7 @@ export const EmailBuilder: React.FC<Props> = ({ template, onBack, onSavedExit })
     name,
     subject,
     preheader,
-    editorType: 'react-email-editor',
+    editorType: 'custom-dnd',
     projectJson: await adapterRef.current?.getProject(),
     mjmlContent: await adapterRef.current?.getMjml(),
     compiledHtml: await adapterRef.current?.getCompiledHtml(),
@@ -195,108 +192,24 @@ export const EmailBuilder: React.FC<Props> = ({ template, onBack, onSavedExit })
         onOpenResourcePicker={() => setShowResourcePicker(true)}
       />
       {notice && <div className="builder-notice">{notice}</div>}
-      <div className="email-builder-layout">
-        <div className="builder-left-column">
-          <div className="builder-left-tabs">
-            <button
-              type="button"
-              className={`builder-tab-btn${activeTab === 'blocks' ? ' builder-tab-btn--active' : ''}`}
-              onClick={() => setActiveTab('blocks')}
-            >
-              Blocks
-            </button>
-            <button
-              type="button"
-              className={`builder-tab-btn${activeTab === 'layers' ? ' builder-tab-btn--active' : ''}`}
-              onClick={() => setActiveTab('layers')}
-            >
-              Layers
-            </button>
-          </div>
-          {activeTab === 'blocks' ? (
-            <BuilderBlocksPanel
-              onAddBlock={handleAddBlock}
-              onDragStart={setDraggingBlockType}
-              onDragEnd={() => setDraggingBlockType(null)}
-            />
-          ) : (
-            <aside className="builder-side-panel">
-              <h3>Layers</h3>
-              <p className="builder-layers-hint">Drag rows to reorder them.</p>
-              <BuilderLayersPanel rows={rows} onReorder={handleReorder} onSelect={handleSelectRow} selectedRowId={selectedRowId} />
-            </aside>
-          )}
-        </div>
-        <div style={{ position: 'relative', flex: 1, display: 'flex' }}>
-          {draggingBlockType && (
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'copy';
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                if (draggingBlockType) {
-                  handleAddBlock(draggingBlockType);
-                }
-                setDraggingBlockType(null);
-              }}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '3px dashed #3b82f6',
-                zIndex: 50,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem',
-                fontWeight: 600,
-                color: '#1d4ed8',
-                pointerEvents: 'auto',
-              }}
-            >
-              Drop to add block
-            </div>
-          )}
-          <BuilderCanvas
-            mjml={template.mjmlContent || ''}
-            html={template.compiledHtml || ''}
-            name={name}
-            project={template.projectJson}
-            device={device}
-            canvasWidth={canvasWidth}
-            socialProfiles={socialProfiles}
-            onReady={async (adapter) => { setAdapter(adapter); refreshHistoryState(); await refreshRows(); refreshQualityChecks(); }}
-            onChange={async () => { markDirty(); refreshHistoryState(); await refreshRows(); refreshQualityChecks(); setTimeout(() => refreshRows(), 600); }}
-            onSelect={setSelectedComponent}
-            onRequestImageUpload={(done, file) => {
-              setAssetPickerCallback(() => done);
-              setAssetPickerInitialFile(file || null);
-              setShowAssetPicker(true);
-            }}
-          />
-        </div>
-        <div className="builder-right-column">
-          <BuilderSettingsPanel
-            subject={subject}
-            preheader={preheader}
-            selected={selectedComponent}
-            onSubjectChange={setDirtySubject}
-            onPreheaderChange={setDirtyPreheader}
-            onSelectedChange={handleSelectedChange}
-            socialProfiles={socialProfiles}
-          />
-          <label className="test-send-inline">
-            Test recipient
-            <input className="ui-input" value={testEmail} onChange={(event) => setTestEmail(event.target.value)} placeholder="you@example.com" />
-          </label>
-          <TemplateQualityPanel issues={quality} />
-          <HtmlSourcePanel getHtml={async () => adapterRef.current?.getCompiledHtml() ?? ''} />
-        </div>
+      <div className="email-builder-layout" style={{ display: 'flex', flex: 1, width: '100%', overflow: 'hidden' }}>
+        <CustomBuilderCanvas
+          mjml={template.mjmlContent || ''}
+          html={template.compiledHtml || ''}
+          name={name}
+          project={template.projectJson}
+          device={device}
+          canvasWidth={canvasWidth}
+          activeTab={activeTab}
+          onReady={async (adapter) => { setAdapter(adapter); refreshHistoryState(); await refreshRows(); refreshQualityChecks(); }}
+          onChange={async () => { markDirty(); refreshHistoryState(); await refreshRows(); refreshQualityChecks(); }}
+          onSelect={setSelectedComponent}
+          onRequestImageUpload={(done, file) => {
+            setAssetPickerCallback(() => done);
+            setAssetPickerInitialFile(file || null);
+            setShowAssetPicker(true);
+          }}
+        />
       </div>
       {showVersions && <TemplateVersionDialog versions={versions} onClose={() => setShowVersions(false)} onRestore={handleRestore} />}
       <TemplateExportDialog

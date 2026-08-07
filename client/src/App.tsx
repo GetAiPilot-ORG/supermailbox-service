@@ -11,7 +11,6 @@ import { BrandLibraryPage } from './features/brand-library';
 import { TemplateManagerPage } from './features/email-templates/pages/TemplateManagerPage';
 import { TemplateGalleryPage } from './features/email-templates/pages/TemplateGalleryPage';
 import { TemplateBuilderPage } from './features/email-templates/pages/TemplateBuilderPage';
-import { ReactEmailEditorPoc } from './features/email-templates/poc/ReactEmailEditorPoc';
 import { EasyEmailEditorPoc } from './features/email-templates/poc/EasyEmailEditorPoc';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
@@ -21,10 +20,12 @@ import './App.css';
 
 
 
+import { CustomEmailEditorPoc } from './features/email-templates/poc/CustomEmailEditorPoc';
+
 gsap.registerPlugin(useGSAP);
 
 export const App: React.FC = () => {
-  if (window.location.pathname === '/dev/email-editor/react-email') return <ReactEmailEditorPoc />;
+  if (window.location.pathname === '/dev/email-editor/custom') return <CustomEmailEditorPoc />;
   if (window.location.pathname === '/dev/email-editor/easy-email') return <EasyEmailEditorPoc />;
   return <DashboardApp />;
 };

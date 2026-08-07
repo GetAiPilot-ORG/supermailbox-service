@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, UploadCloud, FileText, CheckCircle2, AlertCircle, Loader2, Folder, Image } from 'lucide-react';
 import { useAssetUpload } from '../hooks/useAssetUpload';
 import type { AssetFolder, AssetType, BrandAsset } from '../types/brand.types';

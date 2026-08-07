@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Download, History, Mail, Monitor, Redo2, Save, Smartphone, Tablet, Undo2, Image, Code } from 'lucide-react';
 import type { PreviewDevice, SaveState } from '../types/template.types';
+import { useDocumentStore } from '../../email-builder';
 
 type Props = {
   name: string;
@@ -93,6 +94,31 @@ export const BuilderToolbar: React.FC<Props> = ({
         >
           <Smartphone size={16} />
         </button>
+
+        {/* Zoom control */}
+        <select
+          aria-label="Canvas zoom level"
+          style={{
+            fontSize: '12px',
+            padding: '4px 6px',
+            borderRadius: '4px',
+            border: '1px solid #cbd5e1',
+            background: '#ffffff',
+            color: '#334155',
+            cursor: 'pointer',
+          }}
+          defaultValue="1"
+          onChange={(e) => {
+            const z = parseFloat(e.target.value);
+            useDocumentStore.getState().setZoom(z);
+          }}
+        >
+          <option value="0.5">50%</option>
+          <option value="0.75">75%</option>
+          <option value="1">100%</option>
+          <option value="1.25">125%</option>
+          <option value="1.5">150%</option>
+        </select>
 
         {/* Width input — always visible so user can type any size */}
         <div className="canvas-width-control" title="Email canvas width in pixels">

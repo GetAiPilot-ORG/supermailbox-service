@@ -8,60 +8,67 @@ export async function renderTemplate(
   const normalizedVariables = withDefaultTemplateVariables(variables);
 
   try {
-    // Attempt to lookup template and its current live version from database
-    const { data: templateRecord } = await supabase
+    // Attempt to lookup template by ID or key from database
+    let dbRow: any = null;
+
+    // Check by ID first if templateKey is a UUID/ID
+    const { data: byId } = await supabase
       .from('email_templates')
-      .select('id, current_version_id')
-      .eq('key', templateKey)
-      .single();
+      .select('id, key, name, subject, compiled_html, mjml_content, current_version_id')
+      .eq('id', templateKey)
+      .maybeSingle();
 
-    if (templateRecord) {
-      let versionRecord: { subject: string; html_source: string } | null = null;
+    if (byId) {
+      dbRow = byId;
+    } else {
+      const { data: byKey } = await supabase
+        .from('email_templates')
+        .select('id, key, name, subject, compiled_html, mjml_content, current_version_id')
+        .eq('key', templateKey)
+        .maybeSingle();
+      dbRow = byKey;
+    }
 
-      if (templateRecord.current_version_id) {
-        const { data } = await supabase
+    if (dbRow) {
+      let html = dbRow.compiled_html || '';
+      let subject = dbRow.subject || dbRow.name || '';
+
+      // Check current_version_id or latest template_version if compiled_html is empty
+      if (!html && dbRow.current_version_id) {
+        const { data: ver } = await supabase
           .from('template_versions')
           .select('subject, html_source')
-          .eq('id', templateRecord.current_version_id)
-          .single();
-
-        versionRecord = data;
+          .eq('id', dbRow.current_version_id)
+          .maybeSingle();
+        if (ver) {
+          if (ver.html_source) html = ver.html_source;
+          if (ver.subject) subject = ver.subject;
+        }
       }
 
-      if (!versionRecord) {
-        const { data } = await supabase
+      if (!html) {
+        const { data: latestVer } = await supabase
           .from('template_versions')
           .select('subject, html_source')
-          .eq('template_id', templateRecord.id)
-          .eq('status', 'live')
+          .eq('template_id', dbRow.id)
           .order('version_number', { ascending: false })
           .limit(1)
           .maybeSingle();
-
-        versionRecord = data;
+        if (latestVer) {
+          if (latestVer.html_source) html = latestVer.html_source;
+          if (latestVer.subject) subject = latestVer.subject;
+        }
       }
 
-      if (!versionRecord) {
-        const { data } = await supabase
-          .from('template_versions')
-          .select('subject, html_source')
-          .eq('template_id', templateRecord.id)
-          .order('version_number', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        versionRecord = data;
-      }
-
-      if (versionRecord) {
+      if (html) {
         return {
-          subject: interpolateVariables(versionRecord.subject, normalizedVariables),
-          html: addResponsiveEmailFixes(interpolateVariables(versionRecord.html_source, normalizedVariables))
+          subject: interpolateVariables(subject, normalizedVariables),
+          html: addResponsiveEmailFixes(interpolateVariables(html, normalizedVariables)),
         };
       }
     }
   } catch (err) {
-    // Fall back to clean dynamic default template if not found in DB
+    console.warn('[renderTemplate] Database lookup exception:', err);
   }
 
   // Fallback Templates if not found in DB
