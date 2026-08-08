@@ -294,7 +294,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
             </div>
             <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--ink)' }}>{jobStats.queued + jobStats.sent + jobStats.failed + jobStats.suppressed}</div>
           </div>
-          
+
           <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Sent or delivered</span>
@@ -302,7 +302,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
             </div>
             <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--ink)' }}>{jobStats.sent}</div>
           </div>
-          
+
           <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Queued</span>
@@ -310,7 +310,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
             </div>
             <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--ink)' }}>{jobStats.queued}</div>
           </div>
-          
+
           <div style={{ background: '#F5F1EC', border: '1px solid var(--border)', borderRadius: '8px', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Failed or bounced</span>
@@ -323,10 +323,10 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
 
       {/* TWO COLUMN LAYOUT */}
       <div className="campaign-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: '16px', alignItems: 'start', flex: 1 }}>
-        
+
         {/* LEFT COLUMN: Configuration */}
         <div className="campaign-left">
-          
+
           <div className="dashboard-panel" style={{ background: 'var(--surface)', padding: '16px 20px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
             <div className="dashboard-table-header compact" style={{ marginBottom: '12px' }}>
               <div>
@@ -334,7 +334,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                 <h2 style={{ fontSize: '1.1rem' }}>Target Audience</h2>
               </div>
             </div>
-            
+
             <div className="campaign-segment-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '16px' }}>
               {[
                 { label: 'All Users', count: totalCount, mode: 'all', activeBg: '#EAECE9', activeBorder: '#0D4F3C', dotColor: '#0D4F3C' },
@@ -442,12 +442,12 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               </table>
             </div>
           </div>
-          
+
         </div>
 
         {/* RIGHT COLUMN: Summary */}
         <div className="campaign-summary">
-          
+
           <div className="dashboard-panel" style={{ background: 'var(--surface)', padding: '16px 20px', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
             <div className="dashboard-table-header compact" style={{ marginBottom: '14px' }}>
               <div>
@@ -455,7 +455,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                 <h2 style={{ fontSize: '1.1rem' }}>Campaign Details</h2>
               </div>
             </div>
-            
+
             <form onSubmit={handleLaunch} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
                 <label style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', letterSpacing: '0.04em' }}>CAMPAIGN NAME</label>
@@ -516,7 +516,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                   <span style={{ fontSize: '0.825rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Recipients Selected</span>
                   <span className="badge-pill badge-neutral" style={{ fontSize: '0.9rem', fontWeight: 700, padding: '3px 10px' }}>{activeSelectedCount}</span>
                 </div>
-                
+
                 <button
                   type="submit"
                   disabled={activeSelectedCount === 0 || !campaignName || isBroadcasting}
@@ -524,7 +524,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                   style={{ width: '100%', padding: '12px', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
                   {isBroadcasting ? (
-                    <>Processing <Activity size={16} className="spin-loader" style={{border: 'none', animation: 'spin 1s linear infinite'}} /></>
+                    <>Processing <Activity size={16} className="spin-loader" style={{ border: 'none', animation: 'spin 1s linear infinite' }} /></>
                   ) : (
                     <>Launch Campaign <Send size={15} /></>
                   )}
@@ -545,7 +545,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>SMTP / Delivery Config</h3>
               <button onClick={() => setShowSettingsModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} color="var(--text-muted)" /></button>
             </div>
-            
+
             <form onSubmit={handleSaveMailerConfig} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>ZeptoMail API Key</label>
@@ -556,7 +556,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                 <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Verified Sender Email</label>
                 <input type="email" value={fromEmail} onChange={(e) => setFromEmail(e.target.value)} placeholder="noreply@your-verified-domain.com" className="ui-input" style={{ width: '100%' }} />
               </div>
-              
+
               <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
                 <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '12px' }}>Fallback Custom SMTP</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -567,7 +567,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
                   </div>
                 </div>
               </div>
-              
+
               <button type="submit" className="btn-primary" style={{ marginTop: '8px' }}>Save Configuration</button>
             </form>
           </div>
@@ -582,7 +582,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
               <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--neutral)' }}>Add Test Email</h3>
               <button onClick={() => setShowAddEmailModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={18} /></button>
             </div>
-            
+
             <form onSubmit={handleAddCustomEmail} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>EMAIL ADDRESS</label>

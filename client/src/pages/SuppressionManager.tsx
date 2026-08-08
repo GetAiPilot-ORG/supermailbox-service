@@ -170,29 +170,17 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
       if (item.reason === 'manual' || item.reason === 'unsubscribe') bucket.manual += 1;
     });
 
-    return Array.from(buckets.values()).reduce<Array<ReturnType<typeof buildAudienceWeek>[number]>>((acc, day) => {
-      const previous = acc[acc.length - 1];
-      acc.push({
-        ...day,
-        total: day.total + (previous?.total || 0),
-        hard: day.hard + (previous?.hard || 0),
-        soft: day.soft + (previous?.soft || 0),
-        suppressed: day.suppressed + (previous?.suppressed || 0),
-        complaint: day.complaint + (previous?.complaint || 0),
-        manual: day.manual + (previous?.manual || 0)
-      });
-      return acc;
-    }, []);
+    return Array.from(buckets.values());
   }, [bounceReports, suppressions]);
 
-  const audienceTotals = audienceTrendData[audienceTrendData.length - 1] || {
-    total: 0,
-    hard: 0,
-    soft: 0,
-    suppressed: 0,
-    complaint: 0,
-    manual: 0,
-    month: ''
+  const audienceTotals = {
+    total: bounceReports.length,
+    hard: hardBounces.length,
+    soft: softBounces.length,
+    suppressed: suppressions.length,
+    complaint: complaintCount,
+    manual: manualCount + unsubscribeCount,
+    month: audienceTrendData[audienceTrendData.length - 1]?.month || ''
   };
 
   const audienceLegend = [
@@ -314,19 +302,19 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
       </div>
 
       {activeTab !== 'suppression' && (
-        <div className="screen-panel audience-tracker-panel">
-          <div className="audience-tracker-header">
+        <div className="screen-panel audience-tracker-panel zepto-report-card audience-zepto-report">
+          <div className="zepto-report-header">
             <div>
-              <span>Audience analysis</span>
-              <h3>
-                {bounceFilter === 'hard'
-                  ? 'Last 7 days HARD bounce tracker'
-                  : bounceFilter === 'soft'
-                  ? 'Last 7 days SOFT bounce tracker'
-                  : 'Last 7 days bounce and suppression tracker'}
-              </h3>
+              <h3>Overall Report</h3>
+              <span className="zepto-info-dot">i</span>
             </div>
-            <div className="audience-tracker-controls">
+            <div className="zepto-report-tools audience-report-tools">
+              <button type="button" title="Export report">
+                <HardDriveDownload size={15} />
+              </button>
+              <button type="button" title="Line chart">
+                <BarChart3 size={15} />
+              </button>
               <div className="bounce-type-toggle" aria-label="Bounce type filter">
                 {(['all', 'hard', 'soft'] as BounceFilter[]).map((type) => (
                   <button key={type} className={bounceFilter === type ? 'active' : ''} onClick={() => setBounceFilter(type)}>
@@ -340,22 +328,22 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
             </div>
           </div>
 
-          <div className="audience-tracker-layout">
-            <div className="audience-tracker-chart">
+          <div className="zepto-report-body audience-tracker-layout">
+            <div className="zepto-chart-shell audience-tracker-chart">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={audienceTrendData} margin={{ top: 8, right: 18, left: -8, bottom: 8 }}>
-                  <CartesianGrid stroke="rgba(119, 124, 120, 0.18)" vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} />
-                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={34} />
-                  <Tooltip />
+                <LineChart data={audienceTrendData} margin={{ top: 12, right: 12, left: -8, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="0" vertical={false} stroke="#E8E8E8" />
+                  <XAxis dataKey="label" axisLine={{ stroke: '#E8E8E8' }} tickLine={false} tick={{ fontSize: 12, fill: '#5E5E5E' }} dy={8} />
+                  <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#5E5E5E' }} label={{ value: 'Email count', angle: -90, position: 'insideLeft', fill: '#555', fontSize: 12 }} width={42} />
+                  <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #DCDCDC', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }} />
                   {bounceFilter === 'all' && (
                     <>
-                      <Line type="monotone" dataKey="total" stroke={BOUNCE_COLORS.total} strokeWidth={3} dot={false} name="Total Bounces" />
-                      <Line type="monotone" dataKey="hard" stroke={BOUNCE_COLORS.hard} strokeWidth={2.6} dot={false} name="Hard Bounces" />
-                      <Line type="monotone" dataKey="soft" stroke={BOUNCE_COLORS.soft} strokeWidth={2.6} dot={false} name="Soft Bounces" />
-                      <Line type="monotone" dataKey="suppressed" stroke={BOUNCE_COLORS.suppressed} strokeWidth={2.6} dot={false} name="Suppressed" />
-                      <Line type="monotone" dataKey="complaint" stroke={BOUNCE_COLORS.complaint} strokeWidth={2.2} dot={false} name="Complaints" />
-                      <Line type="monotone" dataKey="manual" stroke={BOUNCE_COLORS.manual} strokeWidth={2.2} dot={false} name="Manual" />
+                      <Line type="monotone" dataKey="total" stroke={BOUNCE_COLORS.total} strokeWidth={3} dot={false} activeDot={{ r: 5, fill: BOUNCE_COLORS.total }} name="All bounces" />
+                      <Line type="monotone" dataKey="hard" stroke={BOUNCE_COLORS.hard} strokeWidth={2.6} dot={false} activeDot={{ r: 5, fill: BOUNCE_COLORS.hard }} name="Hard bounces" />
+                      <Line type="monotone" dataKey="soft" stroke={BOUNCE_COLORS.soft} strokeWidth={2.6} dot={false} activeDot={{ r: 5, fill: BOUNCE_COLORS.soft }} name="Soft bounces" />
+                      <Line type="monotone" dataKey="suppressed" stroke={BOUNCE_COLORS.suppressed} strokeWidth={2.6} dot={false} activeDot={{ r: 5, fill: BOUNCE_COLORS.suppressed }} name="Suppressed" />
+                      <Line type="monotone" dataKey="complaint" stroke={BOUNCE_COLORS.complaint} strokeWidth={2.2} dot={false} activeDot={{ r: 5, fill: BOUNCE_COLORS.complaint }} name="Complaints" />
+                      <Line type="monotone" dataKey="manual" stroke={BOUNCE_COLORS.manual} strokeWidth={2.2} dot={false} activeDot={{ r: 5, fill: BOUNCE_COLORS.manual }} name="Manual / opt-out" />
                     </>
                   )}
                   {bounceFilter === 'hard' && (
@@ -366,10 +354,10 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
                   )}
                 </LineChart>
               </ResponsiveContainer>
-              <span className="audience-month-label">{audienceTotals.month}</span>
+              <span className="zepto-chart-month audience-month-label">{audienceTotals.month}</span>
             </div>
 
-            <div className="audience-tracker-legend">
+            <div className="zepto-report-legend audience-tracker-legend">
               {audienceLegend
                 .filter((item) => {
                   if (bounceFilter === 'hard') return item.key === 'hard' || item.key === 'total';
@@ -377,7 +365,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
                   return true;
                 })
                 .map((item) => (
-                  <div key={item.key}>
+                  <div key={item.key} className="zepto-report-pill">
                     <span><b style={{ background: item.color }} /> {item.label}</span>
                     <strong>{item.value}</strong>
                     {item.suffix ? <em>{item.suffix}</em> : null}

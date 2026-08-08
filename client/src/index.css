@@ -327,6 +327,73 @@ textarea:focus-visible {
 .dashboard-live-card span { display: block; color: color-mix(in srgb, var(--surface) 72%, transparent); font-size: 0.8rem; }
 .dashboard-live-card strong { display: block; margin-top: 4px; color: var(--surface); }
 
+.dashboard-credits-card {
+  padding: 18px 24px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.dashboard-credits-header,
+.dashboard-credits-body {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-credits-header {
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.dashboard-credits-header h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.02rem;
+  font-weight: 750;
+}
+
+.dashboard-credits-header button {
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.dashboard-credits-body {
+  gap: 16px;
+}
+
+.dashboard-credits-icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  color: var(--ink);
+}
+
+.dashboard-credits-body strong,
+.dashboard-credits-body span {
+  display: block;
+}
+
+.dashboard-credits-body strong {
+  color: #050505;
+  font-size: 1.28rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.dashboard-credits-body span {
+  margin-top: 8px;
+  color: #444444;
+  font-size: 1rem;
+}
+
 .dashboard-kpi-grid,
 .dashboard-analytics-grid,
 .dashboard-insight-grid,
@@ -397,6 +464,127 @@ textarea:focus-visible {
 
 .dashboard-chart { width: 100%; height: 230px; }
 .dashboard-chart.tall { height: 308px; }
+.zepto-report-card {
+  min-height: 398px;
+  padding: 24px 26px;
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+}
+.zepto-report-header,
+.zepto-report-header > div,
+.zepto-report-tools,
+.zepto-report-body,
+.zepto-report-pill,
+.zepto-report-pill span {
+  display: flex;
+  align-items: center;
+}
+.zepto-report-header {
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.zepto-report-header > div {
+  gap: 8px;
+}
+.zepto-report-header h3 {
+  color: #000000;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+.zepto-info-dot {
+  width: 14px;
+  height: 14px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #aab3c2;
+  border-radius: 999px;
+  color: #8a94a6;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.zepto-report-tools {
+  gap: 8px;
+}
+.zepto-report-tools > button,
+.zepto-report-tools > select {
+  height: 30px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #111827;
+}
+.zepto-report-tools > button {
+  width: 31px;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+}
+.zepto-report-tools > select {
+  min-width: 148px;
+  padding: 0 36px 0 10px;
+  font-size: 0.8rem;
+}
+.zepto-report-body {
+  align-items: stretch;
+  gap: 22px;
+}
+.zepto-chart-shell {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 294px;
+  padding-bottom: 18px;
+}
+.zepto-chart-month {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  color: #555555;
+  font-size: 0.78rem;
+}
+.zepto-report-legend {
+  width: 250px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.zepto-report-pill {
+  min-height: 31px;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 6px 14px;
+  border: 1px solid #e2e2e2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 0.86rem;
+}
+.zepto-report-pill span {
+  min-width: 0;
+  gap: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.zepto-report-pill b {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 2px;
+}
+.zepto-report-pill strong {
+  margin-left: auto;
+  font-weight: 700;
+}
+.zepto-report-pill em {
+  color: #ef4444;
+  font-size: 0.78rem;
+  font-style: normal;
+  white-space: nowrap;
+}
 .dashboard-radial { width: 174px; height: 174px; margin: 4px auto 18px; display: grid; place-items: center; border-radius: 999px; background: conic-gradient(var(--success) 0 98%, var(--surface-muted) 98% 100%); }
 .dashboard-radial-score { width: 122px; height: 122px; display: grid; place-items: center; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
 .dashboard-radial-score strong { font-size: 2.7rem; }
@@ -1263,6 +1451,18 @@ textarea.ui-input { line-height: 1.5; }
   .screen-hero, .dashboard-command-hero, .project-logs-hero { align-items: stretch; flex-direction: column; }
   .dashboard-hero-actions { min-width: 0; justify-items: stretch; }
   .dashboard-live-card { width: 100%; }
+  .zepto-report-header,
+  .zepto-report-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .zepto-report-tools {
+    justify-content: flex-end;
+  }
+  .zepto-report-legend {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .project-logs-grid { grid-template-columns: 1fr; height: auto; }
   .project-logs-projects { border-right: 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; overflow-x: auto; }
   .project-logs-projects-header { min-width: 90px; align-items: center; margin: 0; }
@@ -1289,6 +1489,19 @@ textarea.ui-input { line-height: 1.5; }
   .dashboard-pagination,
   .campaign-toolbar,
   .suppression-toolbar { align-items: stretch; flex-direction: column; }
+  .zepto-report-card {
+    padding: 18px;
+  }
+  .zepto-report-tools {
+    flex-wrap: wrap;
+  }
+  .zepto-report-tools select {
+    flex: 1;
+    min-width: 160px;
+  }
+  .zepto-report-legend {
+    grid-template-columns: 1fr;
+  }
   .search-shell input { min-width: 0; }
   .template-workshop { padding: 12px; }
   .template-workshop {
@@ -3255,6 +3468,7 @@ th {
 
 .template-grid.list {
   grid-template-columns: 1fr;
+  gap: 10px;
 }
 
 .email-template-card,
@@ -3290,13 +3504,46 @@ th {
 }
 
 .email-template-preview iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 760px;
   height: 560px;
   border: 0;
   background: #ffffff;
-  transform: scale(0.37);
-  transform-origin: 0 0;
+  transform: translate(-50%, -50%) scale(var(--template-preview-scale, 0.37));
+  transform-origin: center;
   pointer-events: none;
+}
+
+.template-grid.list .email-template-card {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 184px;
+}
+
+.template-grid.list .email-template-preview {
+  height: 100%;
+  min-height: 184px;
+  aspect-ratio: auto;
+  border-right: 1px solid var(--border);
+  border-bottom: 0;
+  --template-preview-scale: 0.3;
+}
+
+.template-grid.list .email-template-card-body {
+  align-content: center;
+  padding: 18px 20px;
+}
+
+.template-grid.list .email-template-card-top {
+  align-items: flex-start;
+}
+
+.template-grid.list .email-template-actions {
+  justify-content: flex-start;
+  opacity: 1;
+  transform: none;
 }
 
 .email-template-blank-preview {
@@ -4057,6 +4304,19 @@ th {
   .template-preview-grid {
     grid-template-columns: 1fr;
   }
+
+  .template-grid.list .email-template-card {
+    grid-template-columns: 1fr;
+  }
+
+  .template-grid.list .email-template-preview {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1.42;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    --template-preview-scale: 0.37;
+  }
 }
 
 /* ==========================================================================
@@ -4317,6 +4577,89 @@ th {
 .reputation-tab-group button.active {
   color: var(--text-primary, #0a1317);
   font-weight: 700;
+}
+
+.suppression-screen .audience-zepto-report {
+  min-height: 398px;
+  padding: 24px 26px;
+  border-radius: var(--radius-lg, 8px);
+  background: #ffffff;
+}
+
+.suppression-screen .audience-report-tools {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.suppression-screen .audience-report-tools .bounce-type-toggle {
+  height: 30px;
+  padding: 2px;
+}
+
+.suppression-screen .audience-report-tools .bounce-type-toggle button {
+  min-width: 58px;
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 3px;
+  font-size: 0.78rem;
+}
+
+.suppression-screen .audience-report-tools .audience-range-select {
+  height: 30px;
+  min-width: 120px;
+  padding: 0 28px 0 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.suppression-screen .audience-zepto-report .audience-tracker-layout {
+  align-items: stretch;
+  gap: 22px;
+}
+
+.suppression-screen .audience-zepto-report .audience-tracker-chart {
+  flex: 1;
+  min-width: 0;
+  height: 294px;
+  padding-bottom: 18px;
+}
+
+.suppression-screen .audience-zepto-report .audience-tracker-legend {
+  width: 250px;
+  min-width: 250px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.suppression-screen .audience-zepto-report .audience-tracker-legend .zepto-report-pill {
+  min-height: 31px;
+  padding: 6px 14px;
+  border: 1px solid #e2e2e2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  box-shadow: none;
+}
+
+.suppression-screen .audience-zepto-report .audience-tracker-legend .zepto-report-pill span {
+  min-width: 0;
+  overflow: hidden;
+  color: #222222;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.suppression-screen .audience-zepto-report .audience-tracker-legend .zepto-report-pill strong {
+  margin-left: auto;
+  color: #000000;
+  font-weight: 700;
+}
+
+.suppression-screen .audience-zepto-report .audience-tracker-legend .zepto-report-pill em {
+  color: #ff001f;
+  font-size: 0.78rem;
+  font-style: normal;
 }
 
 .dashboard-table-wrap {
