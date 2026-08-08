@@ -13,13 +13,18 @@ const groups = [
   { name: 'Sections', items: [
     { id: 'hero', label: 'Hero', Icon: PanelBottom },
     { id: 'feature', label: 'Features', Icon: Columns2 },
+    { id: 'favicon_menu', label: 'Favicon Navbar', Icon: Link2 },
     { id: 'footer', label: 'Footer', Icon: Link2 },
   ] },
 ];
 
-type Props = { onAddBlock: (blockType: string) => void };
+type Props = { 
+  onAddBlock: (blockType: string) => void;
+  onDragStart?: (blockType: string) => void;
+  onDragEnd?: () => void;
+};
 
-export const BuilderBlocksPanel: React.FC<Props> = ({ onAddBlock }) => {
+export const BuilderBlocksPanel: React.FC<Props> = ({ onAddBlock, onDragStart, onDragEnd }) => {
   const [query, setQuery] = useState('');
   const filtered = useMemo(() => groups.map((group) => ({
     ...group,
@@ -38,7 +43,20 @@ export const BuilderBlocksPanel: React.FC<Props> = ({ onAddBlock }) => {
           <summary>{name}</summary>
           <div className="builder-block-grid">
             {items.map(({ id, label, Icon }) => (
-              <button key={id} type="button" onClick={() => onAddBlock(id)} title={`Add ${label}`}>
+              <button 
+                key={id} 
+                type="button" 
+                onClick={() => onAddBlock(id)} 
+                title={`Add ${label}`}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.effectAllowed = 'copy';
+                  if (onDragStart) onDragStart(id);
+                }}
+                onDragEnd={() => {
+                  if (onDragEnd) onDragEnd();
+                }}
+              >
                 <Icon size={16} />
                 <span>{label}</span>
               </button>

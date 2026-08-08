@@ -3,6 +3,7 @@ import { Palette, RotateCcw, Save, Check, Type, Layout, ShieldAlert, AlertCircle
 import { useBrandStyles, DEFAULT_STYLES } from '../hooks/useBrandStyles';
 import { brandStylesSchema } from '../schemas/brand.schema';
 import type { BrandStyles } from '../types/brand.types';
+import { GradientColorPicker } from './GradientColorPicker';
 
 interface BrandStyleEditorProps {
   brandId?: string;
@@ -127,127 +128,55 @@ export const BrandStyleEditor: React.FC<BrandStyleEditorProps> = ({ brandId }) =
               {/* Primary */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Primary Color (CTA / Highlights)</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={tokens.primary_color}
-                    onChange={(e) => handleChange('primary_color', e.target.value)}
-                    className="w-10 h-10 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={tokens.primary_color}
-                    onChange={(e) => handleChange('primary_color', e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    maxLength={7}
-                    required
-                  />
-                </div>
+                <GradientColorPicker
+                  value={tokens.primary_color}
+                  onChange={(v) => handleChange('primary_color', v)}
+                />
               </div>
 
               {/* Secondary */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Secondary Color (Accents / Borders)</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={tokens.secondary_color}
-                    onChange={(e) => handleChange('secondary_color', e.target.value)}
-                    className="w-10 h-10 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={tokens.secondary_color}
-                    onChange={(e) => handleChange('secondary_color', e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    maxLength={7}
-                    required
-                  />
-                </div>
+                <GradientColorPicker
+                  value={tokens.secondary_color}
+                  onChange={(v) => handleChange('secondary_color', v)}
+                />
               </div>
 
               {/* Background */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Email Background Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={tokens.background_color}
-                    onChange={(e) => handleChange('background_color', e.target.value)}
-                    className="w-10 h-10 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={tokens.background_color}
-                    onChange={(e) => handleChange('background_color', e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    maxLength={7}
-                    required
-                  />
-                </div>
+                <GradientColorPicker
+                  value={tokens.background_color}
+                  onChange={(v) => handleChange('background_color', v)}
+                />
               </div>
 
               {/* Text Color */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Primary Text Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={tokens.text_color}
-                    onChange={(e) => handleChange('text_color', e.target.value)}
-                    className="w-10 h-10 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={tokens.text_color}
-                    onChange={(e) => handleChange('text_color', e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    maxLength={7}
-                    required
-                  />
-                </div>
+                <GradientColorPicker
+                  value={tokens.text_color}
+                  onChange={(v) => handleChange('text_color', v)}
+                />
               </div>
 
               {/* Muted Text */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Muted Text / Footers Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={tokens.muted_text_color}
-                    onChange={(e) => handleChange('muted_text_color', e.target.value)}
-                    className="w-10 h-10 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={tokens.muted_text_color}
-                    onChange={(e) => handleChange('muted_text_color', e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    maxLength={7}
-                    required
-                  />
-                </div>
+                <GradientColorPicker
+                  value={tokens.muted_text_color}
+                  onChange={(v) => handleChange('muted_text_color', v)}
+                />
               </div>
 
               {/* Link Color */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Hyperlinks & Anchor Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={tokens.link_color}
-                    onChange={(e) => handleChange('link_color', e.target.value)}
-                    className="w-10 h-10 rounded-xl border border-slate-300 cursor-pointer p-0.5 bg-white shrink-0"
-                  />
-                  <input
-                    type="text"
-                    value={tokens.link_color}
-                    onChange={(e) => handleChange('link_color', e.target.value)}
-                    className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                    maxLength={7}
-                    required
-                  />
-                </div>
+                <GradientColorPicker
+                  value={tokens.link_color}
+                  onChange={(v) => handleChange('link_color', v)}
+                />
               </div>
             </div>
           </div>

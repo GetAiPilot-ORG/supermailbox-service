@@ -68,18 +68,39 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
   const [zeptoApiKey, setZeptoApiKey] = useState('');
   const [fromEmail, setFromEmail] = useState('noreply@getaipilot.com');
   const [settingsSavedMessage, setSettingsSavedMessage] = useState(false);
+  const [templateList, setTemplateList] = useState<Template[]>(templates);
+
+  const fetchLiveTemplates = async () => {
+    const live = await ApiService.getTemplates();
+    if (live && live.length > 0) {
+      setTemplateList(live);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
     fetchMailerConfig();
+    fetchLiveTemplates();
   }, []);
 
   useEffect(() => {
-    if (templates.length === 0) return;
-    if (!templates.some((template) => template.key === selectedTemplate)) {
-      setSelectedTemplate(templates[0].key);
+    if (showTemplateModal) {
+      fetchLiveTemplates();
     }
-  }, [templates, selectedTemplate]);
+  }, [showTemplateModal]);
+
+  useEffect(() => {
+    if (templates.length > 0) {
+      setTemplateList(templates);
+    }
+  }, [templates]);
+
+  useEffect(() => {
+    if (templateList.length === 0) return;
+    if (!templateList.some((template) => template.key === selectedTemplate)) {
+      setSelectedTemplate(templateList[0].key);
+    }
+  }, [templateList, selectedTemplate]);
 
   const fetchMailerConfig = async () => {
     try {
@@ -686,7 +707,7 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
 
             {/* Template List */}
             <div style={{ padding: '16px 24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {templates
+              {templateList
                 .filter((t) =>
                   !templateSearch ||
                   t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||

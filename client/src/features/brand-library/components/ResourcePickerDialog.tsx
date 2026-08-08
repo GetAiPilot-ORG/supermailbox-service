@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Code, Tag, FileText, Link2, Phone, Sparkles, Check, ChevronRight } from 'lucide-react';
+import { X, Search, Code, Tag, FileText, Link2, Phone, ChevronRight } from 'lucide-react';
 import { resourceResolverService, type BrandMergeTag } from '../services/resourceResolver.service';
 import { brandService } from '../services/brand.service';
 
@@ -21,21 +21,17 @@ export const ResourcePickerDialog: React.FC<ResourcePickerDialogProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [snippets, setSnippets] = useState<any[]>([]);
-  const [loadingSnippets, setLoadingSnippets] = useState<boolean>(false);
 
   const staticTags = resourceResolverService.getAvailableMergeTags();
 
   useEffect(() => {
     if (isOpen) {
-      setLoadingSnippets(true);
       brandService.listSnippets({ brandId })
         .then(res => setSnippets(res || []))
-        .catch(err => console.warn('Could not load snippets for picker:', err))
-        .finally(() => setLoadingSnippets(false));
+        .catch(err => console.warn('Could not load snippets for picker:', err));
     }
   }, [isOpen, brandId]);
 
-  // Combine static merge tags with dynamic snippet tags
   const snippetTags: BrandMergeTag[] = snippets.map(s => {
     const cleanSlug = s.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
     return {
@@ -47,78 +43,177 @@ export const ResourcePickerDialog: React.FC<ResourcePickerDialogProps> = ({
   });
 
   const allTags = [...staticTags, ...snippetTags];
-
   const categories = ['All', 'Company', 'Contacts', 'URLs & Links', 'Design & Colors', 'Snippets', 'System'];
 
   const filteredTags = allTags.filter(t => {
     const matchesCat = selectedCategory === 'All' || t.category === selectedCategory;
-    const matchesSearch = !searchQuery || t.label.toLowerCase().includes(searchQuery.toLowerCase()) || t.tag.toLowerCase().includes(searchQuery.toLowerCase()) || t.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = !searchQuery ||
+      t.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCat && matchesSearch;
   });
 
   const getCatIcon = (cat: string) => {
-    if (cat === 'Company') return <Tag className="w-3.5 h-3.5 text-indigo-500" />;
-    if (cat === 'Contacts') return <Phone className="w-3.5 h-3.5 text-emerald-500" />;
-    if (cat === 'URLs & Links') return <Link2 className="w-3.5 h-3.5 text-purple-500" />;
-    if (cat === 'Snippets') return <FileText className="w-3.5 h-3.5 text-amber-500" />;
-    return <Code className="w-3.5 h-3.5 text-slate-500" />;
+    if (cat === 'Company') return <Tag size={16} color="#6366f1" />;
+    if (cat === 'Contacts') return <Phone size={16} color="#10b981" />;
+    if (cat === 'URLs & Links') return <Link2 size={16} color="#a855f7" />;
+    if (cat === 'Snippets') return <FileText size={16} color="#f59e0b" />;
+    return <Code size={16} color="#64748b" />;
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-white rounded max-w-3xl w-full shadow-2xl border border-slate-300 overflow-hidden flex flex-col max-h-[80vh] animate-scaleUp">
-        
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        backgroundColor: 'rgba(15, 23, 42, 0.65)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        boxSizing: 'border-box',
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '720px',
+          maxHeight: '85vh',
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          border: '1px solid #e2e8f0',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600">
-              <Code className="w-5 h-5" />
+        <div
+          style={{
+            backgroundColor: '#f8fafc',
+            borderBottom: '1px solid #e2e8f0',
+            padding: '16px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                backgroundColor: '#e0e7ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#4f46e5',
+              }}
+            >
+              <Code size={20} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 leading-tight">Insert Brand Merge Tag Token</h3>
-              <p className="text-xs text-slate-500 font-medium">Insert database-driven personalization and compliance variables</p>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
+                Insert Brand Merge Tag Token
+              </h3>
+              <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#64748b' }}>
+                Insert database-driven personalization and compliance variables
+              </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded transition"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#94a3b8',
+              padding: '6px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            <X className="w-5 h-5" />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Filters Toolbar */}
-        <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded text-xs font-semibold whitespace-nowrap transition ${
-                  selectedCategory === cat ? 'bg-indigo-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+        {/* Toolbar: Category Filters & Search */}
+        <div
+          style={{
+            backgroundColor: '#f8fafc',
+            borderBottom: '1px solid #e2e8f0',
+            padding: '12px 20px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
+            {categories.map((cat) => {
+              const active = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    backgroundColor: active ? '#4f46e5' : '#ffffff',
+                    color: active ? '#ffffff' : '#475569',
+                    border: active ? '1px solid #4f46e5' : '1px solid #cbd5e1',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {cat}
+                </button>
+              );
+            })}
           </div>
 
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div style={{ position: 'relative', minWidth: '200px' }}>
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
             <input
               type="text"
               placeholder="Search tokens..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bl-input pl-8 pr-3 py-1.5 w-48"
+              style={{
+                width: '100%',
+                padding: '6px 12px 6px 32px',
+                fontSize: '12px',
+                borderRadius: '6px',
+                border: '1px solid #cbd5e1',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
             />
           </div>
         </div>
 
-        {/* Body / List */}
-        <div className="p-4 overflow-y-auto flex-1 space-y-2">
+        {/* List Content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {filteredTags.length === 0 ? (
-            <div className="text-center py-12 text-xs text-slate-400">
+            <div style={{ textAlign: 'center', padding: '48px 0', fontSize: '13px', color: '#94a3b8' }}>
               No merge tags found matching your search.
             </div>
           ) : (
@@ -133,26 +228,81 @@ export const ResourcePickerDialog: React.FC<ResourcePickerDialogProps> = ({
                   });
                   onClose();
                 }}
-                className="bg-slate-50 hover:bg-indigo-50/70 border border-slate-200/80 hover:border-indigo-300 rounded p-3.5 flex items-center justify-between gap-4 cursor-pointer transition group"
+                style={{
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#eff6ff';
+                  e.currentTarget.style.borderColor = '#93c5fd';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
               >
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="p-2 rounded bg-white border border-slate-200/80 shrink-0 mt-0.5">
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', minWidth: 0 }}>
+                  <div
+                    style={{
+                      padding: '8px',
+                      borderRadius: '6px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: '2px',
+                    }}
+                  >
                     {getCatIcon(item.category)}
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-slate-900 group-hover:text-indigo-700 transition">{item.label}</span>
-                      <span className="px-1.5 py-0.2 text-[9px] font-bold uppercase rounded bg-slate-200 text-slate-600">{item.category}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>{item.label}</span>
+                      <span
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          backgroundColor: '#e2e8f0',
+                          color: '#475569',
+                        }}
+                      >
+                        {item.category}
+                      </span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5 truncate">{item.description}</p>
+                    <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {item.description}
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-white border border-slate-200 text-indigo-700 group-hover:bg-indigo-100 group-hover:border-indigo-300 transition">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                  <span
+                    style={{
+                      fontFamily: 'monospace',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      color: '#4f46e5',
+                    }}
+                  >
                     {item.tag}
                   </span>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition" />
+                  <ChevronRight size={16} color="#94a3b8" />
                 </div>
               </div>
             ))
@@ -160,16 +310,36 @@ export const ResourcePickerDialog: React.FC<ResourcePickerDialogProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 shrink-0">
+        <div
+          style={{
+            backgroundColor: '#f8fafc',
+            borderTop: '1px solid #e2e8f0',
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '12px',
+            color: '#64748b',
+          }}
+        >
           <span>Click any token card to insert it directly into your template text or link field.</span>
           <button
+            type="button"
             onClick={onClose}
-            className="bl-btn bl-btn--secondary"
+            style={{
+              padding: '6px 16px',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#475569',
+              backgroundColor: '#ffffff',
+              border: '1px solid #cbd5e1',
+              borderRadius: '6px',
+              cursor: 'pointer',
+            }}
           >
             Cancel
           </button>
         </div>
-
       </div>
     </div>
   );
