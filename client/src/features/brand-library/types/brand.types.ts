@@ -194,6 +194,7 @@ export interface BrandOverviewStats {
   linksCount: number;
   snippetsCount: number;
   contactsCount: number;
+  socialProfilesCount?: number;
   favouritesCount: number;
   totalStorageBytes: number;
   storageFormatted: string;

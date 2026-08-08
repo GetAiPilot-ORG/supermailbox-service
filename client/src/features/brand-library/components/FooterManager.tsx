@@ -71,7 +71,7 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ brandId }) => {
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start"
           >
             <Plus className="w-4 h-4" /> New Footer
           </button>
@@ -79,9 +79,9 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ brandId }) => {
       </div>
 
       {isAdding && (
-        <form onSubmit={handleCreate} className="bg-emerald-50/50 border border-emerald-200 rounded-2xl p-5 space-y-4 animate-slideDown">
+        <form onSubmit={handleCreate} className="bg-indigo-50/50 border border-indigo-200 rounded-2xl p-5 space-y-4 animate-slideDown">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-900">Create Compliance Footer</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-900">Create Compliance Footer</h4>
             <button type="button" onClick={() => setIsAdding(false)} className="text-xs text-slate-500 hover:text-slate-800">Cancel</button>
           </div>
 
@@ -93,7 +93,7 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ brandId }) => {
                 placeholder="e.g. 2026 GDPR Standard Footer"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -104,7 +104,7 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ brandId }) => {
                   type="checkbox"
                   checked={isDefault}
                   onChange={(e) => setIsDefault(e.target.checked)}
-                  className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <span>Automatically attach to new email layouts</span>
               </label>
@@ -118,7 +118,7 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ brandId }) => {
               placeholder='<div style="font-size: 11px; color: #777; text-align: center;"><p>© {{current_year}} {{brand.company_name}}. All rights reserved.</p><p>{{brand.company_address}}</p><p><a href="{{brand.unsubscribe_url}}">Unsubscribe</a></p></div>'
               value={html}
               onChange={(e) => setHtml(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed"
+              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"
               required
             />
           </div>
@@ -127,7 +127,7 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ brandId }) => {
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
             >
               <Check className="w-4 h-4" />
               <span>{saving ? 'Saving...' : 'Save Footer'}</span>
@@ -147,7 +147,7 @@ export const FooterManager: React.FC<FooterManagerProps> = ({ brandId }) => {
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition inline-flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" /> Add Standard Footer
           </button>

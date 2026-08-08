@@ -11,7 +11,6 @@ import { BrandLibraryPage } from './features/brand-library';
 import { TemplateManagerPage } from './features/email-templates/pages/TemplateManagerPage';
 import { TemplateGalleryPage } from './features/email-templates/pages/TemplateGalleryPage';
 import { TemplateBuilderPage } from './features/email-templates/pages/TemplateBuilderPage';
-import { ReactEmailEditorPoc } from './features/email-templates/poc/ReactEmailEditorPoc';
 import { EasyEmailEditorPoc } from './features/email-templates/poc/EasyEmailEditorPoc';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
@@ -21,16 +20,26 @@ import './App.css';
 
 
 
+import { CustomEmailEditorPoc } from './features/email-templates/poc/CustomEmailEditorPoc';
+
 gsap.registerPlugin(useGSAP);
 
 export const App: React.FC = () => {
-  if (window.location.pathname === '/dev/email-editor/react-email') return <ReactEmailEditorPoc />;
+  if (window.location.pathname === '/dev/email-editor/custom') return <CustomEmailEditorPoc />;
   if (window.location.pathname === '/dev/email-editor/easy-email') return <EasyEmailEditorPoc />;
   return <DashboardApp />;
 };
 
 const DashboardApp: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabType>(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/dashboard/templates')) return 'templates';
+    if (path.startsWith('/dashboard/project_logs')) return 'project_logs';
+    if (path.startsWith('/dashboard/brand_library')) return 'brand_library';
+    if (path.startsWith('/dashboard/campaigns')) return 'campaigns';
+    if (path.startsWith('/dashboard/contacts')) return 'contacts';
+    return 'dashboard';
+  });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.matchMedia('(max-width: 840px)').matches);
   const [templateRoute, setTemplateRoute] = useState<{ page: 'manager' | 'gallery' | 'builder'; templateId?: string }>(() => {
     const match = window.location.pathname.match(/^\/dashboard\/templates\/([^/]+)\/edit$/);
@@ -49,10 +58,25 @@ const DashboardApp: React.FC = () => {
 
   useEffect(() => {
     const readTemplateRoute = () => {
-      const match = window.location.pathname.match(/^\/dashboard\/templates\/([^/]+)\/edit$/);
+      const path = window.location.pathname;
+      if (path.startsWith('/dashboard/templates')) {
+         setActiveTab('templates');
+      } else if (path.startsWith('/dashboard/project_logs')) {
+         setActiveTab('project_logs');
+      } else if (path.startsWith('/dashboard/brand_library')) {
+         setActiveTab('brand_library');
+      } else if (path.startsWith('/dashboard/campaigns')) {
+         setActiveTab('campaigns');
+      } else if (path.startsWith('/dashboard/contacts')) {
+         setActiveTab('contacts');
+      } else {
+         setActiveTab('dashboard');
+      }
+
+      const match = path.match(/^\/dashboard\/templates\/([^/]+)\/edit$/);
       if (match) return setTemplateRoute({ page: 'builder', templateId: match[1] });
-      if (window.location.pathname === '/dashboard/templates/new') return setTemplateRoute({ page: 'gallery' });
-      if (window.location.pathname === '/dashboard/templates') return setTemplateRoute({ page: 'manager' });
+      if (path === '/dashboard/templates/new') return setTemplateRoute({ page: 'gallery' });
+      if (path.startsWith('/dashboard/templates')) return setTemplateRoute({ page: 'manager' });
     };
     window.addEventListener('popstate', readTemplateRoute);
     return () => window.removeEventListener('popstate', readTemplateRoute);
@@ -180,18 +204,27 @@ const DashboardApp: React.FC = () => {
     }
   };
 
+  const isBuilderMode = activeTab === 'templates' && templateRoute.page === 'builder';
+
   return (
-    <div className="app-shell">
+    <div className={`app-shell${isBuilderMode ? ' app-shell--fullscreen' : ''}`}>
       {/* Collapsible Sidebar */}
-      <Sidebar
-        activeTab={activeTab}
-        onSelectTab={(tab) => {
-          setActiveTab(tab);
-          if (tab === 'templates') navigateTemplateRoute({ page: 'manager' });
-        }}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+      {!isBuilderMode && (
+        <Sidebar
+          activeTab={activeTab}
+          onSelectTab={(tab) => {
+            setActiveTab(tab);
+            if (tab === 'templates') {
+              navigateTemplateRoute({ page: 'manager' });
+            } else {
+              const path = tab === 'dashboard' ? '/dashboard' : `/dashboard/${tab}`;
+              window.history.pushState(null, '', path);
+            }
+          }}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+      )}
 
       {/* Main Workspace Content */}
       <div className="app-workspace">

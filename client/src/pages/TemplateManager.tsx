@@ -915,8 +915,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
             color: 'var(--text-secondary)',
             position: 'sticky',
             top: 0,
-            zIndex: 10,
-            background: 'var(--surface-muted)'
+            zIndex: 10
           }}>
             <div>Template Name</div>
             <div>Category</div>
@@ -1045,7 +1044,6 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
               </div>
             </div>
           </div>
-        </div>
 
         {filteredTemplates.length === 0 && (
           <div style={{ textAlign: 'center', padding: '80px 40px', color: 'var(--text-secondary)', background: 'var(--surface)', borderRadius: '6px', border: '1px dashed var(--border)', margin: '20px 0' }}>

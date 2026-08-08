@@ -44,8 +44,9 @@ export interface TemplateVersion {
 export interface Template {
   key: string;
   name: string;
-  category: 'transactional' | 'marketing';
+  category: string;
   versions: TemplateVersion[];
+  subject?: string;
 }
 
 export interface Campaign {
@@ -206,11 +207,45 @@ export class ApiService {
 
   static async getTemplates(): Promise<Template[]> {
     try {
-      const res = await fetchWithTimeout(`${API_BASE}/templates`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.templates) return data.templates;
+      const [resSystem, resCustom] = await Promise.all([
+        fetchWithTimeout(`${API_BASE}/templates`).catch(() => null),
+        fetchWithTimeout(`${API_BASE}/templates/manager`).catch(() => null),
+      ]);
+
+      const map = new Map<string, Template>();
+
+      if (resCustom && resCustom.ok) {
+        const dataCustom = await resCustom.json().catch(() => null);
+        const customItems = dataCustom?.data || dataCustom?.templates || [];
+        if (Array.isArray(customItems)) {
+          customItems.forEach((c: any) => {
+            const key = c.id || c.key;
+            if (key) {
+              map.set(key, {
+                key,
+                name: c.name || key,
+                category: c.category || 'CUSTOM',
+                subject: c.subject || c.name || key,
+                versions: c.versions || [],
+              });
+            }
+          });
+        }
       }
+
+      if (resSystem && resSystem.ok) {
+        const dataSystem = await resSystem.json().catch(() => null);
+        const systemItems = dataSystem?.templates || [];
+        if (Array.isArray(systemItems)) {
+          systemItems.forEach((s: Template) => {
+            if (s.key && !map.has(s.key)) {
+              map.set(s.key, s);
+            }
+          });
+        }
+      }
+
+      return Array.from(map.values());
     } catch (err) {
       console.warn('API getTemplates failed:', err);
     }

@@ -28,26 +28,27 @@ export const AssetGrid: React.FC<AssetGridProps> = ({
 }) => {
   if (assets.length === 0) {
     return (
-      <div className="text-center py-16 bg-white border border-dashed border-slate-300 rounded-2xl p-8">
-        <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
-          {searchQuery ? <SearchX className="w-6 h-6" /> : <Image className="w-6 h-6" />}
+      <div className="bl-empty-state">
+        <div className="bl-empty-state__icon">
+          {searchQuery ? <SearchX size={24} /> : <Image size={24} />}
         </div>
-        <h4 className="text-base font-bold text-slate-800">
+        <h4 className="bl-empty-state__title">
           {searchQuery ? `No assets found for "${searchQuery}"` : isTrash ? 'Trash is empty' : 'No Media Assets Found'}
         </h4>
-        <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-6">
+        <p className="bl-empty-state__desc">
           {searchQuery
             ? 'Try adjusting your search keywords or switching media categories.'
             : isTrash
             ? 'Archived and deleted assets will appear here before permanent deletion.'
-            : 'Upload your company logo, banners, icons, and product photos to start embedding them in email designs.'}
+            : 'No assets found under this filter tab. Click "All Media" or "Logos" above to view your uploaded brand media.'}
         </p>
         {!isTrash && !searchQuery && onOpenUpload && (
           <button
             onClick={onOpenUpload}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl inline-flex items-center gap-2 transition shadow-sm"
+            className="bl-btn bl-btn--primary"
+            style={{ margin: '0 auto' }}
           >
-            <Upload className="w-4 h-4" /> Upload First Asset
+            <Upload size={14} style={{ marginRight: '6px' }} /> Upload First Asset
           </button>
         )}
       </div>
@@ -55,7 +56,7 @@ export const AssetGrid: React.FC<AssetGridProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 animate-fadeIn">
+    <div className="bl-grid">
       {assets.map((asset) => (
         <AssetCard
           key={asset.id}

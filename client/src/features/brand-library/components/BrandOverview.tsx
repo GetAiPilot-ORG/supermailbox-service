@@ -15,7 +15,9 @@ const OverviewAssetThumb: React.FC<{ asset: BrandAsset }> = ({ asset }) => {
   const [useSecureFallback, setUseSecureFallback] = useState(false);
 
   const isLogo = asset.asset_type === 'logo' || asset.asset_type === 'icon' || asset.cloudinary_format === 'svg' || asset.cloudinary_format === 'png';
-  const displayUrl = useSecureFallback ? asset.secure_url : (asset.thumbnail_url || asset.secure_url);
+  const rawUrl = asset.thumbnail_url || asset.secure_url || (asset as any).url;
+  const cloudIdFallback = asset.cloudinary_public_id ? `https://res.cloudinary.com/demo/image/upload/${asset.cloudinary_public_id}` : null;
+  const displayUrl = useSecureFallback ? (asset.secure_url || (asset as any).url || cloudIdFallback) : (rawUrl || cloudIdFallback);
 
   if (imgError || !displayUrl) {
     return (

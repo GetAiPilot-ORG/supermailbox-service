@@ -69,7 +69,95 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── Modern Custom Scrollbars (Global) ────────────────────────────────────── */
+*,
+*::before,
+*::after,
+html,
+body,
+div,
+section,
+aside,
+nav,
+main,
+article,
+form,
+textarea,
+ul,
+ol,
+p,
+iframe,
+fieldset,
+code,
+pre {
+  /* Reset scrollbar-width for Chrome/Safari/Edge so ::-webkit-scrollbar works, overriding any third-party libraries */
+  scrollbar-width: auto !important;
+}
+
+@supports (-moz-appearance: none) {
+  *, *::before, *::after, html, body, div, section, aside, nav, main, article, form, textarea, ul, ol, p, iframe, fieldset, code, pre {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(200, 200, 200, 0.6) transparent !important;
+  }
+}
+
+html *::-webkit-scrollbar,
+body *::-webkit-scrollbar,
+*::-webkit-scrollbar,
+::-webkit-scrollbar {
+  width: 4px !important;
+  height: 4px !important;
+}
+
+html *::-webkit-scrollbar-track,
+body *::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 9999px !important;
+}
+
+html *::-webkit-scrollbar-thumb,
+body *::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
+  background-color: rgba(210, 210, 210, 0.7) !important;
+  border-radius: 9999px !important;
+  border: none !important;
+  background-clip: padding-box !important;
+  transition: background-color 0.2s ease !important;
+}
+
+*::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(180, 180, 180, 0.85) !important;
+}
+
+*::-webkit-scrollbar-thumb:active,
+::-webkit-scrollbar-thumb:active {
+  background-color: rgba(160, 160, 160, 0.95) !important;
+}
+
+*::-webkit-scrollbar-corner,
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-button,
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 html { background: var(--background); }
+
+/* Prevent horizontal scrollbars in the email builder layout */
+.email-builder-layout,
+.builder-canvas-shell,
+.canvas-viewport-wrapper {
+  overflow-x: hidden !important;
+}
 
 body {
   min-width: 320px;
@@ -3800,6 +3888,272 @@ th {
   grid-template-columns: 220px minmax(0, 1fr) 300px;
 }
 
+/* ── Canvas viewport wrapper (CSS-based mobile/desktop preview) ──────────── */
+.canvas-viewport-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* When a custom width is active, show the gray viewport background */
+.canvas-viewport-wrapper--constrained {
+  background: #c8cdd6;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Viewport indicator bar shown above the canvas in constrained mode */
+.canvas-viewport-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+/* ── Canvas width control in toolbar ─────────────────────────────────────── */
+.canvas-width-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  height: 32px;
+}
+
+.canvas-width-input {
+  width: 48px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: right;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.canvas-width-input::-webkit-inner-spin-button,
+.canvas-width-input::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+.canvas-width-unit {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ── Left column (blocks + layers tabs) ───────────────────────────────────── */
+.builder-left-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.builder-left-column .builder-side-panel {
+  border-right: none;
+  flex: 1;
+}
+
+/* ── Tab bar ──────────────────────────────────────────────────────────────── */
+.builder-left-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-muted);
+  flex-shrink: 0;
+}
+
+.builder-tab-btn {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.builder-tab-btn:hover {
+  color: var(--ink);
+}
+
+.builder-tab-btn--active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ── Layers panel hint text ───────────────────────────────────────────────── */
+.builder-layers-hint {
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+  margin: -6px 0 10px;
+  line-height: 1.4;
+}
+
+/* ── Layers list ──────────────────────────────────────────────────────────── */
+.builder-layers-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  cursor: grab;
+  user-select: none;
+  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+  position: relative;
+}
+
+.layer-item:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--ink);
+}
+
+.layer-item:active {
+  cursor: grabbing;
+}
+
+/* Item being dragged */
+.layer-item--dragging {
+  opacity: 0.4;
+  border-style: dashed;
+}
+
+/* Selected item */
+.layer-item--selected {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: var(--primary);
+  color: var(--ink);
+}
+
+.layer-item--selected .layer-drag-handle {
+  opacity: 0.7;
+}
+
+.layer-item--selected .layer-index {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+
+/* Drop indicator — line appears ABOVE item */
+.layer-item--drop-above::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+/* Drop indicator — line appears BELOW item */
+.layer-item--drop-below::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.layer-drag-handle {
+  color: var(--text-secondary);
+  opacity: 0.45;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.layer-item:hover .layer-drag-handle {
+  opacity: 0.8;
+}
+
+.layer-icon {
+  display: flex;
+  align-items: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.layer-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  color: inherit;
+}
+
+.layer-index {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 5px;
+  min-width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Empty state */
+.builder-layers-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 12px;
+  color: var(--text-secondary);
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.builder-layers-empty svg {
+  opacity: 0.4;
+}
+
+
 .builder-side-panel {
   min-height: 0;
   padding: 14px;
@@ -3813,12 +4167,126 @@ th {
   display: flex;
   flex-direction: column;
   border-left: 1px solid var(--border);
-  overflow: auto;
+  background: var(--surface);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .builder-right-column .builder-side-panel {
   border-right: 0;
   border-bottom: 1px solid var(--border);
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+/* ── HTML Source Panel ────────────────────────────────────────────────────── */
+.html-source-panel {
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.html-source-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface-muted);
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 650;
+  transition: background 0.12s, color 0.12s;
+}
+
+.html-source-header:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.html-source-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.html-source-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.html-source-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: #13131f;
+  border-bottom: 1px solid #313244;
+}
+
+.html-source-lines {
+  flex: 1;
+  font-size: 0.68rem;
+  color: #585b70;
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+
+.html-source-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #313244;
+  border-radius: 4px;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.html-source-btn:hover:not(:disabled) {
+  background: #313244;
+  border-color: #45475a;
+}
+
+.html-source-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.html-source-pre {
+  margin: 0;
+  padding: 14px;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  font-family: 'Menlo', 'Consolas', 'Fira Code', 'Courier New', monospace;
+  font-size: 11.5px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+  max-height: 380px;
+  overflow-y: auto;
+  tab-size: 2;
+}
+
+.html-source-pre code {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
 }
 
 .builder-side-panel h3,

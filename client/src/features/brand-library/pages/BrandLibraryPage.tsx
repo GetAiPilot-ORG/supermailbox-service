@@ -81,6 +81,9 @@ export const BrandLibraryPage: React.FC = () => {
 
   useEffect(() => {
     fetchMedia();
+    if (activeTab === 'overview') {
+      refreshOverview();
+    }
   }, [activeBrand, activeTab, selectedType, selectedFolderId, showFavorites, showTrash, searchQuery]);
 
   // Asset Actions
@@ -127,7 +130,7 @@ export const BrandLibraryPage: React.FC = () => {
     { id: 'assets', label: 'Media & Logos', icon: Image, count: overview?.totalAssets },
     { id: 'contacts', label: 'Contacts & Address', icon: Phone, count: overview?.contactsCount },
     { id: 'links', label: 'URL Library', icon: Link2, count: overview?.linksCount },
-    { id: 'social', label: 'Social Profiles', icon: Share2 },
+    { id: 'social', label: 'Social Profiles', icon: Share2, count: overview?.socialProfilesCount },
     { id: 'styles', label: 'Design Tokens & Colors', icon: Palette },
     { id: 'snippets', label: 'Content Snippets', icon: FileText, count: overview?.snippetsCount },
     { id: 'signatures', label: 'Signatures', icon: PenTool },
@@ -387,7 +390,7 @@ export const BrandLibraryPage: React.FC = () => {
 
             {/* TAB 5: SOCIAL PROFILES */}
             {activeTab === 'social' && (
-              <SocialProfileManager brandId={activeBrand?.id} />
+              <SocialProfileManager brandId={activeBrand?.id} onRefreshStats={refreshOverview} />
             )}
 
             {/* TAB 6: DESIGN TOKENS & STYLES */}
