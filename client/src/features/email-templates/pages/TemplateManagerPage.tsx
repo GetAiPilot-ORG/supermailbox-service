@@ -114,6 +114,10 @@ export const TemplateManagerPage: React.FC<Props> = ({ onCreate, onEdit }) => {
               mode="manager"
               onEdit={() => onEdit(template.id)}
               onPreview={() => setPreview(template)}
+              onUse={() => {
+                window.history.pushState(null, '', `/dashboard/campaigns?template=${template.id}`);
+                window.dispatchEvent(new Event('popstate'));
+              }}
               onDuplicate={() => duplicate(template.id)}
               onArchive={() => archive(template.id)}
               onDelete={() => setDeleteTarget(template)}

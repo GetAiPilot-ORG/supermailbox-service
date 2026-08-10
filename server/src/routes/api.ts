@@ -187,8 +187,9 @@ const fetchZeptoSuppressions = async () => {
   if (!authHeader) return null;
 
   const params = new URLSearchParams({ limit: '500', offset: '0' });
-  const mailAgentKey = process.env.ZEPTOMAIL_MAIL_AGENT_KEY || process.env.ZEPTOMAIL_AGENT_KEY;
-  if (mailAgentKey) params.set('mailagent_key', mailAgentKey);
+  
+  // We intentionally do not pass mailagent_key here because we want to fetch 
+  // account-level suppressions (Associated Agent: "All") as well.
 
   const response = await fetch(`${getZeptoApiBaseUrl()}/suppressions/email?${params.toString()}`, {
     headers: {

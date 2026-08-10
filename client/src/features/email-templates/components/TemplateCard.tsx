@@ -1,5 +1,5 @@
 import React from 'react';
-import { Archive, Copy, Eye, FileCode2, Pencil, Trash2 } from 'lucide-react';
+import { Archive, Copy, Eye, FileCode2, Pencil, Trash2, Send } from 'lucide-react';
 import type { EmailTemplate, GalleryTemplate } from '../types/template.types';
 import { getTemplateThumbnailHtml } from '../services/templateThumbnail.service';
 
@@ -71,6 +71,7 @@ export const TemplateCard: React.FC<Props> = ({
               <button type="button" className="icon-btn" onClick={onEdit} title="Edit"><Pencil size={15} /></button>
               <button type="button" className="icon-btn" onClick={onDuplicate} title="Duplicate"><Copy size={15} /></button>
               <button type="button" className="icon-btn" onClick={onExportHtml} title="Export HTML"><FileCode2 size={15} /></button>
+              <button type="button" className="icon-btn" onClick={onUse} title="Use in Campaign"><Send size={15} /></button>
               <button type="button" className="icon-btn" onClick={onArchive} title="Archive"><Archive size={15} /></button>
               <button type="button" className="icon-btn danger" onClick={onDelete} title="Delete"><Trash2 size={15} /></button>
             </>

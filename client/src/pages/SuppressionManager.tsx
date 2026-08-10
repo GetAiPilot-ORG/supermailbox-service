@@ -52,16 +52,16 @@ const toDateKey = (value: Date | string) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 
-const buildAudienceWeek = () => {
+const buildAudienceTrend = (days: number = 7) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  return Array.from({ length: 7 }, (_, index) => {
+  return Array.from({ length: days }, (_, index) => {
     const day = new Date(today);
-    day.setDate(today.getDate() - (6 - index));
+    day.setDate(today.getDate() - ((days - 1) - index));
     return {
       key: toDateKey(day),
-      label: day.toLocaleDateString(undefined, { day: 'numeric' }),
+      label: days > 7 ? day.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : day.toLocaleDateString(undefined, { day: 'numeric' }),
       month: day.toLocaleDateString(undefined, { month: 'long' }),
       total: 0,
       hard: 0,
@@ -121,6 +121,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<ReportTab>('bounces');
   const [bounceFilter, setBounceFilter] = useState<BounceFilter>('all');
+  const [audienceRange, setAudienceRange] = useState<number>(7);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -153,7 +154,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
   }, [typeFilteredBounces]);
 
   const audienceTrendData = useMemo(() => {
-    const buckets = new Map(buildAudienceWeek().map((day) => [day.key, day]));
+    const buckets = new Map(buildAudienceTrend(audienceRange).map((day) => [day.key, day]));
 
     bounceReports.forEach((item) => {
       const bucket = buckets.get(toDateKey(item.processedAt));
@@ -171,7 +172,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
     });
 
     return Array.from(buckets.values());
-  }, [bounceReports, suppressions]);
+  }, [bounceReports, suppressions, audienceRange]);
 
   const audienceTotals = {
     total: bounceReports.length,
@@ -322,8 +323,11 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
                   </button>
                 ))}
               </div>
-              <select className="audience-range-select" defaultValue="7">
+              <select className="audience-range-select" value={audienceRange.toString()} onChange={(e) => setAudienceRange(Number(e.target.value))}>
+                <option value="1">Today</option>
                 <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 90 days</option>
               </select>
             </div>
           </div>

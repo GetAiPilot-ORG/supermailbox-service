@@ -16,7 +16,10 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
   onLaunchCampaign,
 }) => {
   const [campaignName, setCampaignName] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState(templates[0]?.key || 'auth_welcome');
+  const [selectedTemplate, setSelectedTemplate] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('template') || templates[0]?.key || 'auth_welcome';
+  });
   const [scheduleDate, setScheduleDate] = useState('');
 
   // Template Modal dialog state
