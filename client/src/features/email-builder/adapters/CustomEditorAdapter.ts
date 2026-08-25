@@ -2,7 +2,7 @@ import type { DesignRow, EmailEditorAdapter } from '../../email-templates/builde
 import type { PreviewDevice } from '../../email-templates/types/template.types';
 import { compileMjmlViaServer } from '../renderer/htmlCompiler';
 import { documentToMjml } from '../renderer/mjmlRenderer';
-import { convertAnyToDocument, htmlToDocument, mjmlToDocument } from '../renderer/migrationLayer';
+import {  parseTemplateToDocument, convertAnyToDocument, htmlToDocument, mjmlToDocument } from '../renderer/migrationLayer';
 import { useDocumentStore } from '../store/documentStore';
 import type { BlockType } from '../types/document.types';
 
@@ -13,6 +13,13 @@ export class CustomEditorAdapter implements EmailEditorAdapter {
 
   async loadProject(project: unknown): Promise<void> {
     if (!project) return;
+    const doc = parseTemplateToDocument({ project });
+    useDocumentStore.getState().setDocument(doc);
+  }
+
+  async loadMjml(mjml: string): Promise<void> {
+    if (!mjml) return;
+    const doc = parseTemplateToDocument({ mjml });
     const doc = convertAnyToDocument({ project });
     useDocumentStore.getState().setDocument(doc);
   }

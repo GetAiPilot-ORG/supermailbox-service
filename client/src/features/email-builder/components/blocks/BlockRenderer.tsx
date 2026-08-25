@@ -21,10 +21,14 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
     if (activeDevice === 'mobile' && block.visibility.mobile === false) return null;
   }
 
+  const blockBg = style.backgroundColor;
+  const isBlockGradient = blockBg && (blockBg.includes('gradient') || blockBg.includes('url('));
+
   const wrapperStyle: React.CSSProperties = {
     padding: style.padding || '0px',
     margin: style.margin || '0px',
-    backgroundColor: style.backgroundColor || 'transparent',
+    background: isBlockGradient ? blockBg : undefined,
+    backgroundColor: !isBlockGradient ? (blockBg || 'transparent') : undefined,
     borderWidth: style.borderWidth || '0px',
     borderStyle: style.borderStyle || 'none',
     borderColor: style.borderColor || 'transparent',
@@ -49,7 +53,9 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
           />
         </div>
       );
-    case 'button':
+    case 'button': {
+      const btnBg = style.backgroundColor || '#2563eb';
+      const isBtnGradient = btnBg && (btnBg.includes('gradient') || btnBg.includes('url('));
       return (
         <div style={{ ...wrapperStyle, textAlign: (style.align as any) || 'center' }}>
           <a
@@ -59,7 +65,8 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
             onClick={(e) => e.preventDefault()}
             style={{
               display: style.fullWidth ? 'block' : 'inline-block',
-              backgroundColor: style.backgroundColor || '#2563eb',
+              background: isBtnGradient ? btnBg : undefined,
+              backgroundColor: !isBtnGradient ? btnBg : undefined,
               color: style.textColor || '#ffffff',
               fontSize: style.fontSize || '14px',
               fontWeight: style.fontWeight || '600',
@@ -68,12 +75,14 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
               padding: style.padding || '12px 24px',
               textDecoration: 'none',
               textAlign: 'center',
+              boxShadow: style.boxShadow || '0 4px 14px rgba(79, 70, 229, 0.35)',
             }}
           >
             {content.label || 'Click Here'}
           </a>
         </div>
       );
+    }
     case 'divider':
       return (
         <div style={wrapperStyle}>

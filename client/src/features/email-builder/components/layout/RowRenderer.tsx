@@ -42,14 +42,19 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
     },
   });
 
-  const bgStyle = row.settings.background || row.settings.backgroundColor;
+  const rowBg = row.settings.backgroundColor;
+  const isRowGradient = rowBg && (rowBg.includes('gradient') || rowBg.includes('url('));
+
+  const contentBg = row.settings.contentBackgroundColor || row.settings.backgroundColor;
+  const isContentGradient = contentBg && (contentBg.includes('gradient') || contentBg.includes('url('));
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
     position: 'relative',
-    background: bgStyle || 'transparent',
+    background: isRowGradient ? rowBg : undefined,
+    backgroundColor: !isRowGradient ? (rowBg || 'transparent') : undefined,
     outline: isSelected
       ? '2px solid #2563eb'
       : isHovered
@@ -57,6 +62,8 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
       : 'none',
     outlineOffset: '-2px',
     margin: row.settings.margin || '0px',
+    borderRadius: row.settings.borderRadius || '0px',
+    overflow: 'hidden',
   };
 
   const handleSelectPreset = (preset: RowLayoutPreset) => {
@@ -191,11 +198,12 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
           style={{
             maxWidth: `${contentWidth}px`,
             margin: '0 auto',
-            backgroundColor: row.settings.contentBackgroundColor || 'transparent',
+            background: isContentGradient ? contentBg : undefined,
+            backgroundColor: !isContentGradient ? (contentBg || 'transparent') : undefined,
             padding: row.settings.padding || '10px 0px',
             borderRadius: row.settings.borderRadius || '0px',
             display: 'flex',
-            flexDirection: row.settings.stackOnMobile ? 'row' : 'row',
+            flexDirection: 'row',
             flexWrap: 'wrap',
             alignItems: 'stretch',
             boxSizing: 'border-box',

@@ -20,7 +20,7 @@ import { Canvas } from './layout/Canvas';
 import { BlocksPanel } from './layout/BlocksPanel';
 import { LayersPanel } from './layout/LayersPanel';
 import { PropertiesPanel } from './properties/PropertiesPanel';
-import { convertAnyToDocument } from '../renderer/migrationLayer';
+import { parseTemplateToDocument } from '../renderer/migrationLayer';
 
 interface CustomBuilderCanvasProps {
   mjml?: string;
@@ -79,13 +79,13 @@ export const CustomBuilderCanvas: React.FC<CustomBuilderCanvasProps> = ({
     const adapter = new CustomEditorAdapter();
     adapterRef.current = adapter;
 
-    const doc = convertAnyToDocument({
+    const initialDoc = parseTemplateToDocument({
       project,
       mjml,
       html,
       name,
     });
-    useDocumentStore.getState().setDocument(doc);
+    useDocumentStore.getState().setDocument(initialDoc);
 
     onReady(adapter);
 
