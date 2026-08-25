@@ -693,9 +693,9 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
       }
 
       // Fetch aggregate stats
-      const { count: totalSent } = await supabase.from('email_jobs').select('*', { count: 'exact', head: true }).in('status', ['sent', 'delivered']);
+      const { count: totalSent } = await supabase.from('email_jobs').select('*', { count: 'exact', head: true }).in('status', ['sent', 'delivered', 'bounced', 'failed']);
       const { count: totalBounced } = await supabase.from('email_jobs').select('*', { count: 'exact', head: true }).eq('status', 'bounced');
-      const { count: totalDelivered } = await supabase.from('email_jobs').select('*', { count: 'exact', head: true }).eq('status', 'delivered');
+      const { count: totalDelivered } = await supabase.from('email_jobs').select('*', { count: 'exact', head: true }).in('status', ['sent', 'delivered']);
       
       const { count: totalOpened } = await supabase.from('email_events').select('*', { count: 'exact', head: true }).eq('event_type', 'opened');
       const { count: totalClicked } = await supabase.from('email_events').select('*', { count: 'exact', head: true }).eq('event_type', 'clicked');
@@ -818,7 +818,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
           recipient: extractedEmail,
           type: j.type === 'campaign' ? 'Campaign' : 'Transactional',
           provider: j.provider || 'ZeptoMail',
-          status: j.status === 'delivered' ? 'Delivered' : (j.status === 'failed' ? 'Failed' : (j.status === 'sent' ? 'Sent' : 'Queued')),
+          status: formatDashboardJobStatus(j.status),
           attempts: j.attempts
         });
       });

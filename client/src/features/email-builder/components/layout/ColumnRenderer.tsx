@@ -55,8 +55,6 @@ export const ColumnRenderer: React.FC<ColumnRendererProps> = ({ column, rowId })
           ? '1.5px solid #3b82f6'
           : isOver
           ? '2px dashed #2563eb'
-          : isHovered
-          ? '1px dashed #cbd5e1'
           : '1px solid transparent',
         minHeight: '80px',
         display: 'flex',

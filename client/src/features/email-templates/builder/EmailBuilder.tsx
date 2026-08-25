@@ -192,7 +192,7 @@ export const EmailBuilder: React.FC<Props> = ({ template, onBack, onSavedExit })
         onOpenResourcePicker={() => setShowResourcePicker(true)}
       />
       {notice && <div className="builder-notice">{notice}</div>}
-      <div className="email-builder-layout" style={{ display: 'flex', flex: 1, width: '100%', overflow: 'hidden' }}>
+      <div className="email-builder-layout" style={{ display: 'flex', flex: 1, width: '100%', minHeight: 0, overflow: 'hidden' }}>
         <CustomBuilderCanvas
           mjml={template.mjmlContent || ''}
           html={template.compiledHtml || ''}
