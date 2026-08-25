@@ -1525,6 +1525,9 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
     </>
   );
 };
+
+

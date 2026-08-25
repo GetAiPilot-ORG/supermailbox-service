@@ -27,5 +27,5 @@ export const TemplateBuilderPage: React.FC<Props> = ({ templateId, onBack, onSav
     return <div className="template-state"><strong>Opening builder...</strong><p>Loading template source and editor assets.</p></div>;
   }
 
-  return <EmailBuilder template={template} onBack={onBack} onSavedExit={onSavedExit} />;
+  return <EmailBuilder key={template.id} template={template} onBack={onBack} onSavedExit={onSavedExit} />;
 };

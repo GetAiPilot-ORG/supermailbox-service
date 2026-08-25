@@ -42,12 +42,14 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
     },
   });
 
+  const bgStyle = row.settings.background || row.settings.backgroundColor;
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
     position: 'relative',
-    backgroundColor: row.settings.backgroundColor || 'transparent',
+    background: bgStyle || 'transparent',
     outline: isSelected
       ? '2px solid #2563eb'
       : isHovered

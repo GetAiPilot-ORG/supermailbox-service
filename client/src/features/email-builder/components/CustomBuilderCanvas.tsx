@@ -20,7 +20,7 @@ import { Canvas } from './layout/Canvas';
 import { BlocksPanel } from './layout/BlocksPanel';
 import { LayersPanel } from './layout/LayersPanel';
 import { PropertiesPanel } from './properties/PropertiesPanel';
-import { migrateUnlayerDesign } from '../renderer/migrationLayer';
+import { convertAnyToDocument } from '../renderer/migrationLayer';
 
 interface CustomBuilderCanvasProps {
   mjml?: string;
@@ -45,6 +45,8 @@ const collisionDetectionStrategy = (args: any) => {
 };
 
 export const CustomBuilderCanvas: React.FC<CustomBuilderCanvasProps> = ({
+  mjml,
+  html,
   name,
   project,
   device,
@@ -72,18 +74,18 @@ export const CustomBuilderCanvas: React.FC<CustomBuilderCanvasProps> = ({
     })
   );
 
-  // 1. Initialize Document state on mount or when project changes
+  // 1. Initialize Document state on mount or when project/mjml/html changes
   useEffect(() => {
     const adapter = new CustomEditorAdapter();
     adapterRef.current = adapter;
 
-    if (project && typeof project === 'object' && 'schemaVersion' in project && (project as any).rows) {
-      useDocumentStore.getState().setDocument(project as EmailDocument);
-    } else if (project && typeof project === 'object' && Object.keys(project).length > 0) {
-      useDocumentStore.getState().setDocument(migrateUnlayerDesign(project));
-    } else {
-      useDocumentStore.getState().setDocument(createDefaultDocument(name));
-    }
+    const doc = convertAnyToDocument({
+      project,
+      mjml,
+      html,
+      name,
+    });
+    useDocumentStore.getState().setDocument(doc);
 
     onReady(adapter);
 
