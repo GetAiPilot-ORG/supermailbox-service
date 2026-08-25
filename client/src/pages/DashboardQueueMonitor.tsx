@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   CheckCircle2,
   Clock3,
+  Mail,
   MailCheck,
   MailWarning,
   RefreshCw,
@@ -55,9 +56,10 @@ const toNumber = (value: string | number | undefined) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const buildTrendData = (logs: ActivityLog[]) => {
-  if (logs.length === 0) return [];
+const findMetricValue = (metrics: MetricCardData[], title: string) =>
+  metrics.find((metric) => metric.title.toLowerCase() === title.toLowerCase())?.value;
 
+const buildTrendData = (logs: ActivityLog[], range: 'today' | '7days' | '14days' | '30days' = '7days') => {
   const currentYear = new Date().getFullYear();
   const parsedLogs = logs
     .map((log) => {
@@ -70,48 +72,63 @@ const buildTrendData = (logs: ActivityLog[]) => {
     })
     .filter((log) => !Number.isNaN(log.date.getTime()));
 
-  if (parsedLogs.length === 0) return [];
+  const bucketsMap = new Map<string, {
+    name: string;
+    dateKey: string;
+    volume: number;
+    delivered: number;
+    failed: number;
+    queued: number;
+  }>();
+  const now = new Date();
 
-  parsedLogs.sort((a, b) => a.date.getTime() - b.date.getTime());
+  if (range === 'today') {
+    for (let h = 0; h <= 21; h += 3) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, 0, 0);
+      const hourFormatter = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      const label = hourFormatter.format(d);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}-${h}`;
+      bucketsMap.set(key, { name: label, dateKey: key, volume: 0, delivered: 0, failed: 0, queued: 0 });
+    }
 
-  const firstDate = parsedLogs[0].date;
-  const lastDate = parsedLogs[parsedLogs.length - 1].date;
-  const isSameDay = firstDate.toDateString() === lastDate.toDateString();
-
-  const buckets = new Map<string, { name: string; volume: number; delivered: number; failed: number }>();
-
-  if (isSameDay) {
-    const hourFormatter = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     parsedLogs.forEach((log) => {
-      const name = hourFormatter.format(log.date);
-      const bucket = buckets.get(name) ?? { name, volume: 0, delivered: 0, failed: 0 };
-      bucket.volume += 1;
-      if (log.status === 'Delivered' || log.status === 'Sent') bucket.delivered += 1;
-      if (log.status === 'Failed' || log.status === 'Bounced') bucket.failed += 1;
-      buckets.set(name, bucket);
+      if (log.date.toDateString() === now.toDateString()) {
+        const h = Math.floor(log.date.getHours() / 3) * 3;
+        const key = `${log.date.getFullYear()}-${log.date.getMonth()}-${log.date.getDate()}-${h}`;
+        const bucket = bucketsMap.get(key);
+        if (bucket) {
+          bucket.volume += 1;
+          if (log.status === 'Delivered' || log.status === 'Sent') bucket.delivered += 1;
+          else if (log.status === 'Failed' || log.status === 'Bounced') bucket.failed += 1;
+          else if (log.status === 'Queued') bucket.queued += 1;
+        }
+      }
     });
   } else {
+    const numDays = range === '30days' ? 30 : range === '14days' ? 14 : 7;
     const dayFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+
+    for (let i = numDays - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(now.getDate() - i);
+      const label = dayFormatter.format(d);
+      const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+      bucketsMap.set(key, { name: label, dateKey: key, volume: 0, delivered: 0, failed: 0, queued: 0 });
+    }
+
     parsedLogs.forEach((log) => {
-      const name = dayFormatter.format(log.date);
-      const bucket = buckets.get(name) ?? { name, volume: 0, delivered: 0, failed: 0 };
-      bucket.volume += 1;
-      if (log.status === 'Delivered' || log.status === 'Sent') bucket.delivered += 1;
-      if (log.status === 'Failed' || log.status === 'Bounced') bucket.failed += 1;
-      buckets.set(name, bucket);
+      const key = `${log.date.getFullYear()}-${log.date.getMonth() + 1}-${log.date.getDate()}`;
+      const bucket = bucketsMap.get(key);
+      if (bucket) {
+        bucket.volume += 1;
+        if (log.status === 'Delivered' || log.status === 'Sent') bucket.delivered += 1;
+        else if (log.status === 'Failed' || log.status === 'Bounced') bucket.failed += 1;
+        else if (log.status === 'Queued') bucket.queued += 1;
+      }
     });
   }
 
-  const chartData = Array.from(buckets.values());
-
-  if (chartData.length === 1) {
-    return [
-      { name: 'Start', volume: 0, delivered: 0, failed: 0 },
-      chartData[0]
-    ];
-  }
-
-  return chartData.slice(-10);
+  return Array.from(bucketsMap.values());
 };
 
 interface DashboardProps {
@@ -130,6 +147,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedJob, setSelectedJob] = useState<QueueJob | null>(null);
+  const [timeRange, setTimeRange] = useState<'today' | '7days' | '14days' | '30days'>('7days');
   const itemsPerPage = 6;
 
   const analytics = useMemo(() => {
@@ -171,20 +189,42 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
       statusData: Object.entries(statusMap).map(([name, value]) => ({ name, value })),
       successful,
       totalLogs,
-      trendData: buildTrendData(logs),
+      trendData: buildTrendData(logs, timeRange),
       typeData: Object.entries(typeMap).map(([name, value]) => ({ name, value })),
       waitingJobs,
       delayedJobs,
     };
-  }, [jobs, logs]);
+  }, [jobs, logs, timeRange]);
 
   const effectiveLogs = logs;
 
   const filteredLogs = effectiveLogs.filter((l) =>
     `${l.recipient} ${l.provider} ${l.type} ${l.status}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const totalPages = Math.max(1, Math.ceil(filteredLogs.length / itemsPerPage));
+  const pagedLogs = filteredLogs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const maxStatusCount = Math.max(1, ...analytics.statusData.map((item) => item.value));
+  const purchasedEmailCredits = 10000;
+  const usedEmailCredits = analytics.totalLogs || toNumber(findMetricValue(metrics, 'Total Sent')) || 0;
+  const availableEmailCredits = Math.max(0, purchasedEmailCredits - usedEmailCredits);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, logs]);
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
 
   const displayMetrics = [
+    {
+      title: 'Total mail',
+      value: analytics.totalLogs || toNumber(findMetricValue(metrics, 'Total Sent')) || 0,
+      subtitle: `${analytics.providerData.length} providers, ${analytics.typeData.length} mail types`,
+      change: 'live',
+      icon: MailCheck,
+      tone: 'neutral',
+    },
     {
       title: 'Delivery rate',
       value: formatPercent(analytics.deliveryRate),
@@ -195,8 +235,8 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
     },
     {
       title: 'Queue pressure',
-      value: analytics.queuePressure || toNumber(metrics[0]?.value) || 0,
-      subtitle: `${analytics.activeJobs} active, ${analytics.waitingJobs} waiting`,
+      value: analytics.queuePressure,
+      subtitle: `${analytics.activeJobs} active, ${analytics.waitingJobs} waiting, ${analytics.delayedJobs} delayed`,
       change: '0.0%',
       icon: Activity,
       tone: 'neutral',
@@ -208,14 +248,6 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
       change: analytics.failureRate > 2 ? '+0.6%' : '0.0%',
       icon: MailWarning,
       tone: analytics.failureRate > 2 ? 'danger' : 'positive',
-    },
-    {
-      title: 'Provider coverage',
-      value: analytics.providerData.length,
-      subtitle: 'ZeptoMail, SES, Resend routes',
-      change: 'balanced',
-      icon: ServerCog,
-      tone: 'neutral',
     },
   ];
 
@@ -233,9 +265,25 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
           </p>
         </div>
         <div className="dashboard-hero-actions">
+          <button className="dashboard-refresh" onClick={onRefresh} title="Refresh dashboard data">
+            <RefreshCw size={16} />
+            Refresh
+          </button>
           <div className="dashboard-live-card">
             <span>System health</span>
-            <strong>Telemetry online</strong>
+            <strong>{analytics.totalLogs} events loaded</strong>
+          </div>
+        </div>
+      </section>
+
+      <section className="dashboard-credits-card" aria-label="Credits information">
+        <div className="dashboard-credits-body">
+          <div className="dashboard-credits-icon">
+            <Mail size={28} />
+          </div>
+          <div>
+            <strong>{availableEmailCredits.toLocaleString()} emails</strong>
+            <span>available out of {purchasedEmailCredits.toLocaleString()} emails purchased</span>
           </div>
         </div>
       </section>
@@ -265,29 +313,68 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
       </section>
 
       <section className="dashboard-analytics-grid">
-        <article className="dashboard-panel dashboard-panel-large">
-          <div className="dashboard-panel-header">
+        <article className="dashboard-panel dashboard-panel-large" style={{ background: '#FFFFFF', padding: '24px', borderRadius: '16px', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <span>Throughput</span>
-              <h3>Volume and delivered mail</h3>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: 'var(--ink)' }}>Mail analysis</h3>
+              <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.78rem' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748B', fontWeight: 600 }}>
+                  <span style={{ width: '10px', height: '3px', borderRadius: '2px', background: '#8B5CF6' }} /> Volume
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748B', fontWeight: 600 }}>
+                  <span style={{ width: '10px', height: '3px', borderRadius: '2px', background: '#10B981' }} /> Delivered
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748B', fontWeight: 600 }}>
+                  <span style={{ width: '10px', height: '3px', borderRadius: '2px', background: '#EF4444' }} /> Bounced/Failed
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748B', fontWeight: 600 }}>
+                  <span style={{ width: '10px', height: '3px', borderRadius: '2px', background: '#F59E0B' }} /> Queued
+                </span>
+              </div>
             </div>
-            <p>Last 7 active days</p>
+
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as any)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                border: '1px solid var(--border)',
+                background: '#FFFFFF',
+                fontSize: '0.85rem',
+                fontWeight: 500,
+                color: 'var(--ink)',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="7days">Last 7 days</option>
+              <option value="today">Today (Hourly)</option>
+              <option value="14days">Last 14 days</option>
+              <option value="30days">Last 30 days</option>
+            </select>
           </div>
-          <div className="dashboard-chart tall">
-            <ResponsiveContainer>
-              <AreaChart data={analytics.trendData} margin={{ top: 8, right: 10, left: -20, bottom: 0 }}>
+
+          <div className="dashboard-chart tall" style={{ height: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={analytics.trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0D4F3C" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#0D4F3C" stopOpacity={0.02} />
+                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.0} />
+                  </linearGradient>
+                  <linearGradient id="deliveredFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
-                <Area type="monotone" dataKey="volume" stroke="#0D4F3C" strokeWidth={3} fill="url(#volumeFill)" />
-                <Line type="monotone" dataKey="delivered" stroke="#24754E" strokeWidth={3} dot={{ r: 3, fill: '#24754E' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
+                <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #E2E8F0', boxShadow: '0 8px 20px rgba(0,0,0,0.08)' }} />
+                <Area type="monotone" dataKey="delivered" stroke="#10B981" strokeWidth={3} fill="url(#deliveredFill)" dot={false} activeDot={{ r: 6, fill: '#10B981' }} />
+                <Area type="monotone" dataKey="volume" stroke="#8B5CF6" strokeWidth={3} fill="url(#volumeFill)" dot={false} activeDot={{ r: 6, fill: '#8B5CF6' }} />
+                <Line type="monotone" dataKey="failed" stroke="#EF4444" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="queued" stroke="#F59E0B" strokeWidth={2} dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -300,7 +387,12 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
               <h3>Delivery posture</h3>
             </div>
           </div>
-          <div className="dashboard-radial">
+          <div
+            className="dashboard-radial"
+            style={{
+              background: `conic-gradient(var(--success) 0 ${Math.round(analytics.deliveryRate)}%, var(--surface-muted) ${Math.round(analytics.deliveryRate)}% 100%)`,
+            }}
+          >
             <div className="dashboard-radial-score">
               <strong>{Math.round(analytics.deliveryRate)}</strong>
               <span>%</span>
@@ -335,15 +427,22 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             </div>
           </div>
           <div className="dashboard-chart">
-            <ResponsiveContainer>
-              <BarChart data={analytics.providerData} margin={{ top: 8, right: 0, left: -22, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} />
-                <Tooltip cursor={{ fill: '#F8F8F6' }} contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
-                <Bar dataKey="value" fill="#0D4F3C" radius={[6, 6, 0, 0]} barSize={34} />
-              </BarChart>
-            </ResponsiveContainer>
+            {analytics.providerData.length === 0 ? (
+              <div className="dashboard-empty-state">
+                <ServerCog size={22} />
+                <span>No provider data yet.</span>
+              </div>
+            ) : (
+              <ResponsiveContainer>
+                <BarChart data={analytics.providerData} margin={{ top: 8, right: 0, left: -22, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#676D63' }} allowDecimals={false} />
+                  <Tooltip cursor={{ fill: '#F8F8F6' }} contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
+                  <Bar dataKey="value" fill="#0D4F3C" radius={[6, 6, 0, 0]} barSize={34} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </article>
 
@@ -355,16 +454,23 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             </div>
           </div>
           <div className="dashboard-donut-wrap">
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie data={analytics.typeData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={84} paddingAngle={4}>
-                  {analytics.typeData.map((entry, index) => (
-                    <Cell key={entry.name} fill={pieColors[index % pieColors.length]} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
-              </PieChart>
-            </ResponsiveContainer>
+            {analytics.typeData.length === 0 ? (
+              <div className="dashboard-empty-state">
+                <MailWarning size={22} />
+                <span>No mailbox mix data yet.</span>
+              </div>
+            ) : (
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie data={analytics.typeData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={84} paddingAngle={4}>
+                    {analytics.typeData.map((entry, index) => (
+                      <Cell key={entry.name} fill={pieColors[index % pieColors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #D9D6CD' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
             <div className="dashboard-donut-legend">
               {analytics.typeData.map((item, index) => (
                 <span key={item.name}>
@@ -392,7 +498,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                   {item.name}
                 </span>
                 <strong>{item.value}</strong>
-                <i style={{ width: `${Math.min(100, Number(item.value) * 3)}%`, background: statusColors[item.name] ?? '#676D63' }} />
+                <i style={{ width: `${Math.max(6, (Number(item.value) / maxStatusCount) * 100)}%`, background: statusColors[item.name] ?? '#676D63' }} />
               </div>
             ))}
           </div>
@@ -463,7 +569,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                     </td>
                   </tr>
                 ) : (
-                  filteredLogs.map((log) => (
+                  pagedLogs.map((log) => (
                     <tr key={log.id}>
                       <td className="muted-cell">{log.timestamp}</td>
                       <td className="recipient-cell">{cleanRecipient(log.recipient)}</td>
@@ -481,6 +587,28 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                 )}
               </tbody>
             </table>
+          </div>
+          <div className="dashboard-pagination">
+            <span>
+              Showing {filteredLogs.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}-
+              {Math.min(currentPage * itemsPerPage, filteredLogs.length)} of {filteredLogs.length}
+            </span>
+            <div>
+              <button
+                className="btn-secondary"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
           </div>
         </article>
       </section>

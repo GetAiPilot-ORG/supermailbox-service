@@ -66,6 +66,22 @@ function renderBlockToMjml(block: EmailBlock): string {
       const rawHtml = content.html || '';
       return `<mj-raw>${rawHtml}</mj-raw>`;
     }
+    case 'table': {
+      const rawHtml = content.html || '';
+      return `<mj-table padding="${padding}">${rawHtml}</mj-table>`;
+    }
+    case 'badge': {
+      const bg = style.backgroundColor || '#dcfce7';
+      const color = style.textColor || '#15803d';
+      const fontSize = style.fontSize || '11px';
+      const text = escapeXml(content.text || 'Badge');
+      return `<mj-text align="${style.align || 'center'}" padding="${padding}"><span style="display:inline-block;background-color:${bg};color:${color};font-size:${fontSize};font-weight:700;border-radius:9999px;padding:4px 12px;">${text}</span></mj-text>`;
+    }
+    case 'alert': {
+      const title = escapeXml(content.title || '');
+      const message = escapeXml(content.message || '');
+      return `<mj-text padding="${padding}"><strong style="display:block;font-size:13px;margin-bottom:2px;">${title}</strong><span style="font-size:12px;">${message}</span></mj-text>`;
+    }
     case 'social': {
       const align = style.align || 'center';
       const iconSize = style.iconSize || '24px';
@@ -133,7 +149,8 @@ function renderColumnToMjml(column: EmailColumn): string {
 }
 
 function renderRowToMjml(row: EmailRow): string {
-  const bg = row.settings?.backgroundColor ? `background-color="${row.settings.backgroundColor}"` : '';
+  const bgVal = row.settings?.backgroundColor || row.settings?.contentBackgroundColor;
+  const bg = bgVal && bgVal !== 'transparent' && !bgVal.includes('gradient') ? `background-color="${bgVal}"` : '';
   const padding = row.settings?.padding ? `padding="${row.settings.padding}"` : 'padding="10px 0px"';
   const columnsMjml = row.columns.map(renderColumnToMjml).join('\n');
 

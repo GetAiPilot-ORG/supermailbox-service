@@ -679,15 +679,15 @@ export function migrateUnlayerDesign(oldProject: any): EmailDocument {
           const blk = createBlock(blockType);
 
           if (blockType === 'heading') {
-            blk.content = { text: values.text || values.heading || 'Heading', level: 'h2' };
+            blk.content = { text: decodeHtmlEntities(values.text || values.heading || 'Heading'), level: 'h2' };
             blk.style = { ...blk.style, fontSize: values.fontSize || '24px', color: values.color || '#1e293b' };
           } else if (blockType === 'paragraph') {
-            blk.content = { text: values.text || values.html || 'Text content' };
+            blk.content = { text: decodeHtmlEntities(values.text || values.html || 'Text content') };
             blk.style = { ...blk.style, fontSize: values.fontSize || '14px', color: values.color || '#475569' };
           } else if (blockType === 'image') {
             blk.content = { src: values.src?.url || values.src || '', alt: values.altText || '' };
           } else if (blockType === 'button') {
-            blk.content = { label: values.text || 'Click Here', url: values.href?.values?.url || values.url || '#' };
+            blk.content = { label: decodeHtmlEntities(values.text || 'Click Here'), url: values.href?.values?.url || values.url || '#' };
             blk.style = { ...blk.style, backgroundColor: values.backgroundColor || '#2563eb', textColor: values.color || '#ffffff' };
           } else if (blockType === 'html') {
             blk.content = { html: values.html || '<div>Legacy HTML</div>' };

@@ -40,6 +40,15 @@ const extractProjectFromIdempotencyKey = (idempotencyKey?: string | null) => {
   return 'unknown';
 };
 
+const formatDashboardJobStatus = (status?: string | null) => {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'sent' || normalized === 'delivered') return 'Delivered';
+  if (normalized === 'bounced') return 'Bounced';
+  if (normalized === 'queued' || normalized === 'waiting' || normalized === 'active' || normalized === 'delayed') return 'Queued';
+  if (normalized === 'failed') return 'Failed';
+  return 'Queued';
+};
+
 const formatSuppression = (s: any) => ({
   id: s.id,
   email: s.email,
@@ -178,8 +187,9 @@ const fetchZeptoSuppressions = async () => {
   if (!authHeader) return null;
 
   const params = new URLSearchParams({ limit: '500', offset: '0' });
-  const mailAgentKey = process.env.ZEPTOMAIL_MAIL_AGENT_KEY || process.env.ZEPTOMAIL_AGENT_KEY;
-  if (mailAgentKey) params.set('mailagent_key', mailAgentKey);
+  
+  // We intentionally do not pass mailagent_key here because we want to fetch 
+  // account-level suppressions (Associated Agent: "All") as well.
 
   const response = await fetch(`${getZeptoApiBaseUrl()}/suppressions/email?${params.toString()}`, {
     headers: {
@@ -626,12 +636,15 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
       const { count: totalCampaigns } = await supabase.from('campaigns').select('*', { count: 'exact', head: true });
       const { data: recentJobs } = await supabase
         .from('email_jobs')
-        .select('id, type, provider, status, created_at, idempotency_key')
+        .select(`
+          id, type, provider, status, created_at, idempotency_key,
+          contacts ( primary_email )
+        `)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(1000);
 
       let logs = (recentJobs || []).map((j: any) => {
-        const extractedEmail = extractEmailFromIdempotencyKey(j.idempotency_key) || 'unknown@recipient.com';
+        const extractedEmail = j.contacts?.primary_email || extractEmailFromIdempotencyKey(j.idempotency_key) || 'unknown@recipient.com';
         const formattedTime = new Date(j.created_at).toLocaleString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -647,7 +660,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
           recipient: extractedEmail,
           type: j.type === 'campaign' ? 'Campaign' : 'Transactional',
           provider: j.provider || 'ZeptoMail (.IN API)',
-          status: j.status === 'sent' || j.status === 'delivered' ? 'Delivered' : (j.status === 'bounced' ? 'Bounced' : 'Failed')
+          status: formatDashboardJobStatus(j.status)
         };
       });
 
@@ -656,7 +669,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
           .from('webhook_logs')
           .select('id, provider, raw_payload, received_at')
           .order('received_at', { ascending: false })
-          .limit(10);
+          .limit(500);
 
         if (webhookLogs && webhookLogs.length > 0) {
           logs = webhookLogs.flatMap((wl: any) => {
@@ -666,9 +679,10 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
               ? wl.raw_payload
               : [wl.raw_payload];
 
-            return records.slice(0, 5).map((r: any, idx: number) => ({
+            return records.map((r: any, idx: number) => ({
               id: `${wl.id}_${idx}`,
-              timestamp: new Date(r.processed_at || r.bounced_at || wl.received_at).toLocaleTimeString(),
+              createdAt: r.processed_at || r.processedAt || r.bounced_at || r.bouncedAt || wl.received_at,
+              timestamp: new Date(r.processed_at || r.processedAt || r.bounced_at || r.bouncedAt || wl.received_at).toLocaleTimeString(),
               recipient: r.email_address || r.email || r.recipient || 'contact@metabull.com',
               type: 'Transactional',
               provider: 'ZeptoMail (Metabull)',

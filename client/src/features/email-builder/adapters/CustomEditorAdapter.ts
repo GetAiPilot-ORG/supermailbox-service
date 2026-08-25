@@ -2,7 +2,7 @@ import type { DesignRow, EmailEditorAdapter } from '../../email-templates/builde
 import type { PreviewDevice } from '../../email-templates/types/template.types';
 import { compileMjmlViaServer } from '../renderer/htmlCompiler';
 import { documentToMjml } from '../renderer/mjmlRenderer';
-import { parseTemplateToDocument } from '../renderer/migrationLayer';
+import {  parseTemplateToDocument, convertAnyToDocument, htmlToDocument, mjmlToDocument } from '../renderer/migrationLayer';
 import { useDocumentStore } from '../store/documentStore';
 import type { BlockType } from '../types/document.types';
 
@@ -20,6 +20,19 @@ export class CustomEditorAdapter implements EmailEditorAdapter {
   async loadMjml(mjml: string): Promise<void> {
     if (!mjml) return;
     const doc = parseTemplateToDocument({ mjml });
+    const doc = convertAnyToDocument({ project });
+    useDocumentStore.getState().setDocument(doc);
+  }
+
+  async loadMjml(mjml: string): Promise<void> {
+    if (!mjml) return;
+    const doc = mjmlToDocument(mjml);
+    useDocumentStore.getState().setDocument(doc);
+  }
+
+  async loadHtml(html: string): Promise<void> {
+    if (!html) return;
+    const doc = htmlToDocument(html);
     useDocumentStore.getState().setDocument(doc);
   }
 
@@ -63,8 +76,8 @@ export class CustomEditorAdapter implements EmailEditorAdapter {
 
     rows.forEach((row, rIdx) => {
       let hasContents = false;
-      row.columns.forEach((col, cIdx) => {
-        col.blocks.forEach((blk, bIdx) => {
+      row.columns.forEach((col) => {
+        col.blocks.forEach((blk) => {
           hasContents = true;
           result.push({
             id: blk.id,
