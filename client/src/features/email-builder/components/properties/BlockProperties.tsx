@@ -23,6 +23,7 @@ function stripHtml(html: string): string {
 export const BlockProperties: React.FC<BlockPropertiesProps> = ({ block, onRequestImagePicker }) => {
   const updateBlock = useDocumentStore((state) => state.updateBlock);
   const saveBlock = useSavedBlocksStore((state) => state.saveBlock);
+  const [isHtmlModalOpen, setIsHtmlModalOpen] = React.useState(false);
 
   if (!block) return null;
 
@@ -237,11 +238,28 @@ export const BlockProperties: React.FC<BlockPropertiesProps> = ({ block, onReque
       {/* HTML BLOCK */}
       {block.type === 'html' && (
         <div>
-          <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '4px' }}>
+          <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '8px' }}>
             Custom HTML Code
           </label>
+          <button
+            onClick={() => setIsHtmlModalOpen(true)}
+            style={{
+              width: '100%',
+              padding: '8px',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              marginBottom: '8px'
+            }}
+          >
+            Open Fullscreen Editor
+          </button>
           <textarea
-            rows={8}
+            rows={4}
             value={block.content.html || ''}
             onChange={(e) => updateContent({ html: e.target.value })}
             style={{
@@ -255,6 +273,71 @@ export const BlockProperties: React.FC<BlockPropertiesProps> = ({ block, onReque
               color: '#f8fafc',
             }}
           />
+
+          {isHtmlModalOpen && (
+            <div style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              zIndex: 9999,
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '24px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h2 style={{ color: 'white', margin: 0 }}>Edit Custom HTML</h2>
+                <button
+                  onClick={() => setIsHtmlModalOpen(false)}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#ef4444',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Close & Save
+                </button>
+              </div>
+              <div style={{ display: 'flex', flex: 1, gap: '24px', overflow: 'hidden' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <h3 style={{ color: '#94a3b8', fontSize: '14px', marginTop: 0, marginBottom: '8px' }}>HTML Code</h3>
+                  <textarea
+                    value={block.content.html || ''}
+                    onChange={(e) => updateContent({ html: e.target.value })}
+                    style={{
+                      flex: 1,
+                      width: '100%',
+                      fontSize: '14px',
+                      fontFamily: 'monospace',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      border: '1px solid #334155',
+                      background: '#1e293b',
+                      color: '#f8fafc',
+                      resize: 'none'
+                    }}
+                  />
+                </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <h3 style={{ color: '#94a3b8', fontSize: '14px', marginTop: 0, marginBottom: '8px' }}>Live Preview</h3>
+                  <div 
+                    style={{
+                      flex: 1,
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      border: '1px solid #334155',
+                      padding: '16px',
+                      overflowY: 'auto'
+                    }}
+                    dangerouslySetInnerHTML={{ __html: block.content.html || '' }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

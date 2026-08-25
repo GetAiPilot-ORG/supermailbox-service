@@ -327,6 +327,7 @@ export const CustomBuilderCanvas: React.FC<CustomBuilderCanvasProps> = ({
           flex: 1,
           width: '100%',
           height: '100%',
+          minHeight: 0,
           overflow: 'hidden',
           position: 'relative',
         }}

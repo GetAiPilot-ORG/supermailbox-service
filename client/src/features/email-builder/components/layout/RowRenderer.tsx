@@ -55,11 +55,9 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
     position: 'relative',
     background: isRowGradient ? rowBg : undefined,
     backgroundColor: !isRowGradient ? (rowBg || 'transparent') : undefined,
-    outline: isSelected
-      ? '2px solid #2563eb'
-      : isHovered
-      ? '1px dashed #93c5fd'
-      : 'none',
+    border: isSelected
+      ? '2px solid #3b82f6'
+      : '1px solid transparent',
     outlineOffset: '-2px',
     margin: row.settings.margin || '0px',
     borderRadius: row.settings.borderRadius || '0px',

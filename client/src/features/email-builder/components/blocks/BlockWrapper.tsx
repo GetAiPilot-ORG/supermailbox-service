@@ -51,8 +51,6 @@ export const BlockWrapper: React.FC<BlockWrapperProps> = ({ block, columnId, row
     borderRadius: '4px',
     outline: isSelected
       ? '2px solid #2563eb'
-      : isHovered
-      ? '1px dashed #60a5fa'
       : 'none',
     outlineOffset: '-1px',
     cursor: 'pointer',

@@ -40,8 +40,9 @@ export const Canvas: React.FC = () => {
       style={{
         flex: 1,
         height: '100%',
+        minHeight: 0,
         backgroundColor: document?.bodySettings?.backgroundColor || '#f1f5f9',
-        overflowY: 'auto',
+        overflowY: 'scroll',
         padding: document?.bodySettings?.globalPadding || '30px 16px',
         boxSizing: 'border-box',
         display: 'flex',
@@ -66,7 +67,6 @@ export const Canvas: React.FC = () => {
               boxShadow: '0 12px 32px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04)',
               minHeight: '400px',
               borderRadius: '16px',
-              overflow: 'hidden',
               position: 'relative',
               boxSizing: 'border-box',
               transform: `scale(${zoom})`,
