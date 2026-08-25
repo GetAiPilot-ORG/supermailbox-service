@@ -31,6 +31,9 @@ export const ColumnRenderer: React.FC<ColumnRendererProps> = ({ column, rowId })
 
   const blockIds = column.blocks.map((b) => b.id);
 
+  const colBg = column.settings.backgroundColor;
+  const isColGradient = colBg && (colBg.includes('gradient') || colBg.includes('url('));
+
   return (
     <div
       ref={setNodeRef}
@@ -45,7 +48,8 @@ export const ColumnRenderer: React.FC<ColumnRendererProps> = ({ column, rowId })
         maxWidth: `${column.width}%`,
         boxSizing: 'border-box',
         padding: column.settings.padding || '8px',
-        backgroundColor: column.settings.backgroundColor || 'transparent',
+        background: isColGradient ? colBg : undefined,
+        backgroundColor: !isColGradient ? (colBg || 'transparent') : undefined,
         borderRadius: column.settings.borderRadius || '0px',
         border: isSelected
           ? '1.5px solid #3b82f6'

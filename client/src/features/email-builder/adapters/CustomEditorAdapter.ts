@@ -2,9 +2,9 @@ import type { DesignRow, EmailEditorAdapter } from '../../email-templates/builde
 import type { PreviewDevice } from '../../email-templates/types/template.types';
 import { compileMjmlViaServer } from '../renderer/htmlCompiler';
 import { documentToMjml } from '../renderer/mjmlRenderer';
-import { migrateUnlayerDesign } from '../renderer/migrationLayer';
+import { parseTemplateToDocument } from '../renderer/migrationLayer';
 import { useDocumentStore } from '../store/documentStore';
-import type { BlockType, EmailDocument } from '../types/document.types';
+import type { BlockType } from '../types/document.types';
 
 export class CustomEditorAdapter implements EmailEditorAdapter {
   async initialize(_container: HTMLElement): Promise<void> {
@@ -13,18 +13,14 @@ export class CustomEditorAdapter implements EmailEditorAdapter {
 
   async loadProject(project: unknown): Promise<void> {
     if (!project) return;
-
-    if (typeof project === 'object' && 'schemaVersion' in (project as any) && (project as any).schemaVersion === 2) {
-      useDocumentStore.getState().setDocument(project as EmailDocument);
-    } else {
-      // Migrate legacy Unlayer design
-      const migrated = migrateUnlayerDesign(project);
-      useDocumentStore.getState().setDocument(migrated);
-    }
+    const doc = parseTemplateToDocument({ project });
+    useDocumentStore.getState().setDocument(doc);
   }
 
-  async loadMjml(_mjml: string): Promise<void> {
-    return Promise.resolve();
+  async loadMjml(mjml: string): Promise<void> {
+    if (!mjml) return;
+    const doc = parseTemplateToDocument({ mjml });
+    useDocumentStore.getState().setDocument(doc);
   }
 
   async getProject(): Promise<unknown> {

@@ -756,6 +756,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
   };
 
   return (
+    <>
     <div className="template-manager" style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--background)', color: 'var(--ink)' }}>
       
       {/* Top Hero Header */}
@@ -1524,6 +1525,6 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };

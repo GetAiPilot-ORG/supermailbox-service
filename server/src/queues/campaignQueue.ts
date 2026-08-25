@@ -12,7 +12,7 @@ export const redisConnection = redisUrl
   ? new Redis(redisUrl, {
       maxRetriesPerRequest: null,
       lazyConnect: true,
-      retryStrategy: (times) => {
+      retryStrategy: (times: number) => {
         if (times > 3) return null; // Stop retrying after 3 attempts
         return Math.min(times * 1000, 3000);
       }
@@ -22,7 +22,7 @@ export const redisConnection = redisUrl
       port: redisPort,
       maxRetriesPerRequest: null,
       lazyConnect: true,
-      retryStrategy: (times) => {
+      retryStrategy: (times: number) => {
         if (times > 3) return null; // Stop retrying after 3 attempts
         return Math.min(times * 1000, 3000);
       }
