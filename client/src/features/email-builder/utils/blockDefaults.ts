@@ -22,7 +22,7 @@ export function getDefaultBlockConfig(type: BlockType): Omit<EmailBlock, 'id'> {
       return {
         type: 'image',
         content: { src: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop', alt: 'Image description', linkUrl: '' },
-        style: { width: '100%', maxWidth: '100%', align: 'center', padding: '12px 16px', borderRadius: '8px' },
+        style: { width: '100%', maxWidth: '100%', align: 'center', padding: '12px 16px', borderRadius: '8px', objectFit: 'cover' },
       };
     case 'button':
       return {
@@ -200,14 +200,14 @@ export function createRowFromPreset(preset: RowLayoutPreset = '1-col'): EmailRow
   const columns: EmailColumn[] = widths.map((width, idx) => ({
     id: `${rowId}-col-${idx + 1}`,
     width,
-    settings: { padding: '10px', verticalAlign: 'top' },
+    settings: { padding: '0px', verticalAlign: 'top' },
     blocks: [],
   }));
 
   return {
     id: rowId,
     name: `Row (${preset})`,
-    settings: { backgroundColor: 'transparent', contentBackgroundColor: '#ffffff', padding: '10px 0px', stackOnMobile: true },
+    settings: { backgroundColor: 'transparent', contentBackgroundColor: '#ffffff', padding: '0px 0px', stackOnMobile: true },
     columns,
   };
 }

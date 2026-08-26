@@ -73,6 +73,7 @@ export const Canvas: React.FC = () => {
               transformOrigin: 'top center',
               transition: 'max-width 0.2s ease, transform 0.2s ease',
               border: isOverEmptyCanvas ? '2px dashed #2563eb' : '1px solid #e2e8f0',
+              overflow: 'hidden',
             }}
           >
             <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>

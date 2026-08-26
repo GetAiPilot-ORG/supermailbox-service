@@ -31,11 +31,38 @@ function renderBlockToMjml(block: EmailBlock): string {
       const src = escapeXml(content.src || '');
       const alt = escapeXml(content.alt || '');
       const href = content.linkUrl ? `href="${escapeXml(content.linkUrl)}"` : '';
-      const width = style.width ? `width="${style.width}"` : 'width="100%"';
+      
+      // MJML `<mj-image>` `width` attribute only accepts pixels (it runs parseInt).
+      // If you pass "100%", MJML parses it as 100px, resulting in a tiny image!
+      let width = 'width="600px"'; // Default to max email width so it scales to column
+      if (style.width) {
+        const cssWidth = String(style.width).trim();
+        if (cssWidth.endsWith('%')) {
+          const pct = parseInt(cssWidth, 10);
+          if (!isNaN(pct)) {
+            // Approximate column width is max 600px.
+            const pxWidth = Math.round(600 * (pct / 100));
+            width = `width="${pxWidth}px"`;
+          }
+        } else if (cssWidth.endsWith('px')) {
+          width = `width="${cssWidth}"`;
+        } else if (/^\d+$/.test(cssWidth)) {
+          width = `width="${cssWidth}px"`;
+        } else if (cssWidth === 'auto') {
+          width = ''; // Let MJML use natural image width
+        } else {
+          const val = parseInt(cssWidth, 10);
+          if (!isNaN(val)) {
+            width = `width="${val}px"`;
+          }
+        }
+      }
+      
       const align = style.align || 'center';
       const borderRadius = style.borderRadius ? `border-radius="${style.borderRadius}"` : '';
+      const height = style.height ? `height="${style.height}"` : '';
 
-      return `<mj-image src="${src}" alt="${alt}" ${href} ${width} align="${align}" ${borderRadius} padding="${padding}" />`;
+      return `<mj-image src="${src}" alt="${alt}" ${href} ${width} ${height} align="${align}" ${borderRadius} padding="${padding}" />`;
     }
     case 'button': {
       const label = content.label || 'Click Here';
@@ -47,9 +74,14 @@ function renderBlockToMjml(block: EmailBlock): string {
       const fontWeight = style.fontWeight || '600';
       const borderRadius = style.borderRadius || '6px';
       const align = style.align || 'center';
-      const fullWidth = style.fullWidth ? 'width="100%"' : '';
+      let widthAttr = '';
+      if (style.fullWidth) {
+        widthAttr = 'width="100%"';
+      } else if (style.width) {
+        widthAttr = `width="${escapeXml(String(style.width).trim())}"`;
+      }
 
-      return `<mj-button href="${href}" target="${target}" background-color="${bg}" color="${color}" font-size="${fontSize}" font-weight="${fontWeight}" border-radius="${borderRadius}" align="${align}" ${fullWidth} padding="${padding}">${label}</mj-button>`;
+      return `<mj-button href="${href}" target="${target}" background-color="${bg}" color="${color}" font-size="${fontSize}" font-weight="${fontWeight}" border-radius="${borderRadius}" align="${align}" ${widthAttr} padding="${padding}">${label}</mj-button>`;
     }
     case 'divider': {
       const borderColor = style.borderColor || '#e2e8f0';

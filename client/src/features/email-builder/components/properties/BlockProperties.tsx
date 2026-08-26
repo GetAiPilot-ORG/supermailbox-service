@@ -163,6 +163,68 @@ export const BlockProperties: React.FC<BlockPropertiesProps> = ({ block, onReque
               style={{ width: '100%', fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
             />
           </div>
+
+          {/* Image Dimensions */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                Width
+              </label>
+              <input
+                type="text"
+                value={block.style.width || '100%'}
+                onChange={(e) => updateStyle({ width: e.target.value })}
+                placeholder="e.g. 100%, 300px, 50%"
+                style={{ width: '100%', fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                Height (optional)
+              </label>
+              <input
+                type="text"
+                value={block.style.height || ''}
+                onChange={(e) => updateStyle({ height: e.target.value })}
+                placeholder="e.g. 200px, auto"
+                style={{ width: '100%', fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+              />
+            </div>
+          </div>
+
+          {/* Alignment & Fit */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                Alignment
+              </label>
+              <select
+                value={block.style.align || 'center'}
+                onChange={(e) => updateStyle({ align: e.target.value })}
+                style={{ width: '100%', fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+              >
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                Object Fit
+              </label>
+              <select
+                value={block.style.objectFit || 'cover'}
+                onChange={(e) => updateStyle({ objectFit: e.target.value })}
+                style={{ width: '100%', fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+              >
+                <option value="cover">Cover</option>
+                <option value="contain">Contain</option>
+                <option value="fill">Fill</option>
+                <option value="none">None</option>
+                <option value="scale-down">Scale Down</option>
+              </select>
+            </div>
+          </div>
         </div>
       )}
 
@@ -201,6 +263,19 @@ export const BlockProperties: React.FC<BlockPropertiesProps> = ({ block, onReque
               />
               Full Width Button
             </label>
+          </div>
+          <div>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '4px' }}>
+              Button Width (optional)
+            </label>
+            <input
+              type="text"
+              value={block.style.width || ''}
+              onChange={(e) => updateStyle({ width: e.target.value })}
+              placeholder="e.g. 200px, 100%, auto"
+              disabled={block.style.fullWidth}
+              style={{ width: '100%', fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', opacity: block.style.fullWidth ? 0.5 : 1 }}
+            />
           </div>
         </div>
       )}

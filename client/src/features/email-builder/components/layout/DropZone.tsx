@@ -21,8 +21,8 @@ export const DropZone: React.FC<DropZoneProps> = ({ id, columnId, index }) => {
     <div
       ref={setNodeRef}
       style={{
-        height: isOver ? '16px' : '6px',
-        margin: '2px 0',
+        height: isOver ? '16px' : '0px',
+        margin: isOver ? '2px 0' : '0',
         borderRadius: '3px',
         backgroundColor: isOver ? '#2563eb' : 'transparent',
         border: isOver ? '1px dashed #1d4ed8' : 'none',

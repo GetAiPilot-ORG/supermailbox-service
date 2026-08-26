@@ -716,6 +716,7 @@ textarea:focus-visible {
 .badge-warning, .queue-status.delayed { color: #ffffff; background: #f59e0b; border-color: #d97706; font-weight: 500; }
 
 table { width: 100%; border-collapse: collapse; }
+.custom-builder-canvas-shell table { width: auto; border-collapse: separate; }
 th {
   position: sticky;
   top: 0;
@@ -3686,8 +3687,9 @@ th {
 }
 
 .email-template-card:hover .email-template-hover {
-  opacity: 1;
-  transform: translateY(0);
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
 }
 
 .email-template-card-body {

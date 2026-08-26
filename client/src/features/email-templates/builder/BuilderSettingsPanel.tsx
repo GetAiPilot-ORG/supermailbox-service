@@ -249,24 +249,104 @@ export const BuilderSettingsPanel: React.FC<Props> = ({
         <h3>Selected Block</h3>
         {selected ? (
           <>
-            <label>
-              Content
-              <textarea
-                className="ui-input"
-                value={String(selected.content || '')}
-                onChange={(event) => onSelectedChange({ content: event.target.value })}
-                rows={4}
-              />
-            </label>
-            <label>
-              Link or image URL
-              <input
-                className="ui-input"
-                value={selected.attributes?.href || selected.attributes?.src || ''}
-                onChange={(event) => onSelectedChange({ attributes: selected.attributes?.src !== undefined ? { src: event.target.value } : { href: event.target.value } })}
-                placeholder="https://..."
-              />
-            </label>
+            {selected.type === 'image' ? (
+              <>
+                <label>
+                  Image URL
+                  <input
+                    className="ui-input"
+                    value={selected.content?.src || ''}
+                    onChange={(event) => onSelectedChange({ content: { ...selected.content, src: event.target.value } })}
+                    placeholder="https://..."
+                  />
+                </label>
+                <div style={{ marginTop: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Image Width</label>
+                  <input
+                    className="ui-input"
+                    value={selected.style?.width || '100%'}
+                    onChange={(event) => onSelectedChange({ style: { ...selected.style, width: event.target.value } })}
+                    placeholder="e.g. 100%, 300px"
+                  />
+                </div>
+                <div style={{ marginTop: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Alignment</label>
+                  <select
+                    className="ui-input"
+                    value={selected.style?.align || 'center'}
+                    onChange={(event) => onSelectedChange({ style: { ...selected.style, align: event.target.value } })}
+                  >
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </>
+            ) : selected.type === 'button' ? (
+              <>
+                <label>
+                  Button Label
+                  <input
+                    className="ui-input"
+                    value={selected.content?.label || 'Click Here'}
+                    onChange={(event) => onSelectedChange({ content: { ...selected.content, label: event.target.value } })}
+                  />
+                </label>
+                <label>
+                  Link URL
+                  <input
+                    className="ui-input"
+                    value={selected.content?.url || ''}
+                    onChange={(event) => onSelectedChange({ content: { ...selected.content, url: event.target.value } })}
+                    placeholder="https://..."
+                  />
+                </label>
+                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    id="btn-full-width"
+                    checked={selected.style?.fullWidth || false}
+                    onChange={(event) => onSelectedChange({ style: { ...selected.style, fullWidth: event.target.checked } })}
+                  />
+                  <label htmlFor="btn-full-width" style={{ fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer' }}>Full Width</label>
+                </div>
+                <div style={{ marginTop: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Button Width</label>
+                  <input
+                    className="ui-input"
+                    value={selected.style?.width || ''}
+                    onChange={(event) => onSelectedChange({ style: { ...selected.style, width: event.target.value } })}
+                    placeholder="e.g. 200px, 100%, auto"
+                    disabled={selected.style?.fullWidth}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <label>
+                  Content
+                  <textarea
+                    className="ui-input"
+                    value={typeof selected.content === 'object' ? (selected.content.text || selected.content.html || '') : String(selected.content || '')}
+                    onChange={(event) => {
+                      if (selected.type === 'html') onSelectedChange({ content: { ...selected.content, html: event.target.value } });
+                      else if (selected.type === 'heading' || selected.type === 'paragraph') onSelectedChange({ content: { ...selected.content, text: event.target.value } });
+                      else onSelectedChange({ content: event.target.value });
+                    }}
+                    rows={4}
+                  />
+                </label>
+                <label>
+                  Link URL
+                  <input
+                    className="ui-input"
+                    value={selected.attributes?.href || selected.attributes?.src || ''}
+                    onChange={(event) => onSelectedChange({ attributes: selected.attributes?.src !== undefined ? { src: event.target.value } : { href: event.target.value } })}
+                    placeholder="https://..."
+                  />
+                </label>
+              </>
+            )}
 
             {(selected.attributes?.href || selected.attributes?.src) && (
               <button
