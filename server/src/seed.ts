@@ -86,10 +86,23 @@ const DEMO_TEMPLATES = [
   <title>GetAiPilot Email Template</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+  
+    @media only screen and (max-width: 600px) {
+      .email-body {
+        padding: 0 !important;
+      }
+      .email-container-td {
+        padding: 0 !important;
+      }
+      .email-main-card {
+        border-radius: 0 !important;
+        max-width: 100% !important;
+      }
+    }
   </style>
 </head>
 
-<body style="background-color:#f3f4f6; margin:0; padding:10px 16px; font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+<body class="email-body" style="background-color:#f3f4f6; margin:0; padding:10px 16px; font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
 
   <!-- PRE-HEADER (seen in inbox preview, hidden in the email body) -->
   <div style="display:none;max-height:0;overflow:hidden;font-size:1px;color:#ffffff;line-height:1px;">
@@ -98,9 +111,9 @@ const DEMO_TEMPLATES = [
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
-      <td align="center" style="padding: 20px 0;">
+      <td class="email-container-td" align="center" style="padding: 20px 0;">
 
-        <div style="width:100%; max-width:480px; background-color:#ffffff; border-radius:16px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); overflow:hidden; margin:0 auto; text-align:left; box-sizing:border-box;">
+        <div class="email-main-card" style="width:100%; max-width:480px; background-color:#ffffff; border-radius:16px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); overflow:hidden; margin:0 auto; text-align:left; box-sizing:border-box;">
 
           <!-- Logo -->
           <div style="padding:16px 0; text-align:center; box-sizing:border-box;">
@@ -117,7 +130,7 @@ const DEMO_TEMPLATES = [
           </div>
 
           <!-- Hero -->
-          <div style="margin:0; overflow:hidden; background: linear-gradient(to bottom right, #10183f, #1b2360, #8b3cff); color:#ffffff; padding:24px 20px; min-height:160px; position:relative; box-sizing:border-box;">
+          <div style="margin:0; overflow:hidden; background-color: #1b2360; background: linear-gradient(to bottom right, #10183f, #1b2360, #8b3cff); color:#ffffff; padding:24px 20px; min-height:160px; position:relative; box-sizing:border-box;">
 
             <p style="font-size:16px; margin:0 0 4px 0; color:rgba(255,255,255,0.8);">Hi there,</p>
 
@@ -792,7 +805,179 @@ const DEMO_TEMPLATES = [
 </div>`
       }
     ]
-  }
+  },
+
+  {
+    key: 'getaipilot_complete_onboarding',
+    name: 'GetAiPilot Complete Onboarding',
+    category: 'transactional',
+    versions: [
+      {
+        version_number: 1,
+        status: 'live',
+        created_by: 'Admin',
+        subject: 'Action Required: Complete your GetAiPilot Setup!',
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complete your onboarding</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f6f3ee; font-family: 'Helvetica Neue', Arial, sans-serif;">
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f6f3ee; padding:40px 0;">
+    <tr>
+      <td align="center">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden;">
+
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding:40px 40px 30px 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td valign="middle" style="padding-right:12px;">
+                    <div style="width:44px; height:44px; border-radius:50%; background-color:#f47c20;"></div>
+                  </td>
+                  <td valign="middle">
+                    <span style="font-size:26px; font-weight:600; color:#2b2b2b; letter-spacing:-0.5px;">getaipilot</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Illustration -->
+          <tr>
+            <td align="center" style="padding:0 40px 30px 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7d451; border-radius:16px;">
+                <tr>
+                  <td align="center" style="padding:50px 20px; position:relative;">
+                    <table role="presentation" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="font-size:28px; padding-right:15px; vertical-align:top;">&#10022;</td>
+                        <td style="vertical-align:middle;">
+                          <div style="width:90px; height:90px; border-radius:50%; background-color:#f47c20; position:relative;">
+                            <div style="position:relative; top:38px; left:22px; width:45px; height:8px; border-top:4px solid #d9631a; border-radius:50%; border-bottom:none; transform:rotate(0deg);"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Heading -->
+          <tr>
+            <td align="center" style="padding:0 40px 20px 40px;">
+              <h1 style="margin:0; font-size:34px; line-height:1.3; color:#2b2b2b; font-weight:700;">
+                Complete your<br>onboarding
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Body text -->
+          <tr>
+            <td align="center" style="padding:0 50px 30px 50px;">
+              <p style="margin:0; font-size:16px; line-height:1.6; color:#5b5b5b;">
+                You're just a few steps away from getting the most out of GetAiPilot. Finish setting up your profile and preferences so we can personalize your AI workflow automation.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Button -->
+          <tr>
+            <td align="center" style="padding:0 40px 50px 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="background-color:#f47c20; border-radius:30px;">
+                    <a href="https://getaipilot.in" style="display:inline-block; padding:16px 40px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none;">
+                      Complete onboarding
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Help text -->
+          <tr>
+            <td align="center" style="padding:0 50px 30px 50px;">
+              <p style="margin:0; font-size:14px; line-height:1.6; color:#8a8a8a;">
+                If you have any questions, please visit our
+                <a href="#" style="color:#f47c20; text-decoration:none;">FAQs</a>
+                or email us at
+                <a href="mailto:support@getaipilot.com" style="color:#f47c20; text-decoration:none;">support@getaipilot.com</a>.
+                Our team can answer questions about your account or help you with your setup.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 50px;">
+              <hr style="border:none; border-top:1px solid #e5e5e5; margin:0;">
+            </td>
+          </tr>
+
+          <!-- Social icons -->
+          <tr>
+            <td align="center" style="padding:30px 40px 20px 40px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:0 10px;"><a href="#" style="color:#2b2b2b; text-decoration:none; font-size:18px;">&#9679;</a></td>
+                  <td style="padding:0 10px;"><a href="#" style="color:#2b2b2b; text-decoration:none; font-size:18px;">&#9633;</a></td>
+                  <td style="padding:0 10px;"><a href="#" style="color:#2b2b2b; text-decoration:none; font-size:18px;">&#9673;</a></td>
+                  <td style="padding:0 10px;"><a href="#" style="color:#2b2b2b; text-decoration:none; font-size:18px;">&#9654;</a></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer links -->
+          <tr>
+            <td align="center" style="padding:0 40px 25px 40px;">
+              <p style="margin:0; font-size:13px; color:#2b2b2b;">
+                <a href="#" style="color:#2b2b2b; text-decoration:none; font-weight:600;">My Account</a>
+                &nbsp;|&nbsp;
+                <a href="#" style="color:#2b2b2b; text-decoration:none; font-weight:600;">How it works</a>
+                &nbsp;|&nbsp;
+                <a href="#" style="color:#2b2b2b; text-decoration:none; font-weight:600;">FAQs</a>
+                &nbsp;|&nbsp;
+                <a href="#" style="color:#2b2b2b; text-decoration:none; font-weight:600;">T&amp;Cs</a>
+                &nbsp;|&nbsp;
+                <a href="#" style="color:#2b2b2b; text-decoration:none; font-weight:600;">Privacy Policy</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Legal footer -->
+          <tr>
+            <td align="center" style="padding:0 40px 40px 40px;">
+              <p style="margin:0; font-size:11px; line-height:1.7; color:#b0b0b0;">
+                You have received this email as a registered user of GetAiPilot&reg;<br>
+                GetAiPilot, Inc., 123 Main Street, San Francisco, CA 94105 United States.<br>
+                Delaware Corporation State File # 5271511<br>
+                &copy; 2026 GetAiPilot Inc.<br>
+                All rights reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>`
+      }
+    ]
+  },
 ];
 
 async function runSeed() {

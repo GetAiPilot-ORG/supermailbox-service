@@ -64,6 +64,21 @@ export const DocumentProperties: React.FC = () => {
             />
           </div>
 
+          {/* Global Padding */}
+          <div>
+            <label style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', display: 'block', marginBottom: '4px' }}>
+              Global Padding
+            </label>
+            <input
+              type="text"
+              value={bodySettings.globalPadding || '0px'}
+              onChange={(e) => updateBodySettings({ globalPadding: e.target.value })}
+              placeholder="e.g. 20px 0px"
+              style={{ width: '100%', fontSize: '12px', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+            />
+          </div>
+
+
           {/* Body Background & Content Background */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div>

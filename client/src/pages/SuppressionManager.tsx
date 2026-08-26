@@ -129,6 +129,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
   const [emailDialogCategory, setEmailDialogCategory] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState('');
   const [newReason, setNewReason] = useState<SuppressionItem['reason']>('manual');
+  const [detailModalRecord, setDetailModalRecord] = useState<BounceReportItem | null>(null);
 
   const hardBounces = bounceReports.filter((item) => item.bounceType === 'hard');
   const softBounces = bounceReports.filter((item) => item.bounceType === 'soft');
@@ -712,7 +713,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
                             {item.bounceType === 'hard' ? 'Hard bounce' : 'Soft bounce'}
                           </span>
                         </td>
-                        <td><button className="btn-secondary compact">View Details</button></td>
+                        <td><button className="btn-secondary compact" onClick={() => setDetailModalRecord(item)}>View Details</button></td>
                       </tr>
                     ))
                   )}
@@ -722,6 +723,53 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
 
             <div className="analytics-dialog-shortcuts">
               <span>Enter</span> Search <span>ctrl</span><span>k</span> Open <span>esc</span> Close
+            </div>
+          </div>
+        </div>
+      )}
+
+      {detailModalRecord && (
+        <div className="modal-backdrop" style={{ zIndex: 9999 }} onClick={() => setDetailModalRecord(null)}>
+          <div className="analytics-email-dialog bounce-reason-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', padding: '24px' }}>
+            <div className="analytics-dialog-header" style={{ marginBottom: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
+              <h3>Bounce Details</h3>
+              <button className="dialog-close" onClick={() => setDetailModalRecord(null)} aria-label="Close details">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="bounce-detail-content" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Email Address</span>
+                <div style={{ fontSize: '14px', fontWeight: 500, marginTop: '4px' }}>{detailModalRecord.email}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</span>
+                <div style={{ marginTop: '4px' }}>
+                  <span className={`dialog-status ${detailModalRecord.bounceType}`}>
+                    {detailModalRecord.bounceType === 'hard' ? 'Hard bounce' : 'Soft bounce'}
+                  </span>
+                </div>
+              </div>
+              <div>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Exact Reason</span>
+                <div style={{ 
+                  fontSize: '13px', 
+                  marginTop: '8px', 
+                  padding: '12px', 
+                  background: 'var(--bg-secondary)', 
+                  border: '1px solid var(--border-color)', 
+                  borderRadius: '6px',
+                  fontFamily: 'monospace',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  color: 'var(--text-main)'
+                }}>
+                  {detailModalRecord.reason || 'No diagnostic information provided by the receiving server.'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                <button className="btn-primary" onClick={() => setDetailModalRecord(null)}>Close</button>
+              </div>
             </div>
           </div>
         </div>

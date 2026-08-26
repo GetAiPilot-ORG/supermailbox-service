@@ -25,7 +25,6 @@ export const ParagraphBlock: React.FC<ParagraphBlockProps> = ({ block }) => {
     textAlign: (style.textAlign as any) || 'left',
     lineHeight: style.lineHeight || '1.6',
     fontFamily: style.fontFamily || 'inherit',
-    padding: style.padding || '8px 12px',
     width: '100%',
     boxSizing: 'border-box',
   };

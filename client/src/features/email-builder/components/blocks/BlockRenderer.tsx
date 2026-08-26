@@ -49,15 +49,31 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
           <img
             src={content.src || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&auto=format&fit=crop'}
             alt={content.alt || ''}
-            style={{ width: style.width || '100%', maxWidth: '100%', borderRadius: style.borderRadius || '0px', display: 'inline-block', objectFit: (style.objectFit as any) || 'cover' }}
+            style={{
+              width: style.width || '100%',
+              height: style.height || 'auto',
+              maxWidth: '100%',
+              borderRadius: style.borderRadius || '0px',
+              display: 'inline-block',
+              objectFit: (style.objectFit as any) || 'cover'
+            }}
           />
         </div>
       );
     case 'button': {
       const btnBg = style.backgroundColor || '#2563eb';
       const isBtnGradient = btnBg && (btnBg.includes('gradient') || btnBg.includes('url('));
+      // For buttons: outer wrapper uses blockPadding (spacing around the button row),
+      // style.padding is the button's own inner padding only.
+      const btnWrapperStyle: React.CSSProperties = {
+        ...wrapperStyle,
+        background: 'transparent',
+        backgroundColor: 'transparent',
+        padding: '10px 0px',   // outer spacing (vertical only, button stays centered)
+        textAlign: (style.align as any) || 'center',
+      };
       return (
-        <div style={{ ...wrapperStyle, textAlign: (style.align as any) || 'center' }}>
+        <div style={btnWrapperStyle}>
           <a
             href={content.url || '#'}
             target={content.target || '_blank'}
@@ -65,6 +81,8 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
             onClick={(e) => e.preventDefault()}
             style={{
               display: style.fullWidth ? 'block' : 'inline-block',
+              width: style.fullWidth ? '100%' : (style.width || undefined),
+              boxSizing: 'border-box',
               background: isBtnGradient ? btnBg : undefined,
               backgroundColor: !isBtnGradient ? btnBg : undefined,
               color: style.textColor || '#ffffff',
@@ -75,7 +93,7 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
               padding: style.padding || '12px 24px',
               textDecoration: 'none',
               textAlign: 'center',
-              boxShadow: style.boxShadow || '0 4px 14px rgba(79, 70, 229, 0.35)',
+              boxShadow: style.boxShadow || 'none',
             }}
           >
             {content.label || 'Click Here'}
@@ -92,7 +110,7 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
     case 'spacer':
       return <div style={{ height: style.height || '24px', width: '100%' }} />;
     case 'html':
-      return <div style={wrapperStyle} dangerouslySetInnerHTML={{ __html: content.html || '<div>Custom HTML</div>' }} />;
+      return <div style={{ ...wrapperStyle, textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: content.html || '<div>Custom HTML</div>' }} />;
     case 'social':
       return (
         <div style={{ ...wrapperStyle, textAlign: (style.align as any) || 'center' }}>

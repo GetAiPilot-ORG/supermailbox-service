@@ -68,8 +68,10 @@ function htmlElementToBlocks(node: Element, parentColor?: string): EmailBlock[] 
     blk.style = {
       ...blk.style,
       width: styles['width'] || node.getAttribute('width') || '100%',
+      height: styles['height'] || node.getAttribute('height') || '',
       align: styles['text-align'] || 'center',
       borderRadius: styles['border-radius'] || '0px',
+      objectFit: styles['object-fit'] || 'cover',
       padding: styles['padding'] || '8px 12px',
     };
     return [blk];
@@ -171,8 +173,10 @@ function htmlElementToBlocks(node: Element, parentColor?: string): EmailBlock[] 
       blk.style = {
         ...blk.style,
         width: imgStyles['width'] || imgEl.getAttribute('width') || '100%',
+        height: imgStyles['height'] || imgEl.getAttribute('height') || '',
         align: styles['text-align'] || 'center',
         borderRadius: imgStyles['border-radius'] || '0px',
+        objectFit: imgStyles['object-fit'] || 'cover',
         padding: styles['padding'] || '8px 0',
       };
       return [blk];
@@ -506,6 +510,7 @@ export function parseMjmlToDocument(
             blk.style = {
               ...blk.style,
               width: child.getAttribute('width') || '100%',
+              height: child.getAttribute('height') || '',
               align: child.getAttribute('align') || 'center',
               borderRadius: child.getAttribute('border-radius') || '0px',
               padding: child.getAttribute('padding') || '10px 15px',
@@ -686,6 +691,7 @@ export function migrateUnlayerDesign(oldProject: any): EmailDocument {
             blk.style = { ...blk.style, fontSize: values.fontSize || '14px', color: values.color || '#475569' };
           } else if (blockType === 'image') {
             blk.content = { src: values.src?.url || values.src || '', alt: values.altText || '' };
+            blk.style = { ...blk.style, width: values.width || '100%' };
           } else if (blockType === 'button') {
             blk.content = { label: decodeHtmlEntities(values.text || 'Click Here'), url: values.href?.values?.url || values.url || '#' };
             blk.style = { ...blk.style, backgroundColor: values.backgroundColor || '#2563eb', textColor: values.color || '#ffffff' };
@@ -802,16 +808,33 @@ export function parseTemplateToDocument(input: {
     }
   }
 
-  // 5. Try parsing HTML if available
-  if (
-    html &&
-    typeof html === 'string' &&
-    html.trim().length > 10 &&
-    (html.includes('<div') || html.includes('<table') || html.includes('<p') || html.includes('<h1') || html.includes('<h2') || html.includes('<h3') || html.includes('<section'))
-  ) {
+  // 5. Try parsing raw HTML
+  if (html && typeof html === 'string' && html.trim().length > 10) {
     const htmlDoc = parseHtmlToDocument(html, name, subject, preheader);
     if (htmlDoc.rows && htmlDoc.rows.length > 0) {
       return htmlDoc;
+    } else {
+      // Force fallback to a single HTML block so the user doesn't lose their HTML
+      const fallbackDoc = createDefaultDocument(name || 'Email Template', preheader || '');
+      const rowId = createUniqueId('row');
+      const blkId = createUniqueId('blk-html');
+      fallbackDoc.rows = [{
+        id: rowId,
+        name: 'Imported Custom HTML',
+        settings: { backgroundColor: '#ffffff', contentBackgroundColor: 'transparent', padding: '0', borderRadius: '0', stackOnMobile: true },
+        columns: [{
+          id: `${rowId}-col`,
+          width: 100,
+          settings: { padding: '0', backgroundColor: 'transparent', verticalAlign: 'top', border: 'none' },
+          blocks: [{
+            id: blkId,
+            type: 'html',
+            content: { html },
+            style: { padding: '0' }
+          }]
+        }]
+      }];
+      return fallbackDoc;
     }
   }
 

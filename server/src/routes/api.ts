@@ -556,13 +556,46 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
       const { data: logs, error } = await supabase
         .from('webhook_logs')
         .select('id, provider, raw_payload, received_at')
-        .in('provider', ['zeptomail_export'])
+        .in('provider', ['zeptomail_export', 'zeptomail'])
         .order('received_at', { ascending: false })
         .limit(500);
 
       if (error) throw error;
 
       const bounceReports = (logs || []).flatMap((log: any) => {
+        if (log.provider === 'zeptomail') {
+           const events = Array.isArray(log.raw_payload?.events) ? log.raw_payload.events : [log.raw_payload];
+           const reports: any[] = [];
+           for (const event of events) {
+             if (!event) continue;
+             const messages = Array.isArray(event?.event_message) ? event.event_message : [];
+             for (let i = 0; i < messages.length; i++) {
+               const message = messages[i];
+               const email = message?.email_info?.to?.[0]?.email_address?.address || '';
+               const subject = message?.email_info?.subject || '';
+               const eventData = Array.isArray(message?.event_data) ? message.event_data : [];
+               
+               for (const ed of eventData) {
+                 const details = Array.isArray(ed?.details) ? ed.details : [ed];
+                 for (const detail of details) {
+                   if (detail && (detail.reason || detail.diagnostic_message)) {
+                     const isHard = (Array.isArray(event.event_name) && event.event_name[0] === 'hardbounce') || ed.object === 'hardbounce';
+                     reports.push(formatBounceRecord({
+                       id: `${log.id}_${reports.length}`,
+                       email: detail.bounced_recipient || email,
+                       bounceType: isHard ? 'hard' : 'soft',
+                       reason: `${detail.reason ? `Reason: ${detail.reason}\n` : ''}${detail.diagnostic_message || ''}`,
+                       subject,
+                       processedAt: detail.time || log.received_at
+                     }, `${log.id}_${reports.length}`));
+                   }
+                 }
+               }
+             }
+           }
+           return reports;
+        }
+
         const records = Array.isArray(log.raw_payload?.records)
           ? log.raw_payload.records
           : Array.isArray(log.raw_payload)
@@ -570,7 +603,7 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
           : [log.raw_payload];
 
         return records.map((record: any, index: number) => formatBounceRecord(record, `${log.id}_${index}`));
-      }).filter((record: any) => record.email);
+      }).filter((record: any) => record && record.email);
 
       const seen = new Set<string>();
       const uniqueReports = bounceReports.filter((record: any) => {
