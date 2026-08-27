@@ -131,14 +131,25 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
   const [newReason, setNewReason] = useState<SuppressionItem['reason']>('manual');
   const [detailModalRecord, setDetailModalRecord] = useState<BounceReportItem | null>(null);
 
-  const hardBounces = bounceReports.filter((item) => item.bounceType === 'hard');
-  const softBounces = bounceReports.filter((item) => item.bounceType === 'soft');
+  const filteredBounceReports = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const cutoff = new Date(today);
+    cutoff.setDate(today.getDate() - (audienceRange - 1));
+    return bounceReports.filter(item => {
+      const d = new Date(item.processedAt);
+      return d >= cutoff;
+    });
+  }, [bounceReports, audienceRange]);
+
+  const hardBounces = filteredBounceReports.filter((item) => item.bounceType === 'hard');
+  const softBounces = filteredBounceReports.filter((item) => item.bounceType === 'soft');
   const complaintCount = suppressions.filter((item) => item.reason === 'complaint').length;
   const unsubscribeCount = suppressions.filter((item) => item.reason === 'unsubscribe').length;
   const manualCount = suppressions.filter((item) => item.reason === 'manual').length;
-  const hardBounceRate = bounceReports.length > 0 ? (hardBounces.length / bounceReports.length) * 100 : 0;
+  const hardBounceRate = filteredBounceReports.length > 0 ? (hardBounces.length / filteredBounceReports.length) * 100 : 0;
 
-  const typeFilteredBounces = bounceReports.filter((item) => bounceFilter === 'all' || item.bounceType === bounceFilter);
+  const typeFilteredBounces = filteredBounceReports.filter((item) => bounceFilter === 'all' || item.bounceType === bounceFilter);
 
   const categoryData = useMemo(() => {
     const grouped = typeFilteredBounces.reduce<Record<string, { name: string; value: number; hard: number; soft: number; color: string }>>((acc, item) => {
@@ -157,7 +168,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
   const audienceTrendData = useMemo(() => {
     const buckets = new Map(buildAudienceTrend(audienceRange).map((day) => [day.key, day]));
 
-    bounceReports.forEach((item) => {
+    filteredBounceReports.forEach((item) => {
       const bucket = buckets.get(toDateKey(item.processedAt));
       if (!bucket) return;
       bucket.total += 1;
@@ -176,7 +187,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
   }, [bounceReports, suppressions, audienceRange]);
 
   const audienceTotals = {
-    total: bounceReports.length,
+    total: filteredBounceReports.length,
     hard: hardBounces.length,
     soft: softBounces.length,
     suppressed: suppressions.length,
@@ -203,7 +214,7 @@ export const SuppressionManager: React.FC<SuppressionProps> = ({
     return acc;
   }, {}));
 
-  const dialogRecords = bounceReports.filter((item) => {
+  const dialogRecords = filteredBounceReports.filter((item) => {
     const matchesCategory = emailDialogCategory === 'all' || item.category === emailDialogCategory;
     const haystack = `${item.email} ${item.subject} ${item.reason} ${item.category}`.toLowerCase();
     return matchesCategory && haystack.includes(searchTerm.toLowerCase());
