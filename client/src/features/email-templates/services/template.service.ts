@@ -9,6 +9,10 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
   if (init?.body && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
+  const token = localStorage.getItem('adminToken');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers,

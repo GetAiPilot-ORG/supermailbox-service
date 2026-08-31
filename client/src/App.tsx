@@ -12,6 +12,7 @@ import { TemplateManagerPage } from './features/email-templates/pages/TemplateMa
 import { TemplateGalleryPage } from './features/email-templates/pages/TemplateGalleryPage';
 import { TemplateBuilderPage } from './features/email-templates/pages/TemplateBuilderPage';
 import { EasyEmailEditorPoc } from './features/email-templates/poc/EasyEmailEditorPoc';
+import { LoginPage } from './pages/LoginPage';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
 import { ApiService } from './services/api';
@@ -25,8 +26,15 @@ import { CustomEmailEditorPoc } from './features/email-templates/poc/CustomEmail
 gsap.registerPlugin(useGSAP);
 
 export const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('adminToken'));
+
   if (window.location.pathname === '/dev/email-editor/custom') return <CustomEmailEditorPoc />;
   if (window.location.pathname === '/dev/email-editor/easy-email') return <EasyEmailEditorPoc />;
+  
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={() => setIsAuthenticated(true)} />;
+  }
+
   return <DashboardApp />;
 };
 

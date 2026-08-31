@@ -28,6 +28,7 @@ import { registerWebhookRoutes } from './routes/webhooks.js';
 import { registerApiRoutes } from './routes/api.js';
 import { registerTemplateRoutes } from './routes/templates.js';
 import { registerBrandRoutes } from './routes/brand.js';
+import { registerAuthRoutes } from './routes/auth.js';
 import { initCampaignWorker } from './workers/campaignWorker.js';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
@@ -59,6 +60,19 @@ await fastify.register(cors, {
   optionsSuccessStatus: 204,
 });
 
+fastify.addHook('preHandler', async (request, reply) => {
+  const url = request.url;
+  if (!url.startsWith('/v1/') || url.startsWith('/v1/auth/login') || url.startsWith('/v1/webhooks')) {
+    return;
+  }
+  const authHeader = request.headers.authorization;
+  const adminToken = process.env.ADMIN_TOKEN;
+  if (!authHeader || authHeader !== `Bearer ${adminToken}`) {
+    return reply.status(401).send({ success: false, error: 'Unauthorized: Invalid or missing token' });
+  }
+});
+
+await registerAuthRoutes(fastify);
 await registerEmailRoutes(fastify);
 await registerWebhookRoutes(fastify);
 await registerTemplateRoutes(fastify);

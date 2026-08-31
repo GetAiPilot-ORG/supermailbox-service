@@ -132,14 +132,50 @@ const REQUEST_TIMEOUT_MS = 15000;
 const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  const token = localStorage.getItem('adminToken');
+  const headers = new Headers(init.headers || {});
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
   try {
-    return await fetch(url, { ...init, signal: controller.signal });
+    const res = await fetch(url, { ...init, headers, signal: controller.signal });
+    if (res.status === 401 && !url.includes('/auth/login')) {
+      localStorage.removeItem('adminToken');
+      window.location.reload();
+    }
+    return res;
   } finally {
     window.clearTimeout(timeout);
   }
 };
 
 export class ApiService {
+  static async login(password: string): Promise<boolean> {
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.token) {
+          localStorage.setItem('adminToken', data.token);
+          return true;
+        }
+      }
+    } catch (err) {
+      console.warn('API login failed:', err);
+    }
+    return false;
+  }
+
+  static logout() {
+    localStorage.removeItem('adminToken');
+    window.location.reload();
+  }
   static async getCampaignJobStats(campaignId: string): Promise<CampaignJobStats> {
     try {
       const res = await fetchWithTimeout(`${API_BASE}/campaigns/${campaignId}/jobs`);
@@ -289,8 +325,7 @@ export class ApiService {
       const res = await fetchWithTimeout(`${API_BASE}/broadcast`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer supermailbox-secret-key-12345'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ campaignName, templateKey, recipients, scheduledAt })
       });
