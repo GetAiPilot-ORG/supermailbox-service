@@ -114,7 +114,7 @@ export const AssetUploadDialog: React.FC<AssetUploadDialogProps> = ({
   };
 
   return (
-    <div className="brandLibraryRoot fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-2xs flex items-center justify-center p-4">
+    <div className="brandLibraryRoot fixed inset-0 overflow-y-auto bg-slate-900/50 backdrop-blur-2xs flex items-center justify-center p-4" style={{ zIndex: 10000 }}>
       <div className="bg-white rounded-xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden my-auto flex flex-col">
         
         {/* Modal Header */}
