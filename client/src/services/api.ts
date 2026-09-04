@@ -142,8 +142,15 @@ const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {
   try {
     const res = await fetch(url, { ...init, headers, signal: controller.signal });
     if (res.status === 401 && !url.includes('/auth/login')) {
-      localStorage.removeItem('adminToken');
-      window.location.reload();
+      try {
+        const body = await res.clone().json();
+        if (body?.code === 'SESSION_INVALID') {
+          localStorage.removeItem('adminToken');
+          window.location.reload();
+        }
+      } catch {
+        // Non-JSON 401; do not perform blanket logout
+      }
     }
     return res;
   } finally {

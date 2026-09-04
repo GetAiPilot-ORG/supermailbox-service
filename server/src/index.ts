@@ -65,11 +65,41 @@ fastify.addHook('preHandler', async (request, reply) => {
   if (!url.startsWith('/v1/') || url.startsWith('/v1/auth/login') || url.startsWith('/v1/webhooks')) {
     return;
   }
-  const authHeader = request.headers.authorization;
+  const authHeader = request.headers.authorization || (request.headers as any)['Authorization'];
+  const xApiKey = (request.headers['x-api-key'] || (request.headers as any)['X-API-Key']) as string | undefined;
   const adminToken = process.env.ADMIN_TOKEN;
-  if (!authHeader || authHeader !== `Bearer ${adminToken}`) {
-    return reply.status(401).send({ success: false, error: 'Unauthorized: Invalid or missing token' });
+  const adminApiKey = process.env.ADMIN_API_KEY;
+
+  let rawToken: string | undefined;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    rawToken = authHeader.substring(7).trim();
+  } else if (authHeader) {
+    rawToken = authHeader.trim();
+  } else if (xApiKey) {
+    rawToken = xApiKey.trim();
   }
+
+  // Dashboard session token or master API key
+  if (rawToken && ((adminToken && rawToken === adminToken) || (adminApiKey && rawToken === adminApiKey))) {
+    return;
+  }
+
+  // Allow routes with individual DB API key verification
+  const apiKeyRoutes = new Set([
+    '/v1/broadcast',
+    '/v1/contacts/sync',
+    '/v1/send/transactional',
+  ]);
+  const matchedRoute = request.routeOptions?.url || url.split('?')[0];
+  if (apiKeyRoutes.has(matchedRoute) && rawToken) {
+    return;
+  }
+
+  return reply.status(401).send({
+    success: false,
+    error: 'Unauthorized: Invalid or missing token',
+    code: 'SESSION_INVALID'
+  });
 });
 
 await registerAuthRoutes(fastify);
