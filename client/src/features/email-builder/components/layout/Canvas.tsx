@@ -26,14 +26,18 @@ export const Canvas: React.FC = () => {
   const rows = Array.isArray(document?.rows) ? document.rows : [];
   const rowIds = rows.map((r) => r.id);
 
+  const isMobile = activeDevice === 'mobile';
+  const isTablet = activeDevice === 'tablet';
+
   // Calculate viewport width based on active device
   const getCanvasWidth = () => {
-    if (activeDevice === 'mobile') return 360;
-    if (activeDevice === 'tablet') return 480;
-    return document?.bodySettings?.contentWidth || 600;
+    if (isMobile) return '375px';
+    if (isTablet) return '480px';
+    return `${document?.bodySettings?.contentWidth || 600}px`;
   };
 
   const canvasWidth = getCanvasWidth();
+  const numericContentWidth = isMobile ? 375 : isTablet ? 480 : (document?.bodySettings?.contentWidth || 600);
 
   return (
     <div
@@ -41,9 +45,9 @@ export const Canvas: React.FC = () => {
         flex: 1,
         height: '100%',
         minHeight: 0,
-        backgroundColor: document?.bodySettings?.backgroundColor || '#f1f5f9',
-        overflowY: 'scroll',
-        padding: document?.bodySettings?.globalPadding || '30px 16px',
+        backgroundColor: document?.bodySettings?.backgroundColor || '#ffffff',
+        overflowY: 'auto',
+        padding: isMobile ? '20px 0px 40px 0px' : '32px 0px 80px 0px',
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
@@ -61,19 +65,20 @@ export const Canvas: React.FC = () => {
             ref={rows.length === 0 ? setEmptyCanvasRef : undefined}
             style={{
               width: '100%',
-              maxWidth: `${canvasWidth}px`,
+              maxWidth: canvasWidth,
               background: isOverEmptyCanvas ? '#eff6ff' : isBodyContentGradient ? bodyContentBg : undefined,
               backgroundColor: isOverEmptyCanvas ? '#eff6ff' : !isBodyContentGradient ? bodyContentBg : undefined,
-              boxShadow: '0 12px 32px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04)',
+              boxShadow: 'none',
               minHeight: '400px',
-              borderRadius: '16px',
+              borderRadius: '0px',
               position: 'relative',
               boxSizing: 'border-box',
               transform: `scale(${zoom})`,
               transformOrigin: 'top center',
               transition: 'max-width 0.2s ease, transform 0.2s ease',
-              border: isOverEmptyCanvas ? '2px dashed #2563eb' : '1px solid #e2e8f0',
+              border: isOverEmptyCanvas ? '2px dashed #2563eb' : isMobile ? '1px solid #e2e8f0' : 'none',
               overflow: 'hidden',
+              flexShrink: 0,
             }}
           >
             <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
@@ -84,7 +89,7 @@ export const Canvas: React.FC = () => {
                     row={row}
                     index={idx}
                     totalRows={rows.length}
-                    contentWidth={canvasWidth}
+                    contentWidth={numericContentWidth}
                   />
                 ))
               ) : (
@@ -134,7 +139,7 @@ export const Canvas: React.FC = () => {
 
       {/* Add Row Button at bottom */}
       {rows.length > 0 && (
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <div style={{ marginTop: '24px', marginBottom: '40px', flexShrink: 0, textAlign: 'center' }}>
           <button
             type="button"
             onClick={() => setShowRowPicker(true)}
@@ -144,7 +149,7 @@ export const Canvas: React.FC = () => {
               gap: '6px',
               backgroundColor: '#ffffff',
               color: '#2563eb',
-              border: '1px border #bfdbfe',
+              border: '1px solid #bfdbfe',
               borderRadius: '6px',
               padding: '8px 16px',
               fontSize: '13px',

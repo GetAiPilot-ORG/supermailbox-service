@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ChevronDown, ChevronUp, Copy, GripVertical, Plus, Trash2 } from 'lucide-react';
+import { GripVertical, Copy, Trash2, ChevronUp, ChevronDown, Plus } from 'lucide-react';
 import type { EmailRow, RowLayoutPreset } from '../../types/document.types';
 import { useDocumentStore } from '../../store/documentStore';
 import { ColumnRenderer } from './ColumnRenderer';
@@ -24,8 +24,15 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
   const deleteRow = useDocumentStore((state) => state.deleteRow);
   const moveRow = useDocumentStore((state) => state.moveRow);
   const addRow = useDocumentStore((state) => state.addRow);
+  const activeDevice = useDocumentStore((state) => state.activeDevice);
 
   const isSelected = selectedRowId === row.id;
+  const isMobile = activeDevice === 'mobile';
+
+  // Determine if columns should stack on mobile
+  // If first column is <= 20% (icon/bullet), keep horizontal side-by-side for clean mobile layout
+  const isIconRow = row.columns.length > 1 && (row.columns[0]?.width || 0) <= 20;
+  const shouldStack = isMobile && (row.settings.stackOnMobile ?? true) && !isIconRow;
 
   const {
     attributes,
@@ -198,17 +205,23 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
             margin: '0 auto',
             background: isContentGradient ? contentBg : undefined,
             backgroundColor: !isContentGradient ? (contentBg || 'transparent') : undefined,
-            padding: row.settings.padding || '10px 0px',
+            padding: row.settings.padding !== undefined ? row.settings.padding : (isMobile ? '0px' : '0px'),
             borderRadius: row.settings.borderRadius || '0px',
             display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'stretch',
+            flexDirection: shouldStack ? 'column' : 'row',
+            flexWrap: shouldStack ? 'nowrap' : 'wrap',
+            alignItems: shouldStack ? 'center' : 'stretch',
+            gap: shouldStack ? '12px' : undefined,
             boxSizing: 'border-box',
           }}
         >
           {row.columns.map((column) => (
-            <ColumnRenderer key={column.id} column={column} rowId={row.id} />
+            <ColumnRenderer
+              key={column.id}
+              column={column}
+              rowId={row.id}
+              shouldStack={shouldStack}
+            />
           ))}
         </div>
 

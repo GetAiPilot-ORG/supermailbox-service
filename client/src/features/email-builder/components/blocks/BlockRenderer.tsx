@@ -110,7 +110,7 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({ block }) => {
     case 'spacer':
       return <div style={{ height: style.height || '24px', width: '100%' }} />;
     case 'html':
-      return <div style={{ ...wrapperStyle, textAlign: 'center' }} dangerouslySetInnerHTML={{ __html: content.html || '<div>Custom HTML</div>' }} />;
+      return <div style={{ ...wrapperStyle }} dangerouslySetInnerHTML={{ __html: content.html || '<div>Custom HTML</div>' }} />;
     case 'social':
       return (
         <div style={{ ...wrapperStyle, textAlign: (style.align as any) || 'center' }}>
