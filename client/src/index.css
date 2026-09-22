@@ -203,6 +203,57 @@ textarea:focus-visible {
 
 .app-page-motion { min-height: 100%; }
 
+/* Fullscreen builder mode to prevent double scrollbars & unlock smooth canvas scrolling */
+.app-shell--fullscreen {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-shell--fullscreen .app-workspace {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-shell--fullscreen .app-main {
+  padding: 0 !important;
+  overflow: hidden !important;
+  height: 100% !important;
+  max-height: 100vh !important;
+}
+
+.app-shell--fullscreen .app-page-motion {
+  height: 100% !important;
+  min-height: 100% !important;
+  overflow: hidden !important;
+}
+
+.app-shell--fullscreen .email-builder-shell {
+  height: 100% !important;
+  max-height: 100vh !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.email-builder-canvas-viewport::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.email-builder-canvas-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.email-builder-canvas-viewport::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+.email-builder-canvas-viewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
 .app-loading {
   min-height: 100%;
   display: grid;
@@ -715,9 +766,22 @@ textarea:focus-visible {
 .badge-error, .queue-status.failed, .project-logs-status.danger { color: #ffffff; background: #ef4444; border-color: #dc2626; font-weight: 500; }
 .badge-warning, .queue-status.delayed { color: #ffffff; background: #f59e0b; border-color: #d97706; font-weight: 500; }
 
-table { width: 100%; border-collapse: collapse; }
-.custom-builder-canvas-shell table { width: auto; border-collapse: separate; }
-th {
+.dashboard-table-wrap table,
+.project-logs-table,
+.campaign-table-shell table,
+.suppression-screen table,
+.reputation-table,
+table:not(.email-builder-shell table):not(.email-builder-canvas-viewport table) {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-table-wrap th,
+.project-logs-table th,
+.campaign-table-shell th,
+.suppression-screen th,
+.reputation-table th,
+th:not(.email-builder-shell th):not(.email-builder-canvas-viewport th) {
   position: sticky;
   top: 0;
   z-index: 1;
@@ -732,8 +796,48 @@ th {
   border-bottom: 1px solid var(--border);
 }
 
-td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-primary); font-size: 0.8rem; vertical-align: middle; }
-tbody tr:hover { background: var(--surface-muted); }
+.dashboard-table-wrap td,
+.project-logs-table td,
+.campaign-table-shell td,
+.suppression-screen td,
+.reputation-table td,
+td:not(.email-builder-shell td):not(.email-builder-canvas-viewport td) {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+
+.dashboard-table-wrap tbody tr:hover,
+.project-logs-table tbody tr:hover,
+.campaign-table-shell tbody tr:hover,
+.suppression-screen tbody tr:hover,
+.reputation-table tbody tr:hover,
+tbody tr:not(.email-builder-shell *):not(.email-builder-canvas-viewport *):hover {
+  background: var(--surface-muted);
+}
+
+/* Email Builder Canvas Isolated Styles (Prevent global dashboard bleed) */
+.email-builder-canvas-viewport table {
+  border-collapse: separate;
+}
+
+.email-builder-canvas-viewport td,
+.email-builder-canvas-viewport th {
+  padding: 0;
+  border-bottom: none !important;
+  color: inherit;
+  font-size: inherit;
+  vertical-align: top;
+}
+
+.email-builder-canvas-viewport tbody tr:hover,
+.email-builder-canvas-viewport tr:hover,
+.email-builder-canvas-viewport td:hover {
+  background: transparent;
+  background-color: transparent;
+}
 .dashboard-table-wrap, .project-logs-table-wrap, .campaign-table-shell { overflow: auto; }
 .dashboard-table-wrap table, .campaign-table-shell table, .suppression-screen table { min-width: 720px; }
 .recipient-cell, .project-logs-recipient { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }

@@ -18,6 +18,19 @@ function parseCssStyles(styleAttr: string | null | undefined): Record<string, st
   return result;
 }
 
+function decodeHtmlEntities(str: string): string {
+  if (!str) return '';
+  if (typeof DOMParser !== 'undefined') {
+    try {
+      const doc = new DOMParser().parseFromString(str, 'text/html');
+      return doc.body.textContent || str;
+    } catch {
+      return str;
+    }
+  }
+  return str;
+}
+
 function htmlElementToBlocks(node: Element, parentColor?: string): EmailBlock[] {
   const tag = node.tagName.toLowerCase();
   const styles = parseCssStyles(node.getAttribute('style'));
@@ -217,7 +230,48 @@ function htmlElementToBlocks(node: Element, parentColor?: string): EmailBlock[] 
     return [blk];
   }
 
-  // 7. Fallback for any other HTML element
+  // 7. Table handling
+  if (tag === 'table') {
+    // Check if bulletproof button wrapped in table
+    const links = Array.from(node.querySelectorAll('a'));
+    if (links.length === 1) {
+      const aEl = links[0];
+      const aStyles = parseCssStyles(aEl.getAttribute('style'));
+      const isButton = Boolean(
+        aStyles['background'] ||
+        aStyles['background-color'] ||
+        aStyles['border-radius'] ||
+        aStyles['display'] === 'inline-block' ||
+        aEl.classList.contains('cta-button') ||
+        aEl.classList.contains('btn')
+      );
+      if (isButton && (node.textContent?.trim() === aEl.textContent?.trim())) {
+        const blk = createBlock('button');
+        blk.content = {
+          label: aEl.textContent?.trim() || aEl.innerHTML || 'Click Here',
+          url: aEl.getAttribute('href') || '#',
+          target: aEl.getAttribute('target') || '_blank',
+        };
+        blk.style = {
+          ...blk.style,
+          backgroundColor: aStyles['background'] || aStyles['background-color'] || '#2563eb',
+          textColor: aStyles['color'] || '#ffffff',
+          fontSize: aStyles['font-size'] || '14px',
+          fontWeight: aStyles['font-weight'] || '600',
+          borderRadius: aStyles['border-radius'] || '6px',
+          padding: aStyles['padding'] || '12px 24px',
+          align: styles['text-align'] || aStyles['text-align'] || 'center',
+        };
+        return [blk];
+      }
+    }
+
+    const blk = createBlock('html');
+    blk.content = { html: node.outerHTML };
+    return [blk];
+  }
+
+  // 8. Fallback for any other HTML element
   const blk = createBlock('html');
   blk.content = { html: node.outerHTML };
   return [blk];
@@ -248,64 +302,247 @@ export function parseHtmlToDocument(
     const bodyEl = doc.body;
     const bodyStyles = parseCssStyles(bodyEl?.getAttribute('style'));
 
-    // 2. Identify root container and card container
+    // Check for responsive Table-based email structure
+    const mainTable =
+      doc.querySelector('table.full-width-table') ||
+      doc.querySelector('table[width="600"], table[width="620"], table[width="500"], table[width="480"]') ||
+      doc.querySelector('table[style*="max-width: 600"], table[style*="max-width:600"], table[style*="max-width: 620"], table[style*="max-width: 480"]') ||
+      doc.querySelector('td[align="center"] > table') ||
+      doc.querySelector('body > table table') ||
+      (doc.querySelectorAll('table').length === 1 ? doc.querySelector('table') : null);
+
+    const rows: EmailRow[] = [];
+    let contentWidth = 600;
+    let outerBg = bodyStyles['background-color'] || bodyStyles['background'] || '#f8fafc';
+    let cardBg = '#ffffff';
+    let cardTextColor = bodyStyles['color'] || '#334155';
+    let cardFontFamily = bodyStyles['font-family'] || "'Outfit', -apple-system, sans-serif";
+
+    if (mainTable) {
+      const mainTableStyles = parseCssStyles(mainTable.getAttribute('style'));
+      const tableWidthAttr = mainTable.getAttribute('width');
+      if (tableWidthAttr) {
+        contentWidth = parseInt(tableWidthAttr, 10) || 600;
+      } else if (mainTableStyles['max-width'] || mainTableStyles['width']) {
+        contentWidth = parseInt(mainTableStyles['max-width'] || mainTableStyles['width'], 10) || 600;
+      }
+      if (mainTableStyles['background-color'] || mainTableStyles['background']) {
+        cardBg = mainTableStyles['background-color'] || mainTableStyles['background'];
+      }
+
+      // Extract direct top-level <tr> rows of mainTable
+      const trList = Array.from(mainTable.querySelectorAll(':scope > tbody > tr, :scope > tr'));
+
+      trList.forEach((tr, trIdx) => {
+        // Check if pure spacer row
+        const trText = tr.textContent?.trim() || '';
+        const cells = Array.from(tr.querySelectorAll(':scope > td, :scope > th'));
+        
+        const isSpacer = cells.length === 1 && (
+          trText === '' || trText === ' ' || trText === '&nbsp;'
+        ) && (
+          cells[0].hasAttribute('height') ||
+          (cells[0].getAttribute('style') || '').includes('height')
+        );
+
+        if (isSpacer) {
+          const hStr = cells[0].getAttribute('height') || parseCssStyles(cells[0].getAttribute('style'))['height'] || '16px';
+          const hNum = parseInt(hStr, 10) || 16;
+          if (hNum >= 12 && rows.length > 0 && trIdx < trList.length - 1) {
+            const rowId = createUniqueId('row');
+            const colId = `${rowId}-col-1`;
+            const spacerBlk = createBlock('spacer');
+            spacerBlk.style.height = `${hNum}px`;
+            rows.push({
+              id: rowId,
+              name: `Spacer (${hNum}px)`,
+              settings: {
+                backgroundColor: 'transparent',
+                contentBackgroundColor: 'transparent',
+                padding: '0px',
+                stackOnMobile: true,
+              },
+              columns: [{
+                id: colId,
+                width: 100,
+                settings: { padding: '0px', verticalAlign: 'top', backgroundColor: 'transparent' },
+                blocks: [spacerBlk],
+              }],
+            });
+          }
+          return;
+        }
+
+        if (cells.length === 0) return;
+
+        const rowId = createUniqueId('row');
+        const columns: EmailColumn[] = [];
+        const totalWidth = 100;
+        const colWidth = Math.floor(totalWidth / cells.length);
+
+        const trStyles = parseCssStyles(tr.getAttribute('style'));
+        const firstCellStyles = parseCssStyles(cells[0].getAttribute('style'));
+
+        let rowName = `Section ${trIdx + 1}`;
+        const trHtml = tr.innerHTML.toLowerCase();
+        if (trIdx === 0 || trHtml.includes('logo') || trHtml.includes('header')) {
+          rowName = 'Header Section';
+        } else if (trHtml.includes('hero') || tr.querySelector('h1')) {
+          rowName = 'Hero Banner';
+        } else if (trIdx === trList.length - 1 || trHtml.includes('footer') || trHtml.includes('rights reserved') || trHtml.includes('copyright') || trHtml.includes('cpaas')) {
+          rowName = 'Footer Section';
+        } else if (tr.querySelector('h2, h3, h4')) {
+          const headingText = tr.querySelector('h2, h3, h4')?.textContent?.trim();
+          rowName = headingText && headingText.length < 35 ? headingText : 'Content Section';
+        }
+
+        const rowBg = trStyles['background'] || trStyles['background-color'] || 'transparent';
+        const rowContentBg = firstCellStyles['background'] || firstCellStyles['background-color'] || cardBg;
+        const rowPadding = firstCellStyles['padding'] || trStyles['padding'] || '16px 20px';
+        const rowBorderRadius = firstCellStyles['border-radius'] || trStyles['border-radius'] || '0px';
+
+        cells.forEach((cell, cellIdx) => {
+          const colId = `${rowId}-col-${cellIdx + 1}`;
+          const blocks: EmailBlock[] = [];
+          const cellStyles = parseCssStyles(cell.getAttribute('style'));
+          const cellColor = cellStyles['color'] || cardTextColor;
+
+          const cellDirectChildren = Array.from(cell.children).filter(
+            (c) => c.tagName.toLowerCase() !== 'script' && c.tagName.toLowerCase() !== 'style'
+          );
+
+          if (cellDirectChildren.length > 0) {
+            cellDirectChildren.forEach((child) => {
+              blocks.push(...htmlElementToBlocks(child, cellColor));
+            });
+          } else if (cell.innerHTML.trim()) {
+            blocks.push(...htmlElementToBlocks(cell, cellColor));
+          }
+
+          if (blocks.length > 0) {
+            columns.push({
+              id: colId,
+              width: cellIdx === cells.length - 1 ? totalWidth - (colWidth * cellIdx) : colWidth,
+              settings: {
+                padding: '0px',
+                verticalAlign: (cellStyles['vertical-align'] as any) || 'top',
+                backgroundColor: 'transparent',
+              },
+              blocks,
+            });
+          }
+        });
+
+        if (columns.length > 0 && columns.some(c => c.blocks.length > 0)) {
+          rows.push({
+            id: rowId,
+            name: rowName,
+            settings: {
+              backgroundColor: rowBg,
+              contentBackgroundColor: rowContentBg,
+              padding: rowPadding,
+              borderRadius: rowBorderRadius,
+              stackOnMobile: true,
+            },
+            columns,
+          });
+        }
+      });
+    }
+
+    // If mainTable yielded valid rows, return the document
+    if (rows.length > 0) {
+      return {
+        schemaVersion: 2,
+        metadata: {
+          subject: defaultSubject || defaultTitle,
+          preheader,
+          language: 'en',
+          direction: 'ltr',
+        },
+        bodySettings: {
+          backgroundColor: outerBg,
+          contentBackgroundColor: cardBg,
+          contentWidth,
+          defaultFontFamily: cardFontFamily,
+          defaultFontSize: '14px',
+          textColor: cardTextColor,
+          linkColor: '#2563eb',
+          globalPadding: '24px 0px',
+          mobileBreakpoint: 480,
+        },
+        rows,
+      };
+    }
+
+    // 3. Fallback: Card or Div-based Layout
     let outerContainer: Element = bodyEl;
-    if (bodyEl.children.length === 1 && bodyEl.children[0].tagName.toLowerCase() === 'div') {
-      outerContainer = bodyEl.children[0];
+    const bodyDirectDivs = Array.from(bodyEl.children).filter(
+      (c) => c.tagName.toLowerCase() === 'div'
+    );
+
+    let cardEl: Element = bodyEl;
+    let isNestedInWrapper = false;
+
+    if (bodyDirectDivs.length === 1) {
+      const topDiv = bodyDirectDivs[0];
+      const innerDivs = Array.from(topDiv.children).filter(
+        (c) => c.tagName.toLowerCase() === 'div'
+      );
+
+      if (innerDivs.length === 1) {
+        // topDiv is an outer wrapper, innerDiv is the card
+        outerContainer = topDiv;
+        cardEl = innerDivs[0];
+        isNestedInWrapper = true;
+      } else {
+        // topDiv IS the card itself directly inside body
+        cardEl = topDiv;
+        outerContainer = bodyEl;
+        isNestedInWrapper = false;
+      }
+    } else {
+      const candidateMaxWidthDiv = doc.querySelector('div[style*="max-width"]');
+      if (candidateMaxWidthDiv && candidateMaxWidthDiv.parentElement !== bodyEl && candidateMaxWidthDiv.parentElement) {
+        cardEl = candidateMaxWidthDiv;
+        outerContainer = candidateMaxWidthDiv.parentElement;
+        isNestedInWrapper = true;
+      } else if (candidateMaxWidthDiv) {
+        cardEl = candidateMaxWidthDiv;
+        outerContainer = bodyEl;
+        isNestedInWrapper = false;
+      }
     }
 
     const outerStyles = parseCssStyles(outerContainer.getAttribute('style'));
-
-    let cardEl: Element = outerContainer;
-    let isNestedInWrapper = false;
-
-    const outerDirectChildren = Array.from(outerContainer.children).filter(
-      (c) => c.tagName.toLowerCase() !== 'script' && c.tagName.toLowerCase() !== 'style'
-    );
-
-    // If outer container has exactly 1 child div that is a card wrapper
-    if (outerDirectChildren.length === 1 && outerDirectChildren[0].tagName.toLowerCase() === 'div') {
-      const candidateCard = outerDirectChildren[0];
-      const candidateStyles = parseCssStyles(candidateCard.getAttribute('style'));
-      if (
-        candidateStyles['border-radius'] ||
-        candidateStyles['box-shadow'] ||
-        candidateStyles['background'] ||
-        candidateStyles['background-color'] ||
-        candidateStyles['overflow'] === 'hidden'
-      ) {
-        cardEl = candidateCard;
-        isNestedInWrapper = true;
-      }
-    } else if (outerContainer.tagName.toLowerCase() === 'body' && doc.querySelector('table')) {
-      // Table-based container
-      const innerCardDiv = doc.querySelector('td > div[style*="max-width"], td > div[style*="border-radius"]');
-      if (innerCardDiv) {
-        cardEl = innerCardDiv;
-        isNestedInWrapper = true;
-      }
-    }
-
     const cardStyles = parseCssStyles(cardEl.getAttribute('style'));
     const contentWidthStr = cardStyles['max-width'] || outerStyles['max-width'] || bodyStyles['max-width'] || '600';
-    const contentWidth = parseInt(contentWidthStr, 10) || 600;
+    contentWidth = parseInt(contentWidthStr, 10) || 600;
 
-    const cardBg = cardStyles['background'] || cardStyles['background-color'] || outerStyles['background'] || outerStyles['background-color'] || '#ffffff';
-    const outerBg = isNestedInWrapper
-      ? (outerStyles['background'] || outerStyles['background-color'] || bodyStyles['background-color'] || '#f1f5f9')
-      : '#f1f5f9';
+    cardBg = cardStyles['background'] || cardStyles['background-color'] || '#ffffff';
+    outerBg = isNestedInWrapper && outerStyles['background'] && outerStyles['background'] !== cardBg
+      ? (outerStyles['background'] || outerStyles['background-color'] || '#f1f5f9')
+      : (bodyStyles['background-color'] || bodyStyles['background'] || '#f1f5f9');
 
-    const cardTextColor = cardStyles['color'] || outerStyles['color'] || bodyStyles['color'] || '#334155';
-    const cardFontFamily = cardStyles['font-family'] || outerStyles['font-family'] || bodyStyles['font-family'] || 'Inter, Arial, sans-serif';
+    // Ensure the studio canvas backdrop always provides clean contrast for the email card
+    if (
+      !outerBg ||
+      outerBg.toLowerCase() === cardBg.toLowerCase() ||
+      outerBg.toLowerCase() === 'transparent' ||
+      outerBg.toLowerCase() === '#0a0a0c' ||
+      outerBg.toLowerCase() === '#000000' ||
+      outerBg.toLowerCase() === '#131315'
+    ) {
+      outerBg = '#f1f5f9';
+    }
 
-    const rows: EmailRow[] = [];
+    cardTextColor = cardStyles['color'] || outerStyles['color'] || bodyStyles['color'] || '#334155';
+    cardFontFamily = cardStyles['font-family'] || outerStyles['font-family'] || bodyStyles['font-family'] || 'Inter, Arial, sans-serif';
 
-    // 3. Inspect direct children of cardEl
     const cardDirectChildren = Array.from(cardEl.children).filter(
       (c) => c.tagName.toLowerCase() !== 'script' && c.tagName.toLowerCase() !== 'style'
     );
 
-    // Case A: Multi-section card (e.g. Header banner div, Body div, Footer div)
     const isMultiSection =
       cardDirectChildren.length >= 2 &&
       cardDirectChildren.every((c) => {
@@ -355,7 +592,6 @@ export function parseHtmlToDocument(
         }
       });
     } else {
-      // Case B: Single standalone card (e.g. gap_whatsapp_otp, gap_whatsapp_welcome, otp_login, payment_success, welcome_email)
       const rowId = createUniqueId('row');
       const colId = `${rowId}-col-1`;
       const blocks: EmailBlock[] = [];
@@ -395,7 +631,26 @@ export function parseHtmlToDocument(
     }
 
     if (rows.length === 0) {
-      return createDefaultDocument(defaultTitle, defaultPreheader);
+      const fallbackDoc = createDefaultDocument(defaultTitle, defaultPreheader);
+      const rowId = createUniqueId('row');
+      const blkId = createUniqueId('blk-html');
+      fallbackDoc.rows = [{
+        id: rowId,
+        name: 'Imported HTML',
+        settings: { backgroundColor: '#ffffff', contentBackgroundColor: 'transparent', padding: '0', borderRadius: '0', stackOnMobile: true },
+        columns: [{
+          id: `${rowId}-col`,
+          width: 100,
+          settings: { padding: '0', backgroundColor: 'transparent', verticalAlign: 'top', border: 'none' },
+          blocks: [{
+            id: blkId,
+            type: 'html',
+            content: { html },
+            style: { padding: '0' },
+          }],
+        }],
+      }];
+      return fallbackDoc;
     }
 
     return {
@@ -777,8 +1032,23 @@ export function parseTemplateToDocument(input: {
     }
   }
 
-  // 2. If valid schemaVersion 2 EmailDocument with rows
+  // 2. Check if valid schemaVersion 2 EmailDocument with rows
+  // CRITICAL: Detect if parsedProject was truncated/corrupted by previous bug (e.g. only 1 row with <= 3 blocks while full HTML has >= 1500 chars with rich content)
+  const isSuspiciouslyTruncated = Boolean(
+    parsedProject &&
+    typeof parsedProject === 'object' &&
+    (parsedProject as any).schemaVersion === 2 &&
+    Array.isArray((parsedProject as any).rows) &&
+    (parsedProject as any).rows.length === 1 &&
+    ((parsedProject as any).rows[0]?.columns?.[0]?.blocks?.length ?? 0) <= 3 &&
+    html &&
+    typeof html === 'string' &&
+    html.length > 1500 &&
+    (html.includes('<table') || html.includes('full-width-table') || html.includes('<h1') || html.includes('<h2'))
+  );
+
   if (
+    !isSuspiciouslyTruncated &&
     parsedProject &&
     typeof parsedProject === 'object' &&
     (parsedProject as any).schemaVersion === 2 &&
@@ -801,7 +1071,18 @@ export function parseTemplateToDocument(input: {
   }
 
   // 4. Try parsing MJML if available
-  if (mjml && typeof mjml === 'string' && mjml.trim().length > 10 && mjml.includes('<mj-')) {
+  const isMjmlSuspiciouslyTruncated = Boolean(
+    mjml &&
+    typeof mjml === 'string' &&
+    html &&
+    typeof html === 'string' &&
+    html.length > 2000 &&
+    (html.includes('<table') || html.includes('full-width-table') || html.includes('<h1') || html.includes('<h2')) &&
+    ((mjml.match(/<mj-section/g) || []).length <= 1) &&
+    html.length > (mjml.length * 1.5)
+  );
+
+  if (!isMjmlSuspiciouslyTruncated && mjml && typeof mjml === 'string' && mjml.trim().length > 10 && mjml.includes('<mj-')) {
     const mjmlDoc = parseMjmlToDocument(mjml, name, subject, preheader);
     if (mjmlDoc.rows && mjmlDoc.rows.length > 0) {
       return mjmlDoc;

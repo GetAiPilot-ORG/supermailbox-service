@@ -57,11 +57,11 @@ export const RowRenderer: React.FC<RowRendererProps> = ({ row, index, totalRows,
     backgroundColor: !isRowGradient ? (rowBg || 'transparent') : undefined,
     border: isSelected
       ? '2px solid #3b82f6'
-      : '1px solid transparent',
+      : (row.settings.border || '1px solid transparent'),
     outlineOffset: '-2px',
     margin: row.settings.margin || '0px',
     borderRadius: row.settings.borderRadius || '0px',
-    overflow: 'hidden',
+    overflow: 'visible',
   };
 
   const handleSelectPreset = (preset: RowLayoutPreset) => {
