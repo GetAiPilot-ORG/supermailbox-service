@@ -78,3 +78,41 @@ export type QualityIssue = {
   level: 'error' | 'warning' | 'pass';
   message: string;
 };
+
+export type CategoryTemplateItem = EmailTemplate & {
+  isDefault: boolean;
+};
+
+export type CategoryGroupItem = {
+  id: string;
+  name: string;
+  app: 'getaipilot' | 'gap_whatsapp' | 'socialpilot' | 'general';
+  appName: string;
+  description: string;
+  eventTrigger: string;
+  defaultKey: string;
+  activeDefaultTemplateId: string | null;
+  activeDefaultTemplateKey: string;
+  activeDefaultTemplateName: string;
+  variantsCount: number;
+  templates: CategoryTemplateItem[];
+};
+
+export type CategoryAppSummary = {
+  id: string;
+  name: string;
+  count: number;
+};
+
+export type CategorySummary = {
+  totalCategories: number;
+  totalVariants: number;
+  activeDefaultsAssigned: number;
+  apps: CategoryAppSummary[];
+};
+
+export type CategoryDefaultsResponse = {
+  categories: CategoryGroupItem[];
+  summary: CategorySummary;
+};
+

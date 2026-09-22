@@ -404,6 +404,16 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
       const tk = String(templateKey || '').toLowerCase();
       if (tk.includes('whatsapp') || tk.includes('wap_') || tk === 'broadcast_success') {
         resolvedProductCode = 'gap_whatsapp';
+      } else if (
+        tk.includes('getaipilot') ||
+        tk.includes('review') ||
+        tk.includes('waitlist') ||
+        tk.includes('newsletter') ||
+        tk.includes('password_reset') ||
+        tk.includes('verification') ||
+        tk.includes('auth_email')
+      ) {
+        resolvedProductCode = 'getaipilot';
       } else {
         resolvedProductCode = 'socialpilot';
       }

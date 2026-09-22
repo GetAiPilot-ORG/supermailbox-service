@@ -1,5 +1,6 @@
 import { supabase } from '../supabase.js';
 import { addResponsiveEmailFixes } from './responsiveEmail.js';
+import { resolveCategoryDefaultTemplateKey } from './emailTemplateRepository.js';
 
 export async function renderTemplate(
   templateKey: string,
@@ -7,15 +8,22 @@ export async function renderTemplate(
 ): Promise<{ subject: string; html: string }> {
   const normalizedVariables = withDefaultTemplateVariables(variables);
 
+  let resolvedKey = templateKey;
+  try {
+    resolvedKey = await resolveCategoryDefaultTemplateKey(templateKey);
+  } catch (err) {
+    console.warn('[renderTemplate] resolveCategoryDefaultTemplateKey warning:', err);
+  }
+
   try {
     // Attempt to lookup template by ID or key from database
     let dbRow: any = null;
 
-    // Check by ID first if templateKey is a UUID/ID
+    // Check by ID first if resolvedKey is a UUID/ID
     const { data: byId } = await supabase
       .from('email_templates')
       .select('id, key, name, subject, compiled_html, mjml_content, current_version_id')
-      .eq('id', templateKey)
+      .eq('id', resolvedKey)
       .maybeSingle();
 
     if (byId) {
@@ -24,9 +32,18 @@ export async function renderTemplate(
       const { data: byKey } = await supabase
         .from('email_templates')
         .select('id, key, name, subject, compiled_html, mjml_content, current_version_id')
-        .eq('key', templateKey)
+        .eq('key', resolvedKey)
         .maybeSingle();
       dbRow = byKey;
+    }
+
+    if (!dbRow && resolvedKey !== templateKey) {
+      const { data: byOrigKey } = await supabase
+        .from('email_templates')
+        .select('id, key, name, subject, compiled_html, mjml_content, current_version_id')
+        .eq('key', templateKey)
+        .maybeSingle();
+      dbRow = byOrigKey;
     }
 
     if (dbRow) {
@@ -276,6 +293,115 @@ export async function renderTemplate(
         <div style="background: rgba(37, 211, 102, 0.1); border-left: 4px solid #25d366; padding: 12px; margin: 16px 0;">
           <p style="margin: 0; font-size: 14px;">Total WhatsApp Audience Reached: <strong>{{audience_count}}</strong></p>
         </div>
+      </div>
+    `;
+  } else if (k === 'getaipilot_verification' || k === 'verification' || k.includes('getaipilot_auth') || k.includes('getaipilot_signup')) {
+    finalSubject = 'Verify your GetAiPilot account – unlock Telegram, WhatsApp, SocialPilot & AI automation!';
+    finalHtml = `
+      <div style="font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+        <div style="padding: 20px 16px; text-align: center;">
+          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 30px; width: auto; vertical-align: middle; margin-right: 8px;" alt="Logo">
+          <span style="font-weight: 700; color: #111827; font-size: 22px; letter-spacing: -0.5px; vertical-align: middle;">getaipilot</span>
+        </div>
+        <div style="background: linear-gradient(135deg, #10183f 0%, #1b2360 50%, #8b3cff 100%); padding: 32px 28px; color: #ffffff; text-align: left; border-radius: 12px;">
+          <p style="font-size: 15px; margin: 0 0 4px 0; color: rgba(255,255,255,0.85);">Hi ${name},</p>
+          <h1 style="font-size: 28px; font-weight: 700; line-height: 1.25; margin: 0; color: #ffffff;">Welcome to <br />Get<span style="color: #d8b4fe;">AiPilot</span>!</h1>
+          <p style="margin: 8px 0 0 0; font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.4; max-width: 380px;">
+            You’re one step closer to automating messaging, scaling with SocialPilot, and growing your audience.
+          </p>
+        </div>
+        <div style="padding: 28px 20px; text-align: center;">
+          <h2 style="font-weight: 700; color: #1f2937; margin: 0 0 16px 0; font-size: 18px;">Ready to take off?</h2>
+          <p style="font-size: 14px; color: #6b7280; margin: 0 0 24px 0;">Confirm your email to activate your dashboard and deploy your first automation.</p>
+          <a href="{{ConfirmationURL}}" style="display: inline-block; background: linear-gradient(to right, #f43f5e, #8b5cf6); color: #ffffff; font-size: 15px; font-weight: 700; padding: 14px 32px; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);">
+            Confirm Your Email &rarr;
+          </a>
+          <p style="font-size: 12px; color: #9ca3af; margin-top: 24px; word-break: break-all;">
+            If the button doesn’t work, copy and paste this link:<br>
+            <a href="{{ConfirmationURL}}" style="color: #8b5cf6;">{{ConfirmationURL}}</a>
+          </p>
+        </div>
+        <div style="background: #f9fafb; border-top: 1px solid #f3f4f6; padding: 16px; text-align: center;">
+          <p style="font-size: 12px; color: #94a3b8; margin: 0;">GetAiPilot Engine &bull; SuperMailBox CPaaS</p>
+        </div>
+      </div>
+    `;
+  } else if (k === 'password_reset' || k.includes('reset_password') || k.includes('pwd_reset')) {
+    finalSubject = 'Reset Your GetAiPilot Password';
+    finalHtml = `
+      <div style="font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 14px; text-align: center;">
+        <div style="background: #e0f2fe; color: #0369a1; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block; margin-bottom: 20px;">SECURITY NOTICE</div>
+        <h2 style="color: #0f172a; font-size: 24px; font-weight: 800; margin: 0 0 12px 0;">Reset Your Password</h2>
+        <p style="color: #64748b; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+          We received a request to reset the password for your account associated with <strong>{{email}}</strong>. Click the button below to proceed:
+        </p>
+        <a href="{{reset_link}}" style="background: #0284c7; color: #ffffff; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; display: inline-block; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);">
+          Reset My Password &rarr;
+        </a>
+        <p style="color: #94a3b8; font-size: 13px; margin: 0;">This secure link expires in 15 minutes. If you did not initiate this request, no action is required.</p>
+        <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #f1f5f9; font-size: 12px; color: #94a3b8;">
+          GetAiPilot Security &bull; SuperMailBox CPaaS
+        </div>
+      </div>
+    `;
+  } else if (k === 'review_notification' || k.includes('review')) {
+    finalSubject = normalizedVariables.subject || '[Review] New User Feedback Received';
+    finalHtml = `
+      <div style="font-family: sans-serif; padding: 24px; border: 1px solid #eee; border-radius: 12px; max-width: 540px; margin: 0 auto; background: #ffffff;">
+        <h2 style="color: #1da851; margin-top: 0;">New {{source}} Review ⭐</h2>
+        <p><strong>User:</strong> {{user_name}} ({{user_email}})</p>
+        <p><strong>Rating:</strong> {{rating}} / 5 Stars</p>
+        <p><strong>Source:</strong> {{source}}</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 18px 0;" />
+        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 4px solid #1da851;">
+          <p style="font-style: italic; color: #334155; margin: 0;">"{{content}}"</p>
+        </div>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 24px; text-align: center;">Sent via SuperMailBox &bull; GetAiPilot</p>
+      </div>
+    `;
+  } else if (k === 'waitlist_notification' || k.includes('waitlist')) {
+    finalSubject = normalizedVariables.subject || '🚀 New Waitlist Join: {{feature_name}}';
+    finalHtml = `
+      <div style="font-family: sans-serif; padding: 24px; border: 1px solid #eee; border-radius: 12px; max-width: 500px; margin: 0 auto; background: #ffffff;">
+        <h2 style="color: #1da851; text-align: center; margin-top: 0;">New Feature Interest! 🚀</h2>
+        <p style="font-size: 15px; color: #333;">Someone is excited about a new feature on <strong>GetAiPilot</strong>.</p>
+        <div style="background: #f9f9f9; padding: 16px; border-radius: 8px; margin: 18px 0; border-left: 4px solid #8b5cf6;">
+          <p style="margin: 4px 0;"><strong>Feature:</strong> {{feature_name}}</p>
+          <p style="margin: 4px 0;"><strong>User Email:</strong> {{email}}</p>
+        </div>
+        <p style="font-size: 13px; color: #888; text-align: center;">This user wants to be notified when this feature goes live.</p>
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 20px; text-align: center;">GetAiPilot Admin Notifications &bull; SuperMailBox</p>
+      </div>
+    `;
+  } else if (k === 'newsletter_notification' || k.includes('newsletter')) {
+    finalSubject = normalizedVariables.subject || 'New Newsletter Subscriber! 📧';
+    finalHtml = `
+      <div style="font-family: sans-serif; padding: 24px; color: #333; max-width: 500px; margin: 0 auto; border: 1px solid #eee; border-radius: 12px; background: #ffffff;">
+        <h2 style="color: #1da851; margin-top: 0;">New Newsletter Subscriber! 📧</h2>
+        <p>A new user has just subscribed to the GetAiPilot newsletter.</p>
+        <div style="background: #f4f4f4; padding: 16px; border-radius: 8px; border-left: 4px solid #1da851; margin: 18px 0;">
+          <strong>Email:</strong> {{email}}
+        </div>
+        <p style="margin-top: 20px; font-size: 12px; color: #888; text-align: center;">
+          Sent via SuperMailBox &bull; GetAiPilot Dashboard
+        </p>
+      </div>
+    `;
+  } else if (k === 'ai_welcome_followup' || k.includes('followup')) {
+    finalSubject = normalizedVariables.subject || 'Welcome to GetAiPilot! 🚀';
+    finalHtml = normalizedVariables.html || `
+      <div style="font-family: sans-serif; padding: 24px; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff;">
+        <h2 style="color: #2563eb; margin-top: 0;">Welcome to GetAiPilot! 👋</h2>
+        <p>Hi ${name},</p>
+        <p>Thanks for joining GetAiPilot! Your autonomous automation superpowers are ready.</p>
+        <div style="margin: 24px 0; text-align: center;">
+          <a href="https://getaipilot.in/dashboard" style="background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
+            Go to Dashboard &rarr;
+          </a>
+        </div>
+        <p style="font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 24px;">
+          GetAiPilot &bull; SuperMailBox CPaaS
+        </p>
       </div>
     `;
   } else {

@@ -1,4 +1,4 @@
-import type { EmailTemplate, GalleryTemplate, QualityIssue, TemplateVersion } from '../types/template.types';
+import type { CategoryDefaultsResponse, EmailTemplate, GalleryTemplate, QualityIssue, TemplateVersion } from '../types/template.types';
 import { filterLocalGallery } from './templateGallerySeeds';
 
 const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://127.0.0.1:5050/v1';
@@ -25,6 +25,12 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const templateService = {
+  getCategoryDefaults: () => api<CategoryDefaultsResponse>('/templates/categories'),
+  setDefaultTemplate: (categoryId: string, templateIdOrKey: string) =>
+    api<{ success: boolean; categoryId: string; activeDefaultTemplateId: string; activeDefaultTemplateKey: string; activeDefaultTemplateName: string }>(
+      `/templates/categories/${categoryId}/set-default`,
+      { method: 'POST', body: JSON.stringify({ templateId: templateIdOrKey }) }
+    ),
   listTemplates: (params: URLSearchParams) => api<EmailTemplate[]>(`/templates/manager?${params.toString()}`),
   listGalleryTemplates: async (params: URLSearchParams) => {
     try {
@@ -53,3 +59,4 @@ export const templateService = {
   sendTest: (id: string, body: { recipientEmail: string; subject: string; sampleData?: Record<string, string> }) =>
     api<{ success: boolean; provider: string; previewUrl?: string | false; error?: string }>(`/templates/${id}/test-send`, { method: 'POST', body: JSON.stringify(body) }),
 };
+

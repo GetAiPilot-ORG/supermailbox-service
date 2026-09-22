@@ -7,11 +7,13 @@ import {
   compileTemplateById,
   createBlankTemplate,
   duplicateTemplate,
+  getCategoryGroupsWithDefaults,
   getTemplate,
   listGalleryTemplates,
   listTemplateVersions,
   listTemplates,
   restoreTemplateVersion,
+  setDefaultTemplateForCategory,
   softDeleteTemplate,
   updateTemplate,
 } from '../services/emailTemplateRepository.js';
@@ -19,6 +21,12 @@ import {
 const testSendHits = new Map<string, number[]>();
 
 export async function registerTemplateRoutes(fastify: FastifyInstance) {
+  fastify.get('/v1/templates/categories', async (_request, reply) => safe(reply, () => getCategoryGroupsWithDefaults()));
+  fastify.post('/v1/templates/categories/:categoryId/set-default', async (request: FastifyRequest<{ Params: { categoryId: string }; Body: { templateId?: string; templateKey?: string } }>, reply) => {
+    const templateIdentifier = request.body?.templateId || request.body?.templateKey;
+    if (!templateIdentifier) throw statusError('templateId or templateKey is required.', 400);
+    return safe(reply, () => setDefaultTemplateForCategory(request.params.categoryId, templateIdentifier));
+  });
   fastify.get('/v1/templates/manager', async (request, reply) => safe(reply, () => listTemplates((request.query as any) || {})));
   fastify.get('/v1/templates/gallery', async (request, reply) => safe(reply, () => listGalleryTemplates((request.query as any) || {})));
   fastify.post('/v1/templates/blank', async (request: FastifyRequest<{ Body: { name?: string } }>, reply) => safe(reply, () => createBlankTemplate(request.body?.name)));
