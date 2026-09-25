@@ -86,11 +86,12 @@ export type CategoryTemplateItem = EmailTemplate & {
 export type CategoryGroupItem = {
   id: string;
   name: string;
-  app: 'getaipilot' | 'gap_whatsapp' | 'socialpilot' | 'general';
+  app: 'getaipilot' | 'campaign' | 'gap_whatsapp' | 'socialpilot' | 'general';
   appName: string;
   description: string;
   eventTrigger: string;
   defaultKey: string;
+  supportsDefault?: boolean;
   activeDefaultTemplateId: string | null;
   activeDefaultTemplateKey: string;
   activeDefaultTemplateName: string;
@@ -107,6 +108,8 @@ export type CategoryAppSummary = {
 export type CategorySummary = {
   totalCategories: number;
   totalVariants: number;
+  totalLibraryTemplates: number;
+  totalDefaultCategories: number;
   activeDefaultsAssigned: number;
   apps: CategoryAppSummary[];
 };

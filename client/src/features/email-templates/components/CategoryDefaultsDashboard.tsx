@@ -32,6 +32,7 @@ interface Props {
   summary: {
     totalCategories: number;
     totalVariants: number;
+    totalDefaultCategories: number;
     activeDefaultsAssigned: number;
     apps: { id: string; name: string; count: number }[];
   };
@@ -166,7 +167,8 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
           </div>
           <div className="cat-kpi-value">{summary.totalCategories}</div>
           <div className="cat-kpi-sub">
-            <span className="kpi-tag getaipilot">{summary.apps.find(a => a.id === 'getaipilot')?.count || 9} Core</span>
+            <span className="kpi-tag getaipilot">{summary.apps.find(a => a.id === 'getaipilot')?.count ?? 0} Core</span>
+            <span className="kpi-tag campaign">{summary.apps.find(a => a.id === 'campaign')?.count ?? 0} Campaigns</span>
             <span className="kpi-tag gap">{summary.apps.find(a => a.id === 'gap_whatsapp')?.count || 1} WhatsApp</span>
             <span className="kpi-tag social">{summary.apps.find(a => a.id === 'socialpilot')?.count || 1} Social</span>
           </div>
@@ -180,11 +182,15 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
             </div>
           </div>
           <div className="cat-kpi-value">
-            {summary.activeDefaultsAssigned} <span className="cat-kpi-denom">/ {summary.totalCategories}</span>
+            {summary.activeDefaultsAssigned} <span className="cat-kpi-denom">/ {summary.totalDefaultCategories}</span>
           </div>
           <div className="cat-kpi-sub">
             <span className="status-indicator-dot online" />
-            <span className="text-emerald">100% Routed & Ready in Production</span>
+            <span className={summary.activeDefaultsAssigned === summary.totalDefaultCategories ? "text-emerald" : "text-amber"}>
+              {summary.activeDefaultsAssigned === summary.totalDefaultCategories
+                ? "All request flows are routed and ready"
+                : <>{summary.totalDefaultCategories - summary.activeDefaultsAssigned} request flows still need templates</>}
+            </span>
           </div>
         </div>
 
@@ -197,7 +203,7 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
           </div>
           <div className="cat-kpi-value">{summary.totalVariants}</div>
           <div className="cat-kpi-sub text-muted">
-            Across {summary.totalCategories} transaction & marketing flows
+            Assigned to {summary.totalCategories} operational request flows
           </div>
         </div>
 
@@ -232,7 +238,15 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
             onClick={() => setSelectedApp('getaipilot')}
           >
             <span className="app-dot getaipilot" />
-            GetAiPilot Core ({summary.apps.find(a => a.id === 'getaipilot')?.count || 9})
+            GetAiPilot Core ({summary.apps.find(a => a.id === 'getaipilot')?.count ?? 0})
+          </button>
+          <button
+            type="button"
+            className={`cat-tab-btn ${selectedApp === 'campaign' ? 'active' : ''}`}
+            onClick={() => setSelectedApp('campaign')}
+          >
+            <span className="app-dot campaign" />
+            Campaigns ({summary.apps.find(a => a.id === 'campaign')?.count ?? 0})
           </button>
           <button
             type="button"
@@ -278,6 +292,7 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
         {filteredCategories.map((category) => {
           const isCollapsed = expandedCategories[category.id] === false; // default expanded
           const activeTemplate = category.templates.find((t) => t.isDefault) || category.templates[0];
+          const supportsDefault = category.app !== 'campaign' && category.supportsDefault !== false;
 
           return (
             <section key={category.id} className="category-section-card">
@@ -302,10 +317,12 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
                     <span>{category.eventTrigger}</span>
                   </div>
 
-                  <div className="cat-active-summary-pill" title="Currently Active Production Default">
-                    <span className="cat-star-icon">★</span>
-                    <span className="cat-active-name">{category.activeDefaultTemplateName}</span>
-                  </div>
+                  {supportsDefault && (
+                    <div className="cat-active-summary-pill" title="Currently Active Production Default">
+                      <span className="cat-star-icon">★</span>
+                      <span className="cat-active-name">{category.activeDefaultTemplateName}</span>
+                    </div>
+                  )}
 
                   <button
                     type="button"
@@ -333,7 +350,11 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
                         >
                           {/* Top Status Banner */}
                           <div className="variant-status-bar">
-                            {isDefault ? (
+                            {!supportsDefault ? (
+                              <div className="variant-badge alternate">
+                                <span>Campaign Template</span>
+                              </div>
+                            ) : isDefault ? (
                               <div className="variant-badge active-default">
                                 <Check size={13} strokeWidth={3} />
                                 <span>ACTIVE DEFAULT</span>
@@ -391,7 +412,7 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
 
                           {/* Action Buttons */}
                           <div className="variant-actions">
-                            {isDefault ? (
+                            {supportsDefault && (isDefault ? (
                               <button
                                 type="button"
                                 className="btn-default-active"
@@ -414,7 +435,7 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
                                 )}
                                 Set as Active Default
                               </button>
-                            )}
+                            ))}
 
                             <div className="variant-secondary-actions">
                               <button

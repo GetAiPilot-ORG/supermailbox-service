@@ -138,7 +138,7 @@ export const TemplateManagerPage: React.FC<Props> = ({ onCreate, onEdit }) => {
           <LayoutGrid size={16} />
           <span>All Templates Library</span>
           {categoryData && (
-            <span className="mode-count-pill subtle">{categoryData.summary.totalVariants}</span>
+            <span className="mode-count-pill subtle">{categoryData.summary.totalLibraryTemplates}</span>
           )}
         </button>
       </div>

@@ -97,7 +97,26 @@ export async function listTemplates(query: Record<string, any>) {
     .limit(Math.min(Number(query.limit || 50), 100));
 
   if (query.status && query.status !== 'all') request = request.eq('status', query.status);
-  if (query.category && query.category !== 'all') request = request.eq('category', query.category);
+
+  const categoryParam = String(query.category || 'all').trim();
+  if (categoryParam !== 'all') {
+    const matchedCat = CATEGORY_DEFINITIONS.find(
+      (c) => c.id === categoryParam || c.name.toLowerCase() === categoryParam.toLowerCase()
+    );
+    if (matchedCat?.isCatchAll) {
+      const categorizedKeys = CATEGORY_DEFINITIONS
+        .filter((category) => !category.isCatchAll)
+        .flatMap((category) => category.matchKeys);
+      if (categorizedKeys.length > 0) {
+        request = request.not('key', 'in', '(' + categorizedKeys.join(',') + ')');
+      }
+    } else if (matchedCat && matchedCat.matchKeys.length > 0) {
+      request = request.in('key', matchedCat.matchKeys);
+    } else {
+      request = request.eq('category', categoryParam);
+    }
+  }
+
   if (query.industry && query.industry !== 'all') request = request.eq('industry', query.industry);
   if (query.search) request = request.ilike('name', `%${String(query.search).trim()}%`);
 
@@ -398,124 +417,153 @@ const stripHtml = (html: string) => html.replace(/<style[\s\S]*?<\/style>/gi, ''
 export interface CategoryDefinition {
   id: string;
   name: string;
-  app: 'getaipilot' | 'gap_whatsapp' | 'socialpilot' | 'general';
+  app: 'getaipilot' | 'campaign' | 'gap_whatsapp' | 'socialpilot' | 'general';
   appName: string;
   description: string;
   eventTrigger: string;
   defaultKey: string;
   matchKeys: string[];
+  isCatchAll?: boolean;
 }
 
 export const CATEGORY_DEFINITIONS: CategoryDefinition[] = [
+  // ── GETAIPILOT EDGE FUNCTION: send-auth-email ────────────────────────────
   {
     id: 'confirm_email',
-    name: 'Account Verification',
+    name: 'Signup & Email Verification',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Triggered by Supabase Auth hook when a new user signs up or verifies their email on getaipilot.in.',
-    eventTrigger: 'signup / confirm_email',
+    description: 'Triggered when a user signs up on getaipilot.in — sends the official verification link to activate their account and access their dashboard.',
+    eventTrigger: 'send-auth-email (signup / confirm_email)',
     defaultKey: 'getaipilot_confirm_email',
     matchKeys: ['getaipilot_confirm_email', 'getaipilot_confirm_email_v2', 'getaipilot_confirm_email_v3', 'getaipilot_confirm_email_v4']
   },
   {
     id: 'reset_password',
-    name: 'Password Reset & Recovery',
+    name: 'Password Reset & Account Recovery',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Triggered when a user clicks forgot password or requests an account password reset link.',
-    eventTrigger: 'recovery / reset_password',
+    description: 'Triggered when a user clicks "Forgot Password" or requests a secure link to reset and update their account credentials.',
+    eventTrigger: 'send-auth-email (recovery / reset_password)',
     defaultKey: 'getaipilot_reset_password',
-    matchKeys: ['getaipilot_reset_password', 'getaipilot_reset_password_v2', 'getaipilot_password_updated']
+    matchKeys: ['getaipilot_reset_password', 'getaipilot_reset_password_v2']
   },
   {
     id: 'magic_link_otp',
-    name: 'Magic Link & OTP Login',
+    name: 'Magic Link & OTP Instant Login',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Triggered when a user requests passwordless authentication via 6-digit OTP or direct magic sign-in link.',
-    eventTrigger: 'magiclink / otp_login',
+    description: 'Triggered when a user requests passwordless authentication via 6-digit OTP code or 1-click magic sign-in link.',
+    eventTrigger: 'send-auth-email (magiclink / otp_login)',
     defaultKey: 'getaipilot_magic_link_otp',
     matchKeys: ['getaipilot_magic_link_otp', 'getaipilot_magic_link_otp_v2', 'getaipilot_magic_link_otp_v3', 'otp_login']
   },
   {
     id: 'change_email',
-    name: 'Change Email Address',
+    name: 'Email Address Update & Confirmation',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Triggered when an authenticated user modifies their primary account email in profile settings.',
-    eventTrigger: 'email_change',
+    description: 'Triggered when an authenticated user modifies their primary account email in profile settings to verify the new address.',
+    eventTrigger: 'send-auth-email (email_change)',
     defaultKey: 'getaipilot_change_email',
     matchKeys: ['getaipilot_change_email', 'getaipilot_change_email_v2', 'getaipilot_change_email_v3']
   },
   {
     id: 'invite_user',
-    name: 'Workspace & Team Invites',
+    name: 'Team & Workspace Invites',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Triggered when a workspace admin invites team members or collaborators to join their AI organization.',
-    eventTrigger: 'invite / team_member',
+    description: 'Triggered when an organization admin invites colleagues or collaborators to join their GetAiPilot workspace.',
+    eventTrigger: 'send-auth-email (invite / team_member)',
     defaultKey: 'getaipilot_invite_user',
     matchKeys: ['getaipilot_invite_user', 'getaipilot_invite_user_v2', 'getaipilot_invite_user_v3']
   },
   {
     id: 'reauthentication',
-    name: 'Identity Re-authentication',
+    name: 'Security Re-Authentication (Sudo Mode)',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Triggered for high-security actions requiring identity confirmation before executing.',
-    eventTrigger: 'reauthentication / sudo_mode',
+    description: 'Triggered for high-security actions (API key regeneration, organization plan changes) requiring identity re-verification.',
+    eventTrigger: 'send-auth-email (reauthentication / sudo_mode)',
     defaultKey: 'getaipilot_reauthentication',
     matchKeys: ['getaipilot_reauthentication', 'getaipilot_reauthentication_v2', 'getaipilot_reauthentication_v3']
   },
+
+  // GETAIPILOT EDGE FUNCTION: ai-welcome-followup
   {
-    id: 'onboarding',
-    name: 'AI Copilot & Onboarding',
+    id: 'ai_lifecycle_followup',
+    name: 'AI Lifecycle Follow-up',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Lifecycle sequence introducing AI Copilots, workflow automation, and workspace configuration.',
-    eventTrigger: 'onboarding_sequence / assistant_ready',
-    defaultKey: 'getaipilot_assistant_ready',
-    matchKeys: ['getaipilot_assistant_ready', 'getaipilot_workspace_ready', 'getaipilot_copilots_tour', 'getaipilot_first_workflow', 'getaipilot_complete_onboarding', 'getaipilot_welcome', 'welcome_email']
+    description: 'The AI follow-up service sends generated welcome, incomplete-setup, and subscription-expiry messages through one live Supermail template request.',
+    eventTrigger: 'ai-welcome-followup -> ai_welcome_followup',
+    defaultKey: 'ai_welcome_followup',
+    matchKeys: ['ai_welcome_followup']
   },
+
+  // GETAIPILOT ADMIN NOTIFICATIONS: one request contract per category
   {
-    id: 'marketing',
-    name: 'Product Growth & Marketing',
+    id: 'waitlist_notification',
+    name: 'Feature Waitlist Notification',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Feature announcements, premium upgrade prompts, case studies, and user re-engagement blasts.',
-    eventTrigger: 'campaign_broadcast / product_update',
-    defaultKey: 'getaipilot_case_studies',
-    matchKeys: ['getaipilot_case_studies', 'getaipilot_upgrade_premium', 'getaipilot_reengagement', 'getaipilot_feature_announce', 'product_announcement']
+    description: 'Notifies the GetAiPilot admin when a user joins the waitlist for a named feature.',
+    eventTrigger: 'notify-admin-waitlist -> waitlist_notification',
+    defaultKey: 'waitlist_notification',
+    matchKeys: ['waitlist_notification']
   },
   {
-    id: 'billing',
-    name: 'Billing & Account Alerts',
+    id: 'review_notification',
+    name: 'New Review Notification',
     app: 'getaipilot',
     appName: 'GetAiPilot Core',
-    description: 'Payment receipts, billing quota threshold warnings, and subscription lifecycle notices.',
-    eventTrigger: 'billing_alert / invoice / payment',
-    defaultKey: 'getaipilot_billing_alert',
-    matchKeys: ['getaipilot_billing_alert', 'billing_receipt', 'payment_success']
+    description: 'Sends the admin a rating, review text, author details, and the GetAiPilot surface where the review was submitted.',
+    eventTrigger: 'send-review-email -> review_notification',
+    defaultKey: 'review_notification',
+    matchKeys: ['review_notification']
   },
+  {
+    id: 'newsletter_notification',
+    name: 'Newsletter Signup Notification',
+    app: 'getaipilot',
+    appName: 'GetAiPilot Core',
+    description: 'Notifies the admin after a new newsletter subscriber is stored and synchronized with Supermail contacts.',
+    eventTrigger: 'subscribe-newsletter -> newsletter_notification',
+    defaultKey: 'newsletter_notification',
+    matchKeys: ['newsletter_notification']
+  },
+
+  // SATELLITE APPLICATIONS
   {
     id: 'gap_whatsapp',
-    name: 'GAP WhatsApp Automation',
+    name: 'WhatsApp Broadcasts & Automations',
     app: 'gap_whatsapp',
     appName: 'GAP WhatsApp',
-    description: 'WhatsApp broadcast execution notifications, failure alerts, team invites, and OTP verification.',
+    description: 'Triggered by GAP WhatsApp engine for broadcast completion alerts, failure notices, and WhatsApp OTP verification.',
     eventTrigger: 'broadcast_published / broadcast_failed / whatsapp_otp',
     defaultKey: 'gap_whatsapp_welcome',
     matchKeys: ['gap_whatsapp_otp', 'gap_whatsapp_welcome', 'broadcast_success', 'broadcast_failed', 'team_invite']
   },
   {
     id: 'socialpilot',
-    name: 'SocialPilot & AutoDM',
+    name: 'SocialPilot & AutoDM Notifications',
     app: 'socialpilot',
     appName: 'SocialPilot',
-    description: 'Social channel connections, auto-DM automation setup alerts, and broadcast notifications.',
-    eventTrigger: 'account_connected / automation_created',
+    description: 'Triggered by SocialPilot for social account connections, auto-DM automation setup alerts, and welcome triggers.',
+    eventTrigger: 'account_connected / automation_created / auth_welcome',
     defaultKey: 'auth_welcome',
     matchKeys: ['account_connected', 'auth_welcome', 'automation_created', 'broadcast_notification']
+  },
+  {
+    id: 'campaigns',
+    name: 'Campaigns & Remaining Templates',
+    app: 'campaign',
+    appName: 'Campaigns',
+    description: 'Contains every library template that is not assigned to a live GetAiPilot, GAP WhatsApp, or SocialPilot request flow.',
+    eventTrigger: 'campaign composer / template library',
+    defaultKey: 'campaigns',
+    matchKeys: [],
+    isCatchAll: true
   }
 ];
 
@@ -553,33 +601,37 @@ export async function getCategoryGroupsWithDefaults() {
   const storedDefaults = await getStoredCategoryDefaults();
 
   const assignedTemplateIds = new Set<string>();
+  const categoryOwnerByKey = new Map(
+    CATEGORY_DEFINITIONS.flatMap((definition) => definition.matchKeys.map((key) => [key, definition.id] as const))
+  );
 
   const categoryGroups = CATEGORY_DEFINITIONS.map((def) => {
     // Match templates belonging to this category
     const matchingTemplates = allTemplates.filter((t) => {
-      const pJson = (t.projectJson as any) || {};
-      if (pJson.category_id === def.id) return true;
-      if (def.matchKeys.includes(t.key)) return true;
+      const explicitOwner = categoryOwnerByKey.get(t.key);
+      if (def.isCatchAll) return !explicitOwner;
+      if (explicitOwner) return explicitOwner === def.id;
       return false;
     });
 
     matchingTemplates.forEach((t) => assignedTemplateIds.add(t.id));
 
     // Resolve active default template
-    let activeDefaultTemplate = matchingTemplates.find((t) => {
+    const supportsDefault = !def.isCatchAll;
+    let activeDefaultTemplate = supportsDefault ? matchingTemplates.find((t) => {
       const pJson = (t.projectJson as any) || {};
       if (storedDefaults[def.id] && (t.id === storedDefaults[def.id] || t.key === storedDefaults[def.id])) return true;
       if (pJson.is_category_default) return true;
       return false;
-    });
+    }) : null;
 
-    if (!activeDefaultTemplate) {
+    if (supportsDefault && !activeDefaultTemplate) {
       activeDefaultTemplate = matchingTemplates.find((t) => t.key === def.defaultKey) || matchingTemplates[0] || null;
     }
 
     const templatesWithDefaultFlag = matchingTemplates.map((t) => ({
       ...t,
-      isDefault: activeDefaultTemplate ? t.id === activeDefaultTemplate.id : false,
+      isDefault: supportsDefault && activeDefaultTemplate ? t.id === activeDefaultTemplate.id : false,
     }));
 
     return {
@@ -590,6 +642,7 @@ export async function getCategoryGroupsWithDefaults() {
       description: def.description,
       eventTrigger: def.eventTrigger,
       defaultKey: def.defaultKey,
+      supportsDefault,
       activeDefaultTemplateId: activeDefaultTemplate?.id || null,
       activeDefaultTemplateKey: activeDefaultTemplate?.key || def.defaultKey,
       activeDefaultTemplateName: activeDefaultTemplate?.name || 'Default Template',
@@ -598,18 +651,23 @@ export async function getCategoryGroupsWithDefaults() {
     };
   });
 
-  const totalVariants = allTemplates.length;
+  const totalVariants = assignedTemplateIds.size;
   const totalCategories = categoryGroups.length;
-  const activeDefaultsAssigned = categoryGroups.filter((c) => Boolean(c.activeDefaultTemplateId)).length;
+  const defaultCategories = categoryGroups.filter((category) => category.supportsDefault);
+  const totalDefaultCategories = defaultCategories.length;
+  const activeDefaultsAssigned = defaultCategories.filter((category) => Boolean(category.activeDefaultTemplateId)).length;
 
   return {
     categories: categoryGroups,
     summary: {
       totalCategories,
       totalVariants,
+      totalLibraryTemplates: allTemplates.length,
+      totalDefaultCategories,
       activeDefaultsAssigned,
       apps: [
         { id: 'getaipilot', name: 'GetAiPilot Core', count: categoryGroups.filter((c) => c.app === 'getaipilot').length },
+        { id: 'campaign', name: 'Campaigns', count: categoryGroups.filter((c) => c.app === 'campaign').length },
         { id: 'gap_whatsapp', name: 'GAP WhatsApp', count: categoryGroups.filter((c) => c.app === 'gap_whatsapp').length },
         { id: 'socialpilot', name: 'SocialPilot', count: categoryGroups.filter((c) => c.app === 'socialpilot').length },
       ],
@@ -620,6 +678,7 @@ export async function getCategoryGroupsWithDefaults() {
 export async function setDefaultTemplateForCategory(categoryId: string, templateIdOrKey: string) {
   const categoryDef = CATEGORY_DEFINITIONS.find((c) => c.id === categoryId);
   if (!categoryDef) throw new Error(`Category "${categoryId}" not found.`);
+  if (categoryDef.isCatchAll) throw new Error(`Category "${categoryId}" does not support an active default.`);
 
   // Find target template
   const { data: targetTemplate, error: targetErr } = await supabase
@@ -662,11 +721,24 @@ export async function setDefaultTemplateForCategory(categoryId: string, template
 
   // Clear is_category_default on other templates for this category
   const siblingKeys = categoryDef.matchKeys.filter((k) => k !== targetTemplate.key);
-  if (siblingKeys.length > 0) {
-    const { data: siblings } = await supabase
+  if (siblingKeys.length > 0 || categoryDef.isCatchAll) {
+    let siblingRequest = supabase
       .from('email_templates')
-      .select('id, project_json')
-      .in('key', siblingKeys);
+      .select('id, key, project_json')
+      .neq('id', targetTemplate.id);
+
+    if (categoryDef.isCatchAll) {
+      const categorizedKeys = CATEGORY_DEFINITIONS
+        .filter((category) => !category.isCatchAll)
+        .flatMap((category) => category.matchKeys);
+      if (categorizedKeys.length > 0) {
+        siblingRequest = siblingRequest.not('key', 'in', '(' + categorizedKeys.join(',') + ')');
+      }
+    } else {
+      siblingRequest = siblingRequest.in('key', siblingKeys);
+    }
+
+    const { data: siblings } = await siblingRequest;
 
     for (const sib of siblings || []) {
       const sibJson = (sib.project_json && typeof sib.project_json === 'object') ? sib.project_json : {};
@@ -693,7 +765,7 @@ export async function setDefaultTemplateForCategory(categoryId: string, template
 export async function resolveCategoryDefaultTemplateKey(templateKey: string): Promise<string> {
   // Check if templateKey is a category default key or category alias
   const matchedCategory = CATEGORY_DEFINITIONS.find((cat) =>
-    cat.id === templateKey || cat.defaultKey === templateKey
+    !cat.isCatchAll && (cat.id === templateKey || cat.defaultKey === templateKey)
   );
 
   if (matchedCategory) {

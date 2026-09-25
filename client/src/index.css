@@ -5365,6 +5365,11 @@ th {
   color: #0369a1;
 }
 
+.kpi-tag.campaign {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
 .kpi-tag.gap {
   background: #dcfce7;
   color: #15803d;
@@ -5441,6 +5446,7 @@ th {
 }
 
 .app-dot.getaipilot { background: #0284c7; }
+.app-dot.campaign { background: #ea580c; }
 .app-dot.gap { background: #16a34a; }
 .app-dot.social { background: #7c3aed; }
 
@@ -5548,6 +5554,12 @@ th {
   background: #e0f2fe;
   color: #0369a1;
   border: 1px solid #bae6fd;
+}
+
+.cat-app-badge.campaign {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
 }
 
 .cat-app-badge.gap_whatsapp {
