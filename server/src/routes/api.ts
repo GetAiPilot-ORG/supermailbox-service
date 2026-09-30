@@ -773,24 +773,29 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
         }
       ];
 
-// ... inside stats route
-      const cActive = await campaignQueue.getJobs(['active']);
-      const cWaiting = await campaignQueue.getJobs(['waiting']);
-      const cDelayed = await campaignQueue.getJobs(['delayed']);
-      const cFailed = await campaignQueue.getFailed(0, 10);
-      
-      const allQJobs = [...cActive, ...cWaiting, ...cDelayed, ...cFailed];
-      
-      const queueJobs = await Promise.all(allQJobs.map(async j => ({
-        id: j.id || `job_${Math.random()}`,
-        status: await j.getState(),
-        recipient: j.data.recipientEmail || 'unknown@recipient.com',
-        templateKey: j.data.templateKey || 'unknown',
-        attempts: j.attemptsMade || 0,
-        timestamp: new Date(j.timestamp || Date.now()).toLocaleTimeString(),
-        error: j.failedReason,
-        payload: j.data.variables || {}
-      })));
+      let queueJobs: any[] = [];
+      try {
+        const cActive = await campaignQueue.getJobs(['active']);
+        const cWaiting = await campaignQueue.getJobs(['waiting']);
+        const cDelayed = await campaignQueue.getJobs(['delayed']);
+        const cFailed = await campaignQueue.getFailed(0, 10);
+        
+        const allQJobs = [...cActive, ...cWaiting, ...cDelayed, ...cFailed];
+        
+        queueJobs = await Promise.all(allQJobs.map(async j => ({
+          id: j.id || `job_${Math.random()}`,
+          status: await j.getState(),
+          recipient: j.data.recipientEmail || 'unknown@recipient.com',
+          templateKey: j.data.templateKey || 'unknown',
+          attempts: j.attemptsMade || 0,
+          timestamp: new Date(j.timestamp || Date.now()).toLocaleTimeString(),
+          error: j.failedReason,
+          payload: j.data.variables || {}
+        })));
+      } catch (e) {
+        // Redis offline - return empty queueJobs without failing stats
+        queueJobs = [];
+      }
 
       return reply.send({ success: true, metrics, logs, queueJobs });
     } catch (err: any) {

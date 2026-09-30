@@ -1950,7 +1950,7 @@ const DEMO_TEMPLATES = [
               <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="background-color:#f47c20; border-radius:30px;">
-                    <a href="https://getaipilot.in" style="display:inline-block; padding:16px 40px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none;">
+                    <a href="{{ConfirmationURL}}" style="display:inline-block; padding:16px 40px; font-size:16px; font-weight:700; color:#ffffff; text-decoration:none;">
                       Complete onboarding
                     </a>
                   </td>

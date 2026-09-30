@@ -6,7 +6,13 @@ import type { BroadcastRequestPayload, CampaignJobPayload } from '../types.js';
 import { supabase } from '../supabase.js';
 import { checkSuppression } from '../services/suppression.js';
 import { renderTemplate } from '../services/templates.js';
-import { generateSupabaseVerificationLink, isSupabaseAuthLinkConfigured, shouldGenerateSupabaseVerificationLink } from '../services/authLinks.js';
+import {
+  generateSupabaseAuthLink,
+  generateSupabaseVerificationLink,
+  isSupabaseAuthLinkConfigured,
+  shouldGenerateSupabaseAuthLink,
+  shouldGenerateSupabaseVerificationLink
+} from '../services/authLinks.js';
 
 // Live campaign registry (backed by Supabase)
 export const broadcastCampaigns: any[] = [];
@@ -56,19 +62,23 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
 
     const totalRecipients = recipients.length;
     const newCampaignId = `camp_${Math.floor(1000 + Math.random() * 9000)}`;
-    const requiresGeneratedVerificationLinks = shouldGenerateSupabaseVerificationLink(templateKey, campaignName);
-    const recipientsMissingVerificationLinks = recipients.some((recipient: any) =>
+    const requiresGeneratedAuthLinks = shouldGenerateSupabaseAuthLink(templateKey, campaignName);
+    const recipientsMissingAuthLinks = recipients.some((recipient: any) =>
       !recipient.ConfirmationURL &&
       !recipient.confirmation_url &&
       !recipient.confirmationUrl &&
       !recipient.verify_url &&
-      !recipient.verifyUrl
+      !recipient.verifyUrl &&
+      !recipient.login_url &&
+      !recipient.login_link &&
+      !recipient.magic_link &&
+      !recipient.onboarding_url
     );
 
-    if (requiresGeneratedVerificationLinks && recipientsMissingVerificationLinks && !isSupabaseAuthLinkConfigured()) {
+    if (requiresGeneratedAuthLinks && recipientsMissingAuthLinks && !isSupabaseAuthLinkConfigured()) {
       return reply.status(400).send({
         success: false,
-        error: 'This verification campaign needs GETAIPILOT_SUPABASE_URL and GETAIPILOT_SUPABASE_SERVICE_ROLE_KEY configured on the SuperMailBox server so it can generate real Supabase auth links.'
+        error: 'This onboarding or verification campaign needs GETAIPILOT_SUPABASE_URL and GETAIPILOT_SUPABASE_SERVICE_ROLE_KEY configured on the SuperMailBox server so it can generate real Supabase auth links.'
       });
     }
 
@@ -133,17 +143,25 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
         recipient.confirmationUrl ||
         recipient.verify_url ||
         recipient.verifyUrl ||
+        recipient.login_url ||
+        recipient.login_link ||
+        recipient.magic_link ||
+        recipient.onboarding_url ||
+        recipient.action_url ||
         null;
 
-      if (!confirmationUrl && shouldGenerateSupabaseVerificationLink(templateKey, campaignName)) {
-        const generatedLink = await generateSupabaseVerificationLink(email, fullName);
+      if (!confirmationUrl && shouldGenerateSupabaseAuthLink(templateKey, campaignName)) {
+        const generatedLink = await generateSupabaseAuthLink(email, fullName, {
+          templateKey,
+          campaignName
+        });
         if (generatedLink.url) {
           confirmationUrl = generatedLink.url;
         } else if (generatedLink.error) {
-          fastify.log.warn(`[Broadcast Engine] Could not generate Supabase verification link for ${email}: ${generatedLink.error}`);
+          fastify.log.warn(`[Broadcast Engine] Could not generate Supabase auth link for ${email}: ${generatedLink.error}`);
           return reply.status(400).send({
             success: false,
-            error: `Could not generate Supabase verification link for ${email}: ${generatedLink.error}`
+            error: `Could not generate Supabase auth link for ${email}: ${generatedLink.error}`
           });
         }
       }
@@ -187,6 +205,11 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
           confirmationUrl: confirmationUrl,
           verify_url: confirmationUrl,
           verifyUrl: confirmationUrl,
+          login_url: confirmationUrl,
+          login_link: confirmationUrl,
+          magic_link: confirmationUrl,
+          onboarding_url: confirmationUrl,
+          action_url: confirmationUrl,
           subject: subject || campaignName
         }
       });
@@ -399,7 +422,47 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
       });
     }
 
-    let resolvedProductCode = productCode || variables?.productCode;
+    let authLink =
+      variables?.ConfirmationURL ||
+      variables?.confirmation_url ||
+      variables?.confirmationUrl ||
+      variables?.verify_url ||
+      variables?.verifyUrl ||
+      variables?.login_url ||
+      variables?.login_link ||
+      variables?.magic_link ||
+      variables?.onboarding_url ||
+      null;
+
+    if (!authLink && shouldGenerateSupabaseAuthLink(templateKey, variables?.campaign_name || variables?.subject)) {
+      if (isSupabaseAuthLinkConfigured()) {
+        const genRes = await generateSupabaseAuthLink(to, variables?.full_name || variables?.userName, {
+          templateKey,
+          campaignName: variables?.campaign_name || variables?.subject
+        });
+        if (genRes.url) {
+          authLink = genRes.url;
+        }
+      }
+    }
+
+    const resolvedVariables = {
+      ...(variables || {}),
+      ...(authLink ? {
+        ConfirmationURL: authLink,
+        confirmation_url: authLink,
+        confirmationUrl: authLink,
+        verify_url: authLink,
+        verifyUrl: authLink,
+        login_url: authLink,
+        login_link: authLink,
+        magic_link: authLink,
+        onboarding_url: authLink,
+        action_url: authLink
+      } : {})
+    };
+
+    let resolvedProductCode = productCode || resolvedVariables?.productCode;
     if (!resolvedProductCode) {
       const tk = String(templateKey || '').toLowerCase();
       if (tk.includes('whatsapp') || tk.includes('wap_') || tk === 'broadcast_success') {
@@ -443,7 +506,7 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
       }
 
       const normalizedEmail = String(to).toLowerCase().trim();
-      const productName = variables?.productName || toTitle(resolvedProductCode);
+      const productName = resolvedVariables?.productName || toTitle(resolvedProductCode);
 
       const { data: productRow } = await supabase
         .from('products')
@@ -463,7 +526,7 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
         .upsert(
           {
             primary_email: normalizedEmail,
-            full_name: variables?.full_name || variables?.userName || normalizedEmail.split('@')[0]
+            full_name: resolvedVariables?.full_name || resolvedVariables?.userName || normalizedEmail.split('@')[0]
           },
           { onConflict: 'primary_email' }
         )
@@ -485,7 +548,7 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
           .insert({
             product_id: productRow.id,
             template_id: templateRow.id,
-            name: variables?.subject || variables?.campaign_name || `Transactional: ${productName}`,
+            name: resolvedVariables?.subject || resolvedVariables?.campaign_name || `Transactional: ${productName}`,
             status: 'sending',
             sent_count: 1
           })
@@ -544,16 +607,16 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
         emailJobId: dbEmailJobId,
         campaignId: sourceCampaignId ? `camp_db_${sourceCampaignId}` : 'tx_instant',
         recipientEmail: to,
-        recipientName: variables?.full_name || variables?.userName || to.split('@')[0],
+        recipientName: resolvedVariables?.full_name || resolvedVariables?.userName || to.split('@')[0],
         templateKey: templateKey || 'transactional_default',
         productCode: resolvedProductCode,
-        variables: variables || {}
+        variables: resolvedVariables || {}
       });
       queuedToBullMQ = true;
       fastify.log.info(`[Transactional Engine] Enqueued high-priority job [${jobId}] into BullMQ for ${to}`);
     } catch (err) {
       fastify.log.warn(`[Transactional Engine] BullMQ offline, falling back to direct send for ${to}`);
-      const { subject, html } = await renderTemplate(templateKey || 'transactional_default', variables || {});
+      const { subject, html } = await renderTemplate(templateKey || 'transactional_default', resolvedVariables || {});
       const sendResult = await sendEmail({ to, subject, html });
       if (dbEmailJobId && dbEmailJobId !== finalIdempotencyKey) {
         await supabase

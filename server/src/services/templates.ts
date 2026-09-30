@@ -1,12 +1,42 @@
 import { supabase } from '../supabase.js';
 import { addResponsiveEmailFixes } from './responsiveEmail.js';
-import { resolveCategoryDefaultTemplateKey } from './emailTemplateRepository.js';
+import {
+  generateSupabaseAuthLink,
+  isSupabaseAuthLinkConfigured,
+  shouldGenerateSupabaseAuthLink
+} from './authLinks.js';
 
 export async function renderTemplate(
   templateKey: string,
   variables: Record<string, any>
 ): Promise<{ subject: string; html: string }> {
-  const normalizedVariables = withDefaultTemplateVariables(variables);
+  let normalizedVariables = withDefaultTemplateVariables(variables);
+
+  if (
+    !normalizedVariables.ConfirmationURL &&
+    normalizedVariables.email &&
+    shouldGenerateSupabaseAuthLink(templateKey, normalizedVariables.campaign_name || normalizedVariables.subject) &&
+    isSupabaseAuthLinkConfigured()
+  ) {
+    try {
+      const authLinkResult = await generateSupabaseAuthLink(
+        normalizedVariables.email,
+        normalizedVariables.full_name || normalizedVariables.name,
+        {
+          templateKey,
+          campaignName: normalizedVariables.campaign_name || normalizedVariables.subject
+        }
+      );
+      if (authLinkResult.url) {
+        normalizedVariables = withDefaultTemplateVariables({
+          ...normalizedVariables,
+          ConfirmationURL: authLinkResult.url
+        });
+      }
+    } catch (err) {
+      console.warn('[renderTemplate] Could not auto-generate Supabase auth link:', err);
+    }
+  }
 
   let resolvedKey = templateKey;
   try {
@@ -78,9 +108,14 @@ export async function renderTemplate(
       }
 
       if (html) {
+        const interpolatedSubject = interpolateVariables(subject, normalizedVariables);
+        let interpolatedHtml = interpolateVariables(html, normalizedVariables);
+        if (normalizedVariables.ConfirmationURL) {
+          interpolatedHtml = injectActionLinkFallback(interpolatedHtml, normalizedVariables.ConfirmationURL);
+        }
         return {
-          subject: interpolateVariables(subject, normalizedVariables),
-          html: addResponsiveEmailFixes(interpolateVariables(html, normalizedVariables)),
+          subject: interpolatedSubject,
+          html: addResponsiveEmailFixes(interpolatedHtml),
         };
       }
     }
@@ -424,10 +459,25 @@ export async function renderTemplate(
     `;
   }
 
+  const finalSubjectInterpolated = interpolateVariables(finalSubject, normalizedVariables);
+  let finalHtmlInterpolated = interpolateVariables(finalHtml, normalizedVariables);
+  if (normalizedVariables.ConfirmationURL) {
+    finalHtmlInterpolated = injectActionLinkFallback(finalHtmlInterpolated, normalizedVariables.ConfirmationURL);
+  }
+
   return {
-    subject: interpolateVariables(finalSubject, normalizedVariables),
-    html: addResponsiveEmailFixes(interpolateVariables(finalHtml, normalizedVariables))
+    subject: finalSubjectInterpolated,
+    html: addResponsiveEmailFixes(finalHtmlInterpolated)
   };
+}
+
+function injectActionLinkFallback(html: string, actionUrl: string): string {
+  if (!actionUrl) return html;
+  // If the button href still contains literal 'https://getaipilot.in' (without auth parameters), replace it on onboarding/CTA buttons
+  return html.replace(
+    /(<a\b[^>]*\bhref=["'])https:\/\/getaipilot\.in\/?(["'][^>]*>[\s\S]*?(?:Complete\s+Onboarding|Finish\s+onboarding|Complete\s+your\s+onboarding|Setup|Get\s+Started)[\s\S]*?<\/a>)/gi,
+    `$1${actionUrl}$2`
+  );
 }
 
 function interpolateVariables(source: string, variables: Record<string, any>): string {
@@ -442,7 +492,17 @@ function withDefaultTemplateVariables(variables: Record<string, any>): Record<st
     variables.confirmation_url ||
     variables.confirmationUrl ||
     variables.verify_url ||
-    variables.verifyUrl;
+    variables.verifyUrl ||
+    variables.login_url ||
+    variables.loginUrl ||
+    variables.login_link ||
+    variables.loginLink ||
+    variables.magic_link ||
+    variables.magicLink ||
+    variables.onboarding_url ||
+    variables.onboardingUrl ||
+    variables.action_url ||
+    variables.actionUrl;
 
   return {
     ...variables,
@@ -450,6 +510,16 @@ function withDefaultTemplateVariables(variables: Record<string, any>): Record<st
     confirmation_url: confirmationUrl,
     confirmationUrl: confirmationUrl,
     verify_url: confirmationUrl,
-    verifyUrl: confirmationUrl
+    verifyUrl: confirmationUrl,
+    login_url: confirmationUrl,
+    loginUrl: confirmationUrl,
+    login_link: confirmationUrl,
+    loginLink: confirmationUrl,
+    magic_link: confirmationUrl,
+    magicLink: confirmationUrl,
+    onboarding_url: confirmationUrl,
+    onboardingUrl: confirmationUrl,
+    action_url: confirmationUrl,
+    actionUrl: confirmationUrl
   };
 }

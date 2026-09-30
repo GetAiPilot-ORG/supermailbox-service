@@ -28,12 +28,17 @@ export const redisConnection = redisUrl
       }
     });
 
+let hasWarnedOffline = false;
+
 // Avoid crashing server if local Redis is disconnected during dev
 redisConnection.on("error", (err: any) => {
   if (err.code === "ECONNREFUSED") {
-    console.warn(
-      "⚠️  [Redis] Connection refused. (If testing locally without Redis, this is expected).",
-    );
+    if (!hasWarnedOffline) {
+      hasWarnedOffline = true;
+      console.warn(
+        `⚠️  [Redis] Connection refused at ${redisHost}:${redisPort}. (Local dev without Redis: queues disabled, direct email send active).`,
+      );
+    }
   }
 });
 
@@ -76,6 +81,12 @@ export const transactionalQueue = new Queue<CampaignJobPayload>(
     },
   },
 );
+
+// Prevent unhandled error events from BullMQ internal clients when Redis is offline
+campaignQueue.on("error", () => {});
+transactionalQueue.on("error", () => {});
+
+
 
 export async function enqueueCampaignJobs(
   jobs: CampaignJobPayload[],

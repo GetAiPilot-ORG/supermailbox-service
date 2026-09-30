@@ -9,7 +9,6 @@ const fastify = Fastify({
   logger: {
     level: process.env.LOG_LEVEL || 'warn',
   },
-  disableRequestLogging: true,
 });
 
 fastify.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
@@ -109,26 +108,27 @@ await registerTemplateRoutes(fastify);
 await registerApiRoutes(fastify);
 await registerBrandRoutes(fastify);
 
-// Initialize worker if Redis is alive
+// Initialize worker and Bull-Board if Redis is alive
 try {
   const campaignClient = await campaignQueue.client;
   await (campaignClient as any).ping();
   initCampaignWorker();
-} catch (e) {
-  fastify.log.warn('⚠️  [Local Dev] Redis is offline. Background workers and queues are disabled. Start Redis locally or use a cloud Redis URL to test email sending.');
-}
 
-// Register interactive Bull-Board GUI on /admin/queues
-const serverAdapter = new FastifyAdapter();
-createBullBoard({
-  queues: [
-    new BullMQAdapter(transactionalQueue),
-    new BullMQAdapter(campaignQueue)
-  ],
-  serverAdapter,
-});
-serverAdapter.setBasePath('/admin/queues');
-await fastify.register(serverAdapter.registerPlugin(), { prefix: '/admin/queues' });
+  // Register interactive Bull-Board GUI on /admin/queues
+  const serverAdapter = new FastifyAdapter();
+  createBullBoard({
+    queues: [
+      new BullMQAdapter(transactionalQueue),
+      new BullMQAdapter(campaignQueue)
+    ],
+    serverAdapter,
+  });
+  serverAdapter.setBasePath('/admin/queues');
+  await fastify.register(serverAdapter.registerPlugin(), { prefix: '/admin/queues' });
+  console.log(`📊 BullMQ Queue Dashboard ready at http://localhost:${port}/admin/queues`);
+} catch (e) {
+  fastify.log.warn('⚠️  [Local Dev] Redis is offline. Background workers and queues are disabled. Using direct ZeptoMail email sending.');
+}
 
 
 
