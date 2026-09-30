@@ -1,0 +1,82 @@
+[
+  {
+    "oldId": "2de93170-3907-49ae-a565-1c6f8b471cb4",
+    "oldKey": "getaipilot_verify_account",
+    "oldName": "GetAiPilot Account Verification",
+    "newId": "71624932-03d9-436b-8657-987d98a95534",
+    "newKey": "getaipilot_confirm_email",
+    "newName": "GetAiPilot Confirm Email (Default)"
+  },
+  {
+    "oldId": "9df46696-c40c-4b7d-a831-739c66245bed",
+    "oldKey": "getaipilot_magic_link",
+    "oldName": "GetAiPilot Magic Link Sign In",
+    "newId": "0d00c170-7ae5-4956-b8f8-eb07bc4bf075",
+    "newKey": "getaipilot_magic_link_otp",
+    "newName": "GetAiPilot Magic Link / OTP (Default)"
+  },
+  {
+    "oldId": "69f12820-8778-4b3d-acde-20d626018572",
+    "oldKey": "getaipilot_email_change",
+    "oldName": "GetAiPilot Confirm Email Change",
+    "newId": "e06720b2-99fc-4b8a-8523-c5f3a42ce576",
+    "newKey": "getaipilot_change_email",
+    "newName": "GetAiPilot Change Email Address (Default)"
+  },
+  {
+    "oldId": "a062654b-2217-4a87-a12f-7d71f7179e6d",
+    "oldKey": "getaipilot_team_invite",
+    "oldName": "GetAiPilot Team Workspace Invite",
+    "newId": "ccdd7425-291d-4506-ad2b-5852cbe7c440",
+    "newKey": "getaipilot_invite_user",
+    "newName": "GetAiPilot Workspace Invite (Default)"
+  },
+  {
+    "oldId": "e430f694-2425-4dd7-8c72-a21446df163b",
+    "oldKey": "getaipilot_reauth_code",
+    "oldName": "GetAiPilot Reauthentication Security Code",
+    "newId": "abe3177d-dab8-498e-b94f-c8360c807506",
+    "newKey": "getaipilot_reauthentication",
+    "newName": "GetAiPilot Identity Reauthentication (Default)"
+  },
+  {
+    "oldId": "9a67b624-8b25-4928-8b2f-5cb82bdd7220",
+    "oldKey": "socialpilot_auth_welcome_copy_mu87rkmq",
+    "oldName": "SocialPilot Auth Welcome Copy",
+    "newId": "210b797a-cedf-408a-ab23-9da18072e7ab",
+    "newKey": "auth_welcome",
+    "newName": "SocialPilot Auth Welcome"
+  },
+  {
+    "oldId": "824a72bc-4f46-4889-aa8f-f6bcac4b63a6",
+    "oldKey": "untitled_email_template_mtb2xjsv",
+    "oldName": "Untitled email template",
+    "newId": null,
+    "newKey": null,
+    "newName": "Deleted draft"
+  },
+  {
+    "oldId": "8b57e8ff-56ef-42ed-b75c-5c5697cfe9bf",
+    "oldKey": "untitled_email_template_mu82yyrd",
+    "oldName": "Untitled email template",
+    "newId": null,
+    "newKey": null,
+    "newName": "Deleted draft"
+  },
+  {
+    "oldId": "9da83ee2-197d-4cef-b9ac-09aab8588c27",
+    "oldKey": "untitled_email_template_mu835yhz",
+    "oldName": "Untitled email template",
+    "newId": null,
+    "newKey": null,
+    "newName": "Deleted draft"
+  },
+  {
+    "oldId": "1e31d4ed-4117-4781-b294-eaf456cdee0e",
+    "oldKey": "saas_welcome_mu83vr6t",
+    "oldName": "SaaS Welcome",
+    "newId": null,
+    "newKey": null,
+    "newName": "Deleted draft"
+  }
+]

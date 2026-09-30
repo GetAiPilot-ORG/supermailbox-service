@@ -79,223 +79,289 @@ const DEMO_TEMPLATES = [
         created_by: 'Admin',
         subject: 'Verify your GetAiPilot Account',
         html_source: `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GetAiPilot Email Template</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Welcome to GetAiPilot</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
-  
-    @media only screen and (max-width: 600px) {
-      .email-body {
-        padding: 0 !important;
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      width: 100% !important;
+      background-color: #ffffff;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    img {
+      border: 0;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
+    table {
+      border-collapse: collapse !important;
+    }
+    @media screen and (max-width: 620px) {
+      .full-width-table {
+        width: 100% !important;
       }
-      .email-container-td {
-        padding: 0 !important;
+      .mobile-hero-padding {
+        padding: 24px 16px !important;
       }
-      .email-main-card {
-        border-radius: 0 !important;
-        max-width: 100% !important;
+      .mobile-padding {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+      .mobile-stack {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .mobile-center {
+        text-align: center !important;
+      }
+      .mobile-hide {
+        display: none !important;
+      }
+      .cta-button {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
       }
     }
   </style>
 </head>
 
-<body class="email-body" style="background-color:#f3f4f6; margin:0; padding:10px 16px; font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
 
-  <!-- PRE-HEADER (seen in inbox preview, hidden in the email body) -->
-  <div style="display:none;max-height:0;overflow:hidden;font-size:1px;color:#ffffff;line-height:1px;">
-    Don't miss out — verify your GetAiPilot account now!
+  <!-- PRE-HEADER -->
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff; line-height:1px;">
+    Verify your GetAiPilot account – unlock Telegram, WhatsApp, SocialPilot & AI automation!
   </div>
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin: 0; padding: 0;">
     <tr>
-      <td class="email-container-td" align="center" style="padding: 20px 0;">
+      <td align="center" style="padding: 0; margin: 0;">
+        
+        <!-- Main Full Width 600px Container (Flat, No Card Box) -->
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          
+          <!-- 1. Logo Header -->
+          <tr>
+            <td align="center" style="padding: 20px 16px; background-color: #ffffff;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 8px;">
+                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 30px; width: auto; display: block;" alt="GetAiPilot Logo">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="font-weight: 700; color: #111827; font-size: 22px; letter-spacing: -0.5px;">getaipilot</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-        <div class="email-main-card" style="width:100%; max-width:480px; background-color:#ffffff; border-radius:16px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); overflow:hidden; margin:0 auto; text-align:left; box-sizing:border-box;">
+          <!-- 2. Hero Banner (Flat Full Width, Seamless Gradient) -->
+          <tr>
+            <td class="mobile-hero-padding" style="background: #1e1b4b; background: linear-gradient(135deg, #10183f 0%, #1b2360 50%, #8b3cff 100%); padding: 32px 28px; color: #ffffff; text-align: left;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <p style="font-size: 15px; margin: 0 0 4px 0; color: rgba(255,255,255,0.85); font-weight: 400;">Hi there,</p>
+                    <h1 style="font-size: 28px; font-weight: 700; line-height: 1.25; margin: 0; color: #ffffff; letter-spacing: -0.3px;">
+                      Welcome to <br />
+                      Get<span style="color: #d8b4fe;">AiPilot</span>!
+                    </h1>
+                    <p style="margin: 8px 0 0 0; font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.4; max-width: 320px;">
+                      You’re one step closer to automating messaging, scaling with SocialPilot, and growing your audience.
+                    </p>
+                  </td>
+                  <!-- Envelope Illustration -->
+                  <td class="mobile-hide" width="130" align="right" style="vertical-align: middle;">
+                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/5.png" width="120" style="display: block;" alt="Envelope">
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-          <!-- Logo -->
-          <div style="padding:16px 0; text-align:center; box-sizing:border-box;">
-            <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="vertical-align:middle; padding-right:8px;">
-                  <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height:28px; display:block;" alt="GetAiPilot Logo">
-                </td>
-                <td style="vertical-align:middle;">
-                  <span style="font-weight:bold; color:#1f2937; font-size:22px;">getaipilot</span>
-                </td>
-              </tr>
-            </table>
-          </div>
+          <!-- 3. Features Section -->
+          <tr>
+            <td class="mobile-padding" style="padding: 28px 28px 12px 28px; background-color: #ffffff;">
+              <h2 style="text-align: center; font-weight: 700; color: #1f2937; margin: 0 0 24px 0; font-size: 18px;">
+                Here’s what you can do with GetAiPilot:
+              </h2>
 
-          <!-- Hero -->
-          <div style="margin:0; overflow:hidden; background-color: #1b2360; background: linear-gradient(to bottom right, #10183f, #1b2360, #8b3cff); color:#ffffff; padding:24px 20px; min-height:160px; position:relative; box-sizing:border-box;">
+              <!-- Feature 1: Telegram & WhatsApp -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 18px;">
+                <tr>
+                  <td width="48" style="vertical-align: top;">
+                    <table role="presentation" width="38" height="38" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3e8ff; border-radius: 10px;">
+                      <tr>
+                        <td align="center" style="vertical-align: middle;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/16.png" width="22" height="22" style="display: block;" alt="Icon">
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 10px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 15px; margin: 0 0 2px 0;">Telegram &amp; WhatsApp Automation</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Set up auto-forwarding rules, auto-approve join requests, and broadcast messages across channels seamlessly.
+                    </p>
+                  </td>
+                </tr>
+              </table>
 
-            <p style="font-size:16px; margin:0 0 4px 0; color:rgba(255,255,255,0.8);">Hi there,</p>
+              <!-- Feature 2: SocialPilot Multi-Platform Publishing -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 18px;">
+                <tr>
+                  <td width="48" style="vertical-align: top;">
+                    <table role="presentation" width="38" height="38" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3e8ff; border-radius: 10px;">
+                      <tr>
+                        <td align="center" style="vertical-align: middle;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/34.png" width="22" height="22" style="display: block;" alt="Icon">
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 10px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 15px; margin: 0 0 2px 0;">SocialPilot Multi-Platform Growth</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Schedule, automate, and publish content across Instagram, LinkedIn, X, Facebook, and YouTube with AutoDM.
+                    </p>
+                  </td>
+                </tr>
+              </table>
 
-            <h1 style="font-size:28px; font-weight:bold; line-height:1.2; margin:0;">
-              Your account is <br />
-              almost <span style="color:#d8b4fe;">ready!</span>
-            </h1>
+              <!-- Feature 3: Monetization (Telesub) & AI CRM -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
+                <tr>
+                  <td width="48" style="vertical-align: top;">
+                    <table role="presentation" width="38" height="38" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3e8ff; border-radius: 10px;">
+                      <tr>
+                        <td align="center" style="vertical-align: middle;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/32.png" width="22" height="22" style="display: block;" alt="Icon">
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 10px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 15px; margin: 0 0 2px 0;">Monetize with Telesub &amp; AI CRM</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Launch subscription bots, collect recurring member payments, deploy 24/7 AI bots, and manage contacts in CRM.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-            <p style="margin:8px 0 0 0; font-size:16px; color:rgba(255,255,255,0.8); max-width:210px; line-height:1.2;">
-              Just one quick step left before you can start using GetAiPilot.
-            </p>
+          <!-- 4. CTA Block (Ready to take off?) -->
+          <tr>
+            <td class="mobile-padding" style="padding: 20px 28px 24px 28px; border-top: 1px solid #f3f4f6; background-color: #ffffff;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <!-- Left Illustration -->
+                  <td class="mobile-stack mobile-center" width="140" align="center" style="vertical-align: middle; padding-bottom: 12px;">
+                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/8.png" width="125" style="display: block; margin: 0 auto; height: auto;" alt="GetAiPilot Mascot">
+                  </td>
+                  <!-- Right Text & Button -->
+                  <td class="mobile-stack mobile-center" style="vertical-align: middle; padding-left: 16px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 18px; margin: 0 0 4px 0;">Ready to take off?</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0 0 16px 0; line-height: 1.4;">
+                      Confirm your email to activate your dashboard and deploy your first automation.
+                    </p>
 
-            <!-- Paper plane -->
-            <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/34.png" alt="Paper plane" style="position:absolute; top:12px; right:12px; width:24px;" >
+                    <!-- Confirmation Button -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="mobile-center" style="margin: 0;">
+                      <tr>
+                        <td align="center" style="border-radius: 8px; background: linear-gradient(to right, #f43f5e, #8b5cf6); box-shadow: 0 4px 10px rgba(244, 63, 94, 0.25);">
+                          <a href="{{ .ConfirmationURL }}" class="cta-button" target="_blank" style="display: inline-block; color: #ffffff; font-size: 15px; font-weight: 700; padding: 12px 24px; text-decoration: none; border-radius: 8px;">
+                            Confirm Your Email &rarr;
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-            <!-- Envelope Card -->
-            <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/10.png" style="position:absolute; right:8px; bottom:8px; width:140px; height:120px; border-radius:16px; transform:rotate(-8deg); box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);" >
+          <!-- 5. Help Callout -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 28px 20px 28px; background-color: #ffffff;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #faf5ff; border-radius: 12px; padding: 14px;">
+                <tr>
+                  <td width="24" style="vertical-align: top; padding-top: 2px;">
+                    <span style="font-size: 16px; line-height: 1;">💡</span>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 8px;">
+                    <h4 style="font-weight: 700; color: #1f2937; font-size: 14px; margin: 0 0 2px 0;">Need help getting started?</h4>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Check out our Help Center or reply directly to this email anytime.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-          </div>
-
-          <!-- Content -->
-          <div style="padding:24px 16px 12px 16px; box-sizing:border-box;">
-            <h2 style="text-align:center; font-weight:bold; color:#1f2937; margin:0 0 16px 0; font-size:16px;">
-              Here's why verifying matters:
-            </h2>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-              <tr>
-                <td style="width:48px; vertical-align:top;">
-                  <div style="width:32px; height:32px; border-radius:12px; background-color:#f3e8ff; text-align:center; line-height:32px; box-sizing:border-box;">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/16.png" style="width:100%; height:100%; object-fit:contain; display:block;">
-                  </div>
-                </td>
-                <td style="vertical-align:top; padding-top:4px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:16px; margin:0;">Unlock full access</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:2px 0 0 0; line-height:1.2;">
-                    Verifying your email unlocks every feature GetAiPilot has to offer.
-                  </p>
-                </td>
-              </tr>
-            </table>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-              <tr>
-                <td style="width:48px; vertical-align:top;">
-                  <div style="width:32px; height:32px; border-radius:12px; background-color:#f3e8ff; text-align:center; padding:6px; box-sizing:border-box;">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/34.png" style="width:100%; height:100%; object-fit:contain; display:block;">
-                  </div>
-                </td>
-                <td style="vertical-align:top; padding-top:4px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:16px; margin:0;">Keep your account secure</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:2px 0 0 0; line-height:1.2;">
-                    Verification helps us keep your data safe and your account protected.
-                  </p>
-                </td>
-              </tr>
-            </table>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
-              <tr>
-                <td style="width:48px; vertical-align:top;">
-                  <div style="width:32px; height:32px; border-radius:12px; background-color:#f3e8ff; text-align:center; line-height:24px;  box-sizing:border-box;">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/32.png" style="width:100%; height:100%; object-fit:contain; display:block;">
-                  </div>
-                </td>
-                <td style="vertical-align:top; padding-top:4px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:16px; margin:0;">It only takes a second</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:2px 0 0 0; line-height:1.2;">
-                    One click is all it takes to confirm your account and get started.
-                  </p>
-                </td>
-              </tr>
-            </table>
-
-          </div>
-
-          <!-- CTA -->
-          <div style="margin:0 16px 24px 16px; padding:24px 0 12px 0; border-top:1px solid #f3f4f6; box-sizing:border-box; display:flex; align-items:center; gap:20px;">
-            <div style="flex:0 0 180px; width:180px; overflow:hidden; box-sizing:border-box;">
-              <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/8.png" style="width:100%; height:auto; object-fit:contain; display:block;">
-            </div>
-
-            <div style="flex:1; text-align:left;">
-              <h3 style="font-weight:bold; color:#1f2937; font-size:22px; margin:0;">Don't miss out!</h3>
-              <p style="font-size:16px; color:#6b7280; margin:8px 0 20px 0; line-height:1.4;">
-                Verify your account now to start exploring everything GetAiPilot has to offer.
+          <!-- 6. Confirmation URL Link Fallback -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 28px 24px 28px; text-align: center; background-color: #ffffff;">
+              <p style="font-size: 12px; color: #9ca3af; line-height: 1.4; margin: 0; word-break: break-all;">
+                If the button doesn’t work, copy and paste this URL into your browser:<br>
+                <a href="{{ .ConfirmationURL }}" style="color: #8b5cf6; text-decoration: underline;">{{ .ConfirmationURL }}</a>
               </p>
+            </td>
+          </tr>
 
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block; background: linear-gradient(to right, #f43f5e, #8b5cf6); color:#ffffff; font-size:16px; font-weight:bold; padding:12px 24px; border-radius:8px; text-decoration:none; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); box-sizing:border-box;">
-                Verify My Account &rarr;
-              </a>
-            </div>
-          </div>
+          <!-- 7. Footer -->
+          <tr>
+            <td align="center" style="padding: 24px 28px; border-top: 1px solid #f3f4f6; text-align: center; background-color: #ffffff;">
+              <!-- Social Icons -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
+                <tr>
+                  <td style="padding: 0 6px;">
+                    <a href="https://twitter.com" target="_blank" style="text-decoration: none;">
+                      <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/22.png" width="36" height="36" style="display: block; border-radius: 10px;" alt="Twitter">
+                    </a>
+                  </td>
+                  <td style="padding: 0 6px;">
+                    <a href="https://linkedin.com" target="_blank" style="text-decoration: none;">
+                      <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/23.png" width="36" height="36" style="display: block; border-radius: 10px;" alt="LinkedIn">
+                    </a>
+                  </td>
+                  <td style="padding: 0 6px;">
+                    <a href="https://instagram.com" target="_blank" style="text-decoration: none;">
+                      <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/24.png" width="36" height="36" style="display: block; border-radius: 10px;" alt="Instagram">
+                    </a>
+                  </td>
+                </tr>
+              </table>
 
-          <!-- Help -->
-          <div style="margin:0 16px 16px 16px; background-color:#faf5ff; border-radius:12px; padding:16px; box-sizing:border-box;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="width:24px; vertical-align:top; padding-top:2px;">
-                  <svg style="width:20px; height:20px; color:#8b5cf6;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                  </svg>
-                </td>
-                <td style="vertical-align:top; padding-left:12px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:15px; margin:0;">Trouble verifying your account?</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:4px 0 0 0; line-height:1.4;">
-                    Check out our <a href="#" style="color:#8b5cf6; text-decoration:none;">Help Center</a> or reply to this email.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </div>
+              <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280;">Made with <span style="color: #8b5cf6;">&hearts;</span> by the GetAiPilot team</p>
+              <p style="margin: 0 0 4px 0; font-size: 12px; color: #9ca3af;">You're receiving this email because you signed up for GetAiPilot.</p>
+              <p style="margin: 0; font-size: 11px; color: #9ca3af;">&copy; 2026 GetAiPilot. All rights reserved.</p>
+            </td>
+          </tr>
 
-          <!-- Fallback link -->
-          <div style="margin:0 16px 12px 16px; padding:0 8px; text-align:center; box-sizing:border-box;">
-            <p style="font-size:13px; color:#9ca3af; line-height:1.4; margin:0;">
-              If the button doesn't work, copy and paste this URL into your browser:<br>
-              <a href="{{ .ConfirmationURL }}" style="color:#8b5cf6; word-break:break-all;">{{ .ConfirmationURL }}</a>
-            </p>
-          </div>
-
-        </div>
-
-        <!-- Outside Footer -->
-        <div style="width:100%; max-width:400px; margin:24px auto 0 auto; text-align:center; box-sizing:border-box;">
-
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-            <tr>
-              <td style="text-align:left; vertical-align:middle;">
-                <!-- Social Icons -->
-                <a href="#" style="display:inline-block; margin-right:12px; text-decoration:none;">
-                  <div style="width:48px; height:48px; background-color:#ffffff; border-radius:12px; display:inline-block; text-align:center; line-height:48px; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/22.png" alt="Twitter" style="width:38px; height:38px; vertical-align:middle; display:inline-block;">
-                  </div>
-                </a>
-                <a href="#" style="display:inline-block; margin-right:12px; text-decoration:none;">
-                  <div style="width:48px; height:48px; background-color:#ffffff; border-radius:12px; display:inline-block; text-align:center; line-height:48px; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/23.png" alt="LinkedIn" style="width:38px; height:38px; vertical-align:middle; display:inline-block;">
-                  </div>
-                </a>
-                <a href="#" style="display:inline-block; text-decoration:none;">
-                  <div style="width:48px; height:48px; background-color:#ffffff; border-radius:12px; display:inline-block; text-align:center; line-height:48px; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/24.png" alt="Instagram" style="width:38px; height:38px; vertical-align:middle; display:inline-block;">
-                  </div>
-                </a>
-              </td>
-              <td style="text-align:right; vertical-align:middle; font-size:13px; color:#6b7280;">
-                Made with <span style="color:#8b5cf6;">&hearts;</span> by GetAiPilot team
-              </td>
-            </tr>
-          </table>
-
-          <p style="font-size:13px; color:#9ca3af; margin:0 0 4px 0; line-height:1.4;">
-            You're receiving this email because you signed up for GetAiPilot and haven't verified your account yet.<br>
-            If you didn't sign up for this, you can safely ignore this email.
-          </p>
-          <p style="font-size:13px; color:#9ca3af; margin:0;">
-            &copy; 2026 GetAiPilot. All rights reserved.
-          </p>
-
-        </div>
+        </table>
 
       </td>
     </tr>
   </table>
+
 </body>
 </html>`
       }
@@ -311,40 +377,157 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'GAP WhatsApp Engine',
         subject: 'WhatsApp Campaign Published: {{campaign_name}} 🚀',
-        html_source: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #f8fafc; padding: 32px 16px;">
-  <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #075e54 0%, #128c7e 50%, #10b981 100%); padding: 32px 28px; color: #ffffff;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <img src="https://wb.getaipilot.in/logo.png" alt="GAP WhatsApp Logo" style="height: 32px; width: 32px; border-radius: 8px; background: #ffffff; padding: 4px; display: block;" onerror="this.style.display='none'">
-          <span style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">GAP <span style="color: #6ee7b7; font-weight: 400;">WhatsApp Automation</span></span>
-        </div>
-        <span style="background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.5); color: #a7f3d0; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase;">💬 DELIVERED</span>
-      </div>
-      <h1 style="font-size: 24px; font-weight: 800; line-height: 1.3; margin: 0 0 8px 0; color: #ffffff;">Hey {{full_name}}, your WhatsApp broadcast is live! 🚀</h1>
-      <p style="font-size: 14px; color: #dcfce7; margin: 0;">Your campaign <strong>{{campaign_name}}</strong> was successfully dispatched to all target contacts.</p>
-    </div>
-    <div style="padding: 28px;">
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 14px;">
-          <span style="font-size: 13px; font-weight: 700; color: #334155;">WhatsApp Delivery Channel</span>
-          <span style="font-size: 12px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 3px 10px; border-radius: 20px;">Meta Cloud API</span>
-        </div>
-        <p style="font-size: 14px; color: #1e293b; line-height: 1.6; margin: 0; background: #f0fdf4; padding: 14px; border-radius: 8px; border-left: 3px solid #22c55e;">
-          Campaign <strong>"{{campaign_name}}"</strong> completed execution cleanly. All message queues have been processed.
-        </p>
-      </div>
-      <div style="text-align: center; margin: 32px 0 16px 0;">
-        <a href="https://wb.getaipilot.in/broadcasts" style="display: inline-block; background: linear-gradient(135deg, #128c7e 0%, #075e54 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 36px; border-radius: 10px; box-shadow: 0 4px 14px rgba(18, 140, 126, 0.35);">
-          View Campaign Reports & Performance &rarr;
-        </a>
-      </div>
-    </div>
-    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center;">
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">Sent to admin via <strong>GAP WhatsApp Automation Engine</strong> &bull; SuperMailBox CPaaS</p>
-    </div>
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Campaign Published</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    WhatsApp Campaign Festive Community Launch was successfully published to 4,850 contacts.
   </div>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="GetAiPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">getaipilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">✓ DELIVERED</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #064e3b; background: linear-gradient(135deg, #064e3b 0%, #0f766e 50%, #10b981 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">Broadcast Dispatch</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      Broadcast Successfully Sent! 🚀
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #ccfbf1; line-height: 1.5; max-width: 460px;">
+                      Your WhatsApp campaign <strong>Festive Community Launch</strong> was delivered to all target recipients.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <h3 style="font-weight: 700; color: #0f172a; font-size: 15px; margin: 0 0 14px 0;">Campaign Dispatch Summary:</h3>
+              
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px;">
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Campaign Name</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">Festive Community Launch</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Target Audience</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">4,850 contacts</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Delivery Channel</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">WhatsApp Cloud API Tier 2 (High Speed)</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: none;">Dispatch Status</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: none; text-align: right;"><span style="color: #059669; font-weight: 700;">✓ Completed (100%)</span></td>
+  </tr>
+              </table>
+
+              <!-- WhatsApp Chat Message Preview Bubble -->
+              <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; margin-bottom: 20px;">
+                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 10px;">WhatsApp Message Preview</span>
+                <div style="background: #e7fce9; border-left: 4px solid #25d366; padding: 14px; border-radius: 8px; font-size: 13.5px; color: #0f172a; line-height: 1.5;">
+                  "Hey! 🚀 Exclusive VIP early access is now live for all GetAiPilot members. Tap below to claim your early bird pass before it expires tonight!"
+                </div>
+              </div>
+
+              <!-- Metrics highlight -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                <tr>
+                  <td width="33%" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; color: #166534; font-weight: 700; text-transform: uppercase;">Sent</div>
+                    <div style="font-size: 18px; color: #15803d; font-weight: 800; margin-top: 2px;">4,850</div>
+                  </td>
+                  <td width="5%">&nbsp;</td>
+                  <td width="33%" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; color: #166534; font-weight: 700; text-transform: uppercase;">Delivered</div>
+                    <div style="font-size: 18px; color: #15803d; font-weight: 800; margin-top: 2px;">4,812</div>
+                  </td>
+                  <td width="5%">&nbsp;</td>
+                  <td width="33%" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 11px; color: #166534; font-weight: 700; text-transform: uppercase;">Read Rate</div>
+                    <div style="font-size: 18px; color: #15803d; font-weight: 800; margin-top: 2px;">86.4%</div>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://wb.getaipilot.in/broadcasts" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35); white-space: nowrap;">
+                  View Live Campaign Analytics &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">GetAiPilot WhatsApp Automation &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -358,37 +541,140 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'GAP WhatsApp Engine',
         subject: '⚠️ Alert: WhatsApp Broadcast Failed - {{campaign_name}}',
-        html_source: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #f8fafc; padding: 32px 16px;">
-  <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #991b1b 0%, #dc2626 50%, #ef4444 100%); padding: 32px 28px; color: #ffffff;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <img src="https://wb.getaipilot.in/logo.png" alt="GAP WhatsApp Logo" style="height: 32px; width: 32px; border-radius: 8px; background: #ffffff; padding: 4px; display: block;" onerror="this.style.display='none'">
-          <span style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">GAP <span style="color: #fca5a5; font-weight: 400;">WhatsApp Engine</span></span>
-        </div>
-        <span style="background: rgba(254, 226, 226, 0.25); border: 1px solid rgba(254, 226, 226, 0.5); color: #fecaca; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase;">⚠️ FAILED</span>
-      </div>
-      <h1 style="font-size: 24px; font-weight: 800; line-height: 1.3; margin: 0 0 8px 0; color: #ffffff;">Broadcast Attention Required</h1>
-      <p style="font-size: 14px; color: #fee2e2; margin: 0;">Hey {{full_name}}, campaign <strong>{{campaign_name}}</strong> encountered an issue during execution.</p>
-    </div>
-    <div style="padding: 28px;">
-      <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 14px; padding: 20px; margin-bottom: 28px;">
-        <span style="font-size: 12px; font-weight: 700; color: #9f1239; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Error Diagnostic Details</span>
-        <p style="font-size: 14px; color: #881337; font-family: monospace; line-height: 1.5; margin: 0; background: #ffffff; padding: 12px; border-radius: 6px; border: 1px solid #ffe4e6;">
-          {{error_message}}
-        </p>
-      </div>
-      <div style="text-align: center; margin: 32px 0 16px 0;">
-        <a href="https://wb.getaipilot.in/broadcasts" style="display: inline-block; background: #dc2626; color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 36px; border-radius: 10px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);">
-          Troubleshoot Campaign & Retry &rarr;
-        </a>
-      </div>
-    </div>
-    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center;">
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">Sent via <strong>GAP WhatsApp Automation Engine</strong> &bull; SuperMailBox CPaaS</p>
-    </div>
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alert: WhatsApp Broadcast Failed</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    Alert: WhatsApp Campaign Weekend Flash Sale Blast paused due to an access token exception.
   </div>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="GetAiPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">getaipilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">⚠️ ATTENTION REQUIRED</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #450a0a; background: linear-gradient(135deg, #450a0a 0%, #991b1b 50%, #dc2626 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">Delivery Alert</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      Broadcast Execution Failed ⚠️
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #fecaca; line-height: 1.5; max-width: 460px;">
+                      Campaign <strong>Weekend Flash Sale Blast</strong> encountered a provider issue during execution and paused.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <!-- Error Diagnostic Details Card -->
+              <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 14px; padding: 20px; margin-bottom: 20px;">
+                <span style="font-size: 12px; font-weight: 700; color: #9f1239; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Error Diagnostic Details</span>
+                <p style="font-size: 13.5px; color: #881337; font-family: monospace; line-height: 1.5; margin: 0; background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #ffe4e6;">
+                  META_OAUTH_TOKEN_EXPIRED: The Meta WhatsApp Cloud API access token expired. Re-authentication required in Settings.
+                </p>
+              </div>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px;">
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Campaign Name</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">Weekend Flash Sale Blast</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Failed Contacts</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;"><span style="color: #dc2626; font-weight: 700;">124 / 2,500 contacts</span></td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: none;">Current Status</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: none; text-align: right;"><span style="color: #dc2626; font-weight: 700;">Halted (Action Required)</span></td>
+  </tr>
+              </table>
+
+              <!-- Troubleshooting Steps -->
+              <div style="background: #ffffff; border: 1px solid #f1f5f9; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                <h4 style="font-size: 13.5px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0;">Recommended Resolution Steps:</h4>
+                <p style="font-size: 13px; color: #475569; margin: 0; line-height: 1.6;">
+                  1. Refresh your Meta WhatsApp Cloud API access token in Settings > Channels.<br>
+                  2. Verify template parameters match the approved Meta WhatsApp template.<br>
+                  3. Resume the campaign queue to dispatch remaining contacts.
+                </p>
+              </div>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://wb.getaipilot.in/broadcasts" class="cta-button" style="display: inline-block; background: #dc2626; color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35); white-space: nowrap;">
+                  Troubleshoot Campaign & Retry &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">GAP WhatsApp Automation &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -402,43 +688,139 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'GAP WhatsApp Engine',
         subject: 'You are invited to join GAP WhatsApp Automation as {{role}}',
-        html_source: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #f8fafc; padding: 32px 16px;">
-  <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #075e54 0%, #128c7e 50%, #25d366 100%); padding: 36px 28px; text-align: center; color: #ffffff;">
-      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 8px 18px; border-radius: 999px; margin-bottom: 20px;">
-        <img src="https://wb.getaipilot.in/logo.png" alt="WhatsApp Logo" style="height: 24px; width: 24px; border-radius: 6px; background: #ffffff; padding: 2px;" onerror="this.style.display='none'">
-        <span style="font-size: 15px; font-weight: 800; color: #ffffff;">GAP <span style="color: #dcfce7; font-weight: 400;">WhatsApp Team</span></span>
-      </div>
-      <h1 style="font-size: 26px; font-weight: 800; margin: 0 0 10px 0; color: #ffffff;">Team Invitation for {{full_name}}! 🎉</h1>
-      <p style="font-size: 15px; color: #dcfce7; margin: 0; max-width: 480px; margin: 0 auto;">You have been invited to join the WhatsApp Automation workspace as an official <strong>{{role}}</strong>.</p>
-    </div>
-    <div style="padding: 32px 28px;">
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 28px;">
-        <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0 0 16px 0;">Your Account Credentials:</h3>
-        <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px;">
-          <span style="font-size: 13px; color: #64748b;">Assigned Role:</span>
-          <strong style="font-size: 14px; color: #128c7e;">{{role}}</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px;">
-          <span style="font-size: 13px; color: #64748b;">Temporary Password:</span>
-          <code style="font-size: 14px; color: #0f172a; background: #e2e8f0; padding: 2px 8px; border-radius: 4px;">{{password}}</code>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="font-size: 13px; color: #64748b;">Invitation Expires:</span>
-          <span style="font-size: 13px; color: #ef4444; font-weight: 600;">{{expires_at}}</span>
-        </div>
-      </div>
-      <div style="text-align: center; margin: 32px 0 16px 0;">
-        <a href="{{invite_link}}" style="display: inline-block; background: linear-gradient(135deg, #128c7e 0%, #075e54 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 36px; border-radius: 10px; box-shadow: 0 4px 14px rgba(18, 140, 126, 0.35);">
-          Accept Invitation & Sign In &rarr;
-        </a>
-      </div>
-    </div>
-    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center;">
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">GAP WhatsApp Automation &bull; SuperMailBox CPaaS</p>
-    </div>
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Invitation for WhatsApp Automation</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    You are invited to join the GetAiPilot Growth Team on WhatsApp Automation as Marketing Manager.
   </div>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="GetAiPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">getaipilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">👥 TEAM INVITATION</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #064e3b; background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #059669 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">WhatsApp Workspace</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      You are Invited to the Team! 🎉
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #dcfce7; line-height: 1.5; max-width: 460px;">
+                      You have been invited to join the <strong>GetAiPilot Growth Team</strong> as an official <strong>Marketing Manager</strong>.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <h3 style="font-weight: 700; color: #0f172a; font-size: 15px; margin: 0 0 14px 0;">Invitation & Credentials:</h3>
+              
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px;">
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Workspace Name</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">GetAiPilot Growth Team</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Assigned Role</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;"><span style="color: #059669; font-weight: 700;">Marketing Manager</span></td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Temporary Access Key</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;"><code style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-family: monospace;">GAP-SEC-9284</code></td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: none;">Invitation Validity</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: none; text-align: right;"><span style="color: #059669; font-weight: 600;">24 hours from issuance</span></td>
+  </tr>
+              </table>
+
+              <!-- What you can access -->
+              <div style="background: #ffffff; border: 1px solid #f1f5f9; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                <h4 style="font-size: 13.5px; font-weight: 700; color: #1e293b; margin: 0 0 10px 0;">Your Role Permissions Include:</h4>
+                <p style="font-size: 13px; color: #475569; margin: 0; line-height: 1.6;">
+                  &bull; <strong>Multi-Agent Shared Inbox:</strong> Manage customer live chats and assign conversations.<br>
+                  &bull; <strong>Campaign Broadcasting:</strong> Schedule and monitor verified WhatsApp marketing blasts.<br>
+                  &bull; <strong>AI Bot Orchestration:</strong> Review automated agent responses and contact synchronizations.
+                </p>
+              </div>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://wb.getaipilot.in/auth/join" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35); white-space: nowrap;">
+                  Accept Invitation & Set Password &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">GetAiPilot WhatsApp Automation &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -452,12 +834,161 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'GAP_WHATSAPP Bot',
         subject: 'Welcome to GetAiPilot on WhatsApp!',
-        html_source: `<div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto; background: #075e54; color: #ffffff; padding: 24px; border-radius: 16px;">
-  <h3 style="margin-top: 0; color: #25d366;">💬 GetAiPilot WhatsApp Alert</h3>
-  <p>Hi <strong>{{name}}</strong>, welcome to GetAiPilot on WhatsApp! 🚀</p>
-  <p style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">Your account setup is complete. Reply <strong>START</strong> to receive real-time autonomous alerts and updates directly on WhatsApp.</p>
-  <p style="font-size: 12px; opacity: 0.8; margin-bottom: 0;">Sent via GAP_WHATSAPP &bull; Metabull CPaaS</p>
-</div>`
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to GetAiPilot on WhatsApp!</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    Welcome to GetAiPilot WhatsApp Automation. Deploy 24/7 AI chat agents, broadcast campaigns, and sync contacts seamlessly.
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="GetAiPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">getaipilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">💬 CLOUD API READY</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #064e3b; background: linear-gradient(135deg, #064e3b 0%, #0d9488 50%, #10b981 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">GetAiPilot Ecosystem</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      Automate WhatsApp at Scale! 💬
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #ccfbf1; line-height: 1.5; max-width: 460px;">
+                      Your WhatsApp Automation engine is configured. Connect your number, launch AI bots, and engage customers 24/7.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <h3 style="font-weight: 700; color: #0f172a; font-size: 16px; margin: 0 0 16px 0;">3 Steps to Launch Your WhatsApp Automation:</h3>
+              
+              
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 14px;">
+    <tr>
+      <td width="48" style="vertical-align: top; width: 48px; min-width: 48px;">
+        <div style="width: 40px; min-width: 40px; height: 40px; min-height: 40px; background-color: #f1f5f9; border-radius: 10px; text-align: center; display: table-cell; vertical-align: middle;">
+          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/16.png" width="20" height="20" style="display: block; margin: 0 auto; width: 20px; height: 20px;" alt="Icon">
+        </div>
+      </td>
+      <td style="vertical-align: top; padding-left: 12px;">
+        <h4 style="font-weight: 700; color: #0f172a; font-size: 14.5px; margin: 0 0 2px 0; line-height: 1.3;">1. Connect WhatsApp Cloud API</h4>
+        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.45;">Bind your official Meta Business Cloud API number or scan QR to activate instant webhook listening.</p>
+      </td>
+    </tr>
+  </table>
+  <div style="border-bottom: 1px solid #f1f5f9; margin: 12px 0;"></div>
+              
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 14px;">
+    <tr>
+      <td width="48" style="vertical-align: top; width: 48px; min-width: 48px;">
+        <div style="width: 40px; min-width: 40px; height: 40px; min-height: 40px; background-color: #f1f5f9; border-radius: 10px; text-align: center; display: table-cell; vertical-align: middle;">
+          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/robo.png" width="20" height="20" style="display: block; margin: 0 auto; width: 20px; height: 20px;" alt="Icon">
+        </div>
+      </td>
+      <td style="vertical-align: top; padding-left: 12px;">
+        <h4 style="font-weight: 700; color: #0f172a; font-size: 14.5px; margin: 0 0 2px 0; line-height: 1.3;">2. Deploy 24/7 AI Auto-Replies</h4>
+        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.45;">Train AI agents with your company knowledge base to handle FAQs, bookings, and customer support.</p>
+      </td>
+    </tr>
+  </table>
+  <div style="border-bottom: 1px solid #f1f5f9; margin: 12px 0;"></div>
+              
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 4px;">
+    <tr>
+      <td width="48" style="vertical-align: top; width: 48px; min-width: 48px;">
+        <div style="width: 40px; min-width: 40px; height: 40px; min-height: 40px; background-color: #f1f5f9; border-radius: 10px; text-align: center; display: table-cell; vertical-align: middle;">
+          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/18.png" width="20" height="20" style="display: block; margin: 0 auto; width: 20px; height: 20px;" alt="Icon">
+        </div>
+      </td>
+      <td style="vertical-align: top; padding-left: 12px;">
+        <h4 style="font-weight: 700; color: #0f172a; font-size: 14.5px; margin: 0 0 2px 0; line-height: 1.3;">3. Broadcast High-Converting Campaigns</h4>
+        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.45;">Send template-approved broadcasts and rich catalog notifications to thousands of opted-in contacts.</p>
+      </td>
+    </tr>
+  </table>
+  
+
+              <!-- Feature Highlight Box -->
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px 20px; margin-top: 20px;">
+                <h4 style="font-size: 14px; font-weight: 700; color: #166534; margin: 0 0 6px 0;">🚀 Built-in Growth Engines:</h4>
+                <p style="font-size: 13px; color: #15803d; margin: 0; line-height: 1.5;">
+                  &bull; <strong>Telesub Monetization:</strong> Collect subscription payments and manage paid member channels.<br>
+                  &bull; <strong>Ecosystem Contact Sync:</strong> Automatically push leads from WhatsApp conversations directly to your CRM.
+                </p>
+              </div>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://wb.getaipilot.in/dashboard" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35); white-space: nowrap;">
+                  Launch WhatsApp Dashboard &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">GetAiPilot WhatsApp Automation &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -471,14 +1002,145 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'GAP_WHATSAPP Bot',
         subject: 'Your WhatsApp Security Code: {{otp_code}}',
-        html_source: `<div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto; background: #128c7e; color: #ffffff; padding: 24px; border-radius: 16px; text-align: center;">
-  <h3 style="margin-top: 0; color: #25d366;">🔒 WhatsApp Authentication Code</h3>
-  <p>Hello {{name}}, your security code for GetAiPilot WhatsApp login is:</p>
-  <div style="background: #075e54; padding: 16px; border-radius: 12px; font-size: 32px; font-weight: bold; letter-spacing: 6px; margin: 16px 0; color: #25d366;">
-    {{otp_code}}
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your WhatsApp Verification Code</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .otp-display { font-size: 30px !important; letter-spacing: 6px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    Your GetAiPilot WhatsApp verification code is 849 204. Valid for 10 minutes.
   </div>
-  <p style="font-size: 13px; opacity: 0.9;">Code valid for 10 minutes. Do not share this code.</p>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="GetAiPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">getaipilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">🔒 SECURE AUTH</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #064e3b; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #10b981 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">WhatsApp Automation</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      Your Security Verification Code
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #d1fae5; line-height: 1.5; max-width: 440px;">
+                      Use this one-time code to authenticate your WhatsApp Business API session and connect your workspace.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 20px;">
+                <p style="font-size: 13px; color: #64748b; margin: 0 0 12px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">One-Time Verification Code</p>
+                <div class="otp-display" style="background: #064e3b; color: #34d399; font-size: 34px; font-weight: 800; letter-spacing: 8px; font-family: monospace; padding: 14px 24px; border-radius: 10px; display: inline-block; border: 1px solid #047857; margin-bottom: 12px;">
+                  849 204
+                </div>
+                <p style="font-size: 12.5px; color: #64748b; margin: 0;">
+                  ⏱️ <strong>Valid for 10 minutes</strong> &bull; Single-use only
+                </p>
+              </div>
+
+              <!-- Security Tips Box -->
+              <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td width="24" style="vertical-align: top; font-size: 16px; width: 24px;">🛡️</td>
+                    <td style="vertical-align: top; padding-left: 10px; font-size: 13px; color: #92400e; line-height: 1.45;">
+                      <strong>Security Advisory:</strong> Never share this verification code with anyone. GetAiPilot representatives will never contact you to ask for your OTP or login credentials.
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Security Audit Details -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #ffffff; border: 1px solid #f1f5f9; border-radius: 12px; margin-bottom: 20px;">
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Service</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">GAP WhatsApp Engine Cloud API</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Action</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">Account Authentication & Device Binding</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: none;">Security Standard</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: none; text-align: right;">End-to-End Encrypted Session</td>
+  </tr>
+              </table>
+
+              <div style="text-align: center; margin: 24px 0 12px 0;">
+                <a href="https://wb.getaipilot.in/security" style="display: inline-block; background: #065f46; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 11px 28px; border-radius: 8px;">
+                  Manage Account Security &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">GetAiPilot WhatsApp Automation &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -492,33 +1154,139 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'SocialPilot Engine',
         subject: 'New Social Account Connected: {{platform}}',
-        html_source: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #f8fafc; padding: 32px 16px;">
-  <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 32px 28px; color: #ffffff;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <img src="https://social.getaipilot.in/logo.png" alt="SocialPilot Logo" style="height: 28px; width: 28px; border-radius: 6px; background: #ffffff; padding: 2px;" onerror="this.style.display='none'">
-          <span style="font-size: 18px; font-weight: 800; color: #ffffff;">SocialPilot</span>
-        </div>
-        <span style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 999px;">✓ CONNECTED</span>
-      </div>
-      <h1 style="font-size: 22px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff;">New Channel Connected! 🔗</h1>
-      <p style="font-size: 14px; color: #c7d2fe; margin: 0;">Hey {{name}}, your <strong>{{platform}}</strong> account is ready to publish.</p>
-    </div>
-    <div style="padding: 28px;">
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
-        <p style="font-size: 15px; color: #1e293b; margin: 0 0 12px 0;">You can now schedule posts, auto-publish campaigns, and track analytics for <strong>{{platform}}</strong>.</p>
-        <span style="display: inline-block; background: #e0e7ff; color: #3730a3; font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 20px;">Channel Status: Active</span>
-      </div>
-      <div style="text-align: center;">
-        <a href="https://social.getaipilot.in/accounts" style="display: inline-block; background: #4f46e5; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 12px 28px; border-radius: 8px;">View All Connected Accounts &rarr;</a>
-      </div>
-    </div>
-    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center;">
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">SocialPilot Engine &bull; SuperMailBox CPaaS</p>
-    </div>
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Account Connected</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    Your Instagram account (@getaipilot_official) has been successfully connected to SocialPilot.
   </div>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="SocialPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">socialpilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">✓ CONNECTED</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #0f172a; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #3b82f6 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">Channel Integration</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      New Channel Active & Linked! 🔗
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #dbeafe; line-height: 1.5; max-width: 460px;">
+                      Your <strong>Instagram Business</strong> account (@getaipilot_official) has been authorized and is ready for automated broadcasting.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <h3 style="font-weight: 700; color: #0f172a; font-size: 15px; margin: 0 0 14px 0;">Account Connection Details:</h3>
+              
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px;">
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Platform</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">Instagram Business</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Account Handle</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;"><strong style="color: #2563eb;">@getaipilot_official</strong></td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Publishing Status</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;"><span style="color: #059669; font-weight: 700;">✓ Active & Synchronized</span></td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: none;">Permissions Granted</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: none; text-align: right;">Feed Posts, Stories, Reels, AutoDM</td>
+  </tr>
+              </table>
+
+              <!-- Next Steps Box -->
+              <div style="background: #ffffff; border: 1px solid #f1f5f9; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                <h4 style="font-size: 13.5px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0;">Next Recommended Actions:</h4>
+                <p style="font-size: 13px; color: #475569; margin: 0; line-height: 1.6;">
+                  1. Schedule your first draft campaign in the SocialPilot composer.<br>
+                  2. Configure AutoDM keyword triggers to automatically capture leads from comments.<br>
+                  3. Track post performance metrics and engagement in the analytics tab.
+                </p>
+              </div>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://social.getaipilot.in/accounts" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); white-space: nowrap;">
+                  Manage Connected Accounts &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">SocialPilot Engine &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -531,53 +1299,163 @@ const DEMO_TEMPLATES = [
         version_number: 1,
         status: 'live',
         created_by: 'SocialPilot Auth',
-        subject: 'Welcome to QuickPost! 🚀',
-        html_source: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #f8fafc; padding: 32px 16px;">
-  <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); padding: 36px 28px; text-align: center; color: #ffffff;">
-      <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 8px 18px; border-radius: 999px; margin-bottom: 20px;">
-        <img src="https://social.getaipilot.in/logo.png" alt="SocialPilot Logo" style="height: 24px; width: 24px; border-radius: 6px; background: #ffffff; padding: 2px;" onerror="this.style.display='none'">
-        <span style="font-size: 15px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px;">SocialPilot <span style="color: #a5b4fc; font-weight: 400;">QuickPost</span></span>
-      </div>
-      <h1 style="font-size: 26px; font-weight: 800; margin: 0 0 10px 0; color: #ffffff;">Welcome Aboard, {{name}}! 🎉</h1>
-      <p style="font-size: 15px; color: #c7d2fe; margin: 0; max-width: 480px; margin: 0 auto;">Your social broadcasting superpower is ready. Start publishing, scheduling, and automating post campaigns in seconds.</p>
-    </div>
-    <div style="padding: 32px 28px;">
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px; margin-bottom: 28px;">
-        <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0 0 16px 0;">What you can do right now:</h3>
-        <div style="display: flex; gap: 12px; margin-bottom: 14px;">
-          <div style="background: #e0e7ff; color: #4338ca; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; line-height: 28px; text-align: center;">1</div>
-          <div>
-            <strong style="font-size: 14px; color: #1e293b;">Connect Social Accounts</strong>
-            <p style="font-size: 13px; color: #64748b; margin: 2px 0 0 0;">Link Instagram, LinkedIn, Twitter/X, and Facebook in one click.</p>
-          </div>
-        </div>
-        <div style="display: flex; gap: 12px; margin-bottom: 14px;">
-          <div style="background: #e0e7ff; color: #4338ca; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; line-height: 28px; text-align: center;">2</div>
-          <div>
-            <strong style="font-size: 14px; color: #1e293b;">Create & Schedule Campaigns</strong>
-            <p style="font-size: 13px; color: #64748b; margin: 2px 0 0 0;">Draft posts with AI assistance and schedule multi-channel blasts.</p>
-          </div>
-        </div>
-        <div style="display: flex; gap: 12px;">
-          <div style="background: #e0e7ff; color: #4338ca; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; flex-shrink: 0; line-height: 28px; text-align: center;">3</div>
-          <div>
-            <strong style="font-size: 14px; color: #1e293b;">Enable AutoDM Automations</strong>
-            <p style="font-size: 13px; color: #64748b; margin: 2px 0 0 0;">Automatically send DMs to users who comment on your posts.</p>
-          </div>
-        </div>
-      </div>
-      <div style="text-align: center; margin: 32px 0 16px 0;">
-        <a href="https://social.getaipilot.in/dashboard" style="display: inline-block; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 36px; border-radius: 10px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);">
-          Launch SocialPilot Dashboard &rarr;
-        </a>
-      </div>
-    </div>
-    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center;">
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">Account Status: <strong style="color: #10b981;">✓ {{otp_code}}</strong> &bull; SuperMailBox Infrastructure</p>
-    </div>
+        subject: 'Welcome to SocialPilot! 🚀',
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to SocialPilot</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    Welcome to SocialPilot! Connect Instagram, LinkedIn, Twitter, Facebook, and YouTube with AI auto-publishing.
   </div>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="SocialPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">socialpilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #eef2ff; border: 1px solid #c7d2fe; color: #4338ca; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">🚀 SOCIAL SUITE</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #0f172a; background: linear-gradient(135deg, #0f172a 0%, #312e81 50%, #6366f1 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">All-in-One Publishing</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      Welcome to SocialPilot! 🎉
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #c7d2fe; line-height: 1.5; max-width: 460px;">
+                      Your multi-channel social broadcasting command center is ready. Start publishing, scheduling, and automating post campaigns in seconds.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <h3 style="font-weight: 700; color: #0f172a; font-size: 16px; margin: 0 0 16px 0;">Here is what you can do right now:</h3>
+              
+              
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 14px;">
+    <tr>
+      <td width="48" style="vertical-align: top; width: 48px; min-width: 48px;">
+        <div style="width: 40px; min-width: 40px; height: 40px; min-height: 40px; background-color: #f1f5f9; border-radius: 10px; text-align: center; display: table-cell; vertical-align: middle;">
+          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/34.png" width="20" height="20" style="display: block; margin: 0 auto; width: 20px; height: 20px;" alt="Icon">
+        </div>
+      </td>
+      <td style="vertical-align: top; padding-left: 12px;">
+        <h4 style="font-weight: 700; color: #0f172a; font-size: 14.5px; margin: 0 0 2px 0; line-height: 1.3;">1. Connect Social Channels</h4>
+        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.45;">Link Instagram, LinkedIn, 𝕏 Twitter, Facebook, and YouTube in one click with official OAuth.</p>
+      </td>
+    </tr>
+  </table>
+  <div style="border-bottom: 1px solid #f1f5f9; margin: 12px 0;"></div>
+              
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 14px;">
+    <tr>
+      <td width="48" style="vertical-align: top; width: 48px; min-width: 48px;">
+        <div style="width: 40px; min-width: 40px; height: 40px; min-height: 40px; background-color: #f1f5f9; border-radius: 10px; text-align: center; display: table-cell; vertical-align: middle;">
+          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/18.png" width="20" height="20" style="display: block; margin: 0 auto; width: 20px; height: 20px;" alt="Icon">
+        </div>
+      </td>
+      <td style="vertical-align: top; padding-left: 12px;">
+        <h4 style="font-weight: 700; color: #0f172a; font-size: 14.5px; margin: 0 0 2px 0; line-height: 1.3;">2. AI Caption & Scheduling Studio</h4>
+        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.45;">Draft engaging posts with AI assistance, generate hashtags, and schedule multi-channel blasts.</p>
+      </td>
+    </tr>
+  </table>
+  <div style="border-bottom: 1px solid #f1f5f9; margin: 12px 0;"></div>
+              
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 4px;">
+    <tr>
+      <td width="48" style="vertical-align: top; width: 48px; min-width: 48px;">
+        <div style="width: 40px; min-width: 40px; height: 40px; min-height: 40px; background-color: #f1f5f9; border-radius: 10px; text-align: center; display: table-cell; vertical-align: middle;">
+          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/5.png" width="20" height="20" style="display: block; margin: 0 auto; width: 20px; height: 20px;" alt="Icon">
+        </div>
+      </td>
+      <td style="vertical-align: top; padding-left: 12px;">
+        <h4 style="font-weight: 700; color: #0f172a; font-size: 14.5px; margin: 0 0 2px 0; line-height: 1.3;">3. Enable AutoDM Lead Generation</h4>
+        <p style="font-size: 13px; color: #64748b; margin: 0; line-height: 1.45;">Turn comments into customers by automatically sending direct messages when users interact with your posts.</p>
+      </td>
+    </tr>
+  </table>
+  
+
+              <!-- Supported Networks Badge Row -->
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-top: 20px; text-align: center;">
+                <span style="font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 10px;">Supported Platforms</span>
+                <span style="background: #fce7f3; color: #be185d; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin: 2px; display: inline-block;">📸 Instagram</span>
+                <span style="background: #e0e7ff; color: #3730a3; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin: 2px; display: inline-block;">💼 LinkedIn</span>
+                <span style="background: #f1f5f9; color: #0f172a; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin: 2px; display: inline-block;">𝕏 Twitter</span>
+                <span style="background: #dbeafe; color: #1d4ed8; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin: 2px; display: inline-block;">📘 Facebook</span>
+                <span style="background: #fee2e2; color: #b91c1c; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin: 2px; display: inline-block;">▶️ YouTube</span>
+              </div>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://social.getaipilot.in/dashboard" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35); white-space: nowrap;">
+                  Launch SocialPilot Dashboard &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">SocialPilot &bull; SuperMailBox Infrastructure</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -591,39 +1469,139 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'SocialPilot AutoDM',
         subject: 'AutoDM Automation Active: {{automation_name}} ⚡',
-        html_source: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #f8fafc; padding: 32px 16px;">
-  <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 32px 28px; color: #ffffff;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <img src="https://social.getaipilot.in/logo.png" alt="SocialPilot Logo" style="height: 28px; width: 28px; border-radius: 6px; background: #ffffff; padding: 2px;" onerror="this.style.display='none'">
-          <span style="font-size: 18px; font-weight: 800; color: #ffffff;">AutoDM <span style="color: #a7f3d0; font-weight: 400;">Automation</span></span>
-        </div>
-        <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 999px;">⚡ ACTIVE</span>
-      </div>
-      <h1 style="font-size: 22px; font-weight: 800; margin: 0 0 6px 0; color: #ffffff;">New AutoDM Engine Configured!</h1>
-      <p style="font-size: 14px; color: #cbd5e1; margin: 0;">Your automation rule <strong>{{automation_name}}</strong> is now active and responding to triggers.</p>
-    </div>
-    <div style="padding: 28px;">
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-        <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px;">
-          <span style="font-size: 13px; color: #64748b;">Automation Rule:</span>
-          <strong style="font-size: 14px; color: #1e293b;">{{automation_name}}</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between;">
-          <span style="font-size: 13px; color: #64748b;">Trigger Condition:</span>
-          <strong style="font-size: 14px; color: #4f46e5;">{{trigger_type}}</strong>
-        </div>
-      </div>
-      <div style="text-align: center; margin-top: 28px;">
-        <a href="https://social.getaipilot.in/autodm" style="display: inline-block; background: #4f46e5; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 12px 28px; border-radius: 8px;">Manage AutoDM Automations &rarr;</a>
-      </div>
-    </div>
-    <div style="background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center;">
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">SocialPilot AutoDM Engine &bull; SuperMailBox CPaaS</p>
-    </div>
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoDM Automation Active</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    AutoDM Automation VIP Early Access is now active and responding to user comments.
   </div>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="SocialPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">socialpilot <span style="color: #4f46e5; font-weight: 400;">autodm</span></span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">⚡ ACTIVE RULE</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #0f172a; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4f46e5 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">Direct Message Trigger</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      AutoDM Engine Activated! ⚡
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #c7d2fe; line-height: 1.5; max-width: 460px;">
+                      Your automation rule <strong>VIP Early Access</strong> is live and actively converting post commenters into private leads.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <h3 style="font-weight: 700; color: #0f172a; font-size: 15px; margin: 0 0 14px 0;">Automation Configuration:</h3>
+              
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px;">
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Automation Rule</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;">VIP Early Access AutoDM</td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Trigger Keyword</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;"><code style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 4px; font-weight: 700;">ACCESS</code></td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: 1px solid #f1f5f9;">Trigger Type</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: 1px solid #f1f5f9; text-align: right;"><strong style="color: #4f46e5;">Keyword Match (Exact & Comments)</strong></td>
+  </tr>
+                
+  <tr>
+    <td style="padding: 10px 14px; font-size: 13px; color: #64748b; font-weight: 500; border-bottom: none;">Follower Gate</td>
+    <td align="right" style="padding: 10px 14px; font-size: 13.5px; color: #0f172a; font-weight: 700; border-bottom: none; text-align: right;">Active (Must follow @getaipilot to receive link)</td>
+  </tr>
+              </table>
+
+              <!-- Real Engine Highlights Box -->
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                <h4 style="font-size: 13.5px; font-weight: 700; color: #166534; margin: 0 0 6px 0;">⚡ Active Engine Capabilities:</h4>
+                <p style="font-size: 13px; color: #15803d; margin: 0; line-height: 1.6;">
+                  &bull; <strong>Dual-Action Reply:</strong> Dispatches public comment reply + instant private DM.<br>
+                  &bull; <strong>Follower-Gate Verification:</strong> Checks if user follows your account before delivering the link.<br>
+                  &bull; <strong>Ecosystem CRM Sync:</strong> Automatically captures commenter details into GetAiPilot CRM.
+                </p>
+              </div>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://social.getaipilot.in/autodm" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%); color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35); white-space: nowrap;">
+                  Manage AutoDM Automations &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">SocialPilot AutoDM Engine &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },
@@ -637,48 +1615,126 @@ const DEMO_TEMPLATES = [
         status: 'live',
         created_by: 'QuickPost Broadcast',
         subject: 'Post Published: {{campaign_name}}',
-        html_source: `<div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 620px; margin: 0 auto; background: #f8fafc; padding: 32px 16px;">
-  <div style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08); overflow: hidden;">
-    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%); padding: 32px 28px; color: #ffffff;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <img src="https://social.getaipilot.in/logo.png" alt="SocialPilot Logo" style="height: 32px; width: 32px; border-radius: 8px; background: #ffffff; padding: 4px; display: block;" onerror="this.style.display='none'">
-          <span style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">SocialPilot <span style="color: #818cf8; font-weight: 400;">QuickPost</span></span>
-        </div>
-        <span style="background: rgba(52, 211, 153, 0.2); border: 1px solid rgba(52, 211, 153, 0.4); color: #34d399; font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase;">✓ PUBLISHED</span>
-      </div>
-      <h1 style="font-size: 24px; font-weight: 800; line-height: 1.3; margin: 0 0 8px 0; color: #ffffff;">Hey {{full_name}}, your post is live! 🚀</h1>
-      <p style="font-size: 14px; color: #c7d2fe; margin: 0;">Your broadcast campaign <strong>{{campaign_name}}</strong> was successfully published across your connected channels.</p>
-    </div>
-    <div style="padding: 28px;">
-      <div style="margin-bottom: 24px;">
-        <span style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 12px;">Target Channels</span>
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <span style="background: linear-gradient(135deg, #e1306c, #fd1d1d, #f56040); color: #ffffff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-block;">📸 Instagram</span>
-          <span style="background: #0a66c2; color: #ffffff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-block;">💼 LinkedIn</span>
-          <span style="background: #000000; color: #ffffff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-block;">𝕏 Twitter</span>
-          <span style="background: #1877f2; color: #ffffff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px; display: inline-block;">📘 Facebook</span>
-        </div>
-      </div>
-      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 14px;">
-          <span style="font-size: 13px; font-weight: 700; color: #334155;">Post Caption Preview</span>
-          <span style="font-size: 12px; color: #94a3b8;">{{platforms}}</span>
-        </div>
-        <p style="font-size: 15px; color: #1e293b; line-height: 1.6; margin: 0; font-style: italic; background: #f8fafc; padding: 14px; border-radius: 8px; border-left: 3px solid #6366f1;">
-          "{{caption}}"
-        </p>
-      </div>
-      <div style="text-align: center; margin: 32px 0 16px 0;">
-        <a href="https://social.getaipilot.in/broadcasts" style="display: inline-block; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 14px 36px; border-radius: 10px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);">
-          View Analytics & Post Performance &rarr;
-        </a>
-      </div>
-    </div>
-      <p style="font-size: 12px; color: #94a3b8; margin: 0;">Sent to {{email}} via <strong>SocialPilot Broadcast Engine</strong> &bull; SuperMailBox CPaaS</p>
-    </div>
+        html_source: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Published: Autonomous Launch Campaign</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+    body { margin: 0 !important; padding: 0 !important; background-color: #ffffff; font-family: "Outfit", -apple-system, sans-serif; }
+    table { border-collapse: collapse !important; }
+    @media screen and (max-width: 620px) {
+      .full-width-table { width: 100% !important; margin: 0 !important; }
+      .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+      .mobile-hero-padding { padding: 22px 16px !important; }
+      .mobile-hero-title { font-size: 22px !important; }
+      .cta-button { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 13px 20px !important; }
+    }
+  </style>
+</head>
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif;">
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff;">
+    Your post Autonomous Launch Campaign has been successfully published across connected channels.
   </div>
-</div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding: 16px 0 32px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f1f5f9;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align: middle; padding-right: 10px;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="SocialPilot Logo">
+                        </td>
+                        <td style="vertical-align: middle;">
+                          <span style="font-weight: 700; color: #0f172a; font-size: 19px; letter-spacing: -0.5px;">socialpilot</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="vertical-align: middle; text-align: right;">
+                    <span style="background: #f5f3ff; border: 1px solid #ddd6fe; color: #6d28d9; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.05em; text-transform: uppercase;">✓ POST LIVE</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 16px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding: 0 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #0f172a; background: linear-gradient(135deg, #0f172a 0%, #2e1065 50%, #7c3aed 100%); border-radius: 16px; overflow: hidden;">
+                <tr>
+                  <td class="mobile-hero-padding" style="padding: 28px 24px; color: #ffffff; text-align: left;">
+                    <div style="margin-bottom: 10px;">
+                      <span style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; text-transform: uppercase;">Publishing Notification</span>
+                    </div>
+                    <h1 class="mobile-hero-title" style="font-size: 24px; font-weight: 800; line-height: 1.25; margin: 0 0 8px 0; color: #ffffff; letter-spacing: -0.4px;">
+                      Your Post is Officially Live! 🚀
+                    </h1>
+                    <p style="margin: 0; font-size: 13.5px; color: #e9d5ff; line-height: 1.5; max-width: 460px;">
+                      Your broadcast campaign <strong>Autonomous Launch Campaign</strong> was successfully published across all selected channels.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Spacer -->
+          <tr><td style="height: 20px; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+          <!-- Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 24px;">
+              <!-- Target Channels Badges -->
+              <div style="margin-bottom: 18px;">
+                <span style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Published Target Channels</span>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 10px;">
+                  <span style="background: #fce7f3; color: #be185d; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-right: 6px; display: inline-block;">📸 Instagram</span>
+                  <span style="background: #e0e7ff; color: #3730a3; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-right: 6px; display: inline-block;">💼 LinkedIn</span>
+                  <span style="background: #f1f5f9; color: #0f172a; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-right: 6px; display: inline-block;">𝕏 Twitter</span>
+                  <span style="background: #dbeafe; color: #1d4ed8; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block;">📘 Facebook</span>
+                </div>
+              </div>
+
+              <!-- Post Caption Preview Card -->
+              <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px;">
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">Post Caption Preview</span>
+                  <span style="font-size: 12px; color: #94a3b8;">Instagram, LinkedIn, X, Facebook</span>
+                </div>
+                <p style="font-size: 14.5px; color: #1e293b; line-height: 1.6; margin: 0; font-style: italic; background: #f8fafc; padding: 14px; border-radius: 8px; border-left: 3px solid #7c3aed;">
+                  "🚀 Excited to announce our newest AI automation features are officially live on GetAiPilot! Automate Telegram, WhatsApp, and social publishing in one unified dashboard. Check out the link in bio for early access! #AI #Automation #GetAiPilot"
+                </p>
+              </div>
+
+              <div style="text-align: center; margin: 28px 0 16px 0;">
+                <a href="https://social.getaipilot.in/broadcasts" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%); color: #ffffff; font-size: 14.5px; font-weight: 700; text-decoration: none; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35); white-space: nowrap;">
+                  View Live Post Performance &rarr;
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 24px; border-top: 1px solid #f1f5f9; text-align: center; background-color: #fafafa; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 12px; color: #64748b; margin: 0 0 6px 0; font-weight: 600;">SocialPilot Broadcast Engine &bull; SuperMailBox CPaaS</p>
+              <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.5;">&copy; 2026 GetAiPilot Inc. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
       }
     ]
   },

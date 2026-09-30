@@ -1,6 +1,17 @@
 import type { BlockType, EmailBlock, EmailColumn, EmailDocument, EmailRow } from '../types/document.types';
 import { createBlock, createDefaultDocument, createUniqueId } from '../utils/blockDefaults';
 
+function decodeHtmlEntities(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
 function parseCssStyles(styleAttr: string | null | undefined): Record<string, string> {
   const result: Record<string, string> = {};
   if (!styleAttr) return result;

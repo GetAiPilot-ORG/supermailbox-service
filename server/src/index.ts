@@ -27,6 +27,7 @@ import { registerWebhookRoutes } from './routes/webhooks.js';
 import { registerApiRoutes } from './routes/api.js';
 import { registerTemplateRoutes } from './routes/templates.js';
 import { registerBrandRoutes } from './routes/brand.js';
+import { registerAuthRoutes } from './routes/auth.js';
 import { initCampaignWorker } from './workers/campaignWorker.js';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
@@ -58,6 +59,49 @@ await fastify.register(cors, {
   optionsSuccessStatus: 204,
 });
 
+fastify.addHook('preHandler', async (request, reply) => {
+  const url = request.url;
+  if (!url.startsWith('/v1/') || url.startsWith('/v1/auth/login') || url.startsWith('/v1/webhooks')) {
+    return;
+  }
+  const authHeader = request.headers.authorization || (request.headers as any)['Authorization'];
+  const xApiKey = (request.headers['x-api-key'] || (request.headers as any)['X-API-Key']) as string | undefined;
+  const adminToken = process.env.ADMIN_TOKEN;
+  const adminApiKey = process.env.ADMIN_API_KEY;
+
+  let rawToken: string | undefined;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    rawToken = authHeader.substring(7).trim();
+  } else if (authHeader) {
+    rawToken = authHeader.trim();
+  } else if (xApiKey) {
+    rawToken = xApiKey.trim();
+  }
+
+  // Dashboard session token or master API key
+  if (rawToken && ((adminToken && rawToken === adminToken) || (adminApiKey && rawToken === adminApiKey))) {
+    return;
+  }
+
+  // Allow routes with individual DB API key verification
+  const apiKeyRoutes = new Set([
+    '/v1/broadcast',
+    '/v1/contacts/sync',
+    '/v1/send/transactional',
+  ]);
+  const matchedRoute = request.routeOptions?.url || url.split('?')[0];
+  if (apiKeyRoutes.has(matchedRoute) && rawToken) {
+    return;
+  }
+
+  return reply.status(401).send({
+    success: false,
+    error: 'Unauthorized: Invalid or missing token',
+    code: 'SESSION_INVALID'
+  });
+});
+
+await registerAuthRoutes(fastify);
 await registerEmailRoutes(fastify);
 await registerWebhookRoutes(fastify);
 await registerTemplateRoutes(fastify);

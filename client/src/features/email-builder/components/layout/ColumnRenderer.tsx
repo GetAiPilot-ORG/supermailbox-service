@@ -10,9 +10,10 @@ import { DropZone } from './DropZone';
 interface ColumnRendererProps {
   column: EmailColumn;
   rowId: string;
+  shouldStack?: boolean;
 }
 
-export const ColumnRenderer: React.FC<ColumnRendererProps> = ({ column, rowId }) => {
+export const ColumnRenderer: React.FC<ColumnRendererProps> = ({ column, rowId, shouldStack }) => {
   const [isHovered, setIsHovered] = useState(false);
   const selectedColumnId = useDocumentStore((state) => state.selectedColumnId);
   const selectColumn = useDocumentStore((state) => state.selectColumn);
@@ -44,10 +45,12 @@ export const ColumnRenderer: React.FC<ColumnRendererProps> = ({ column, rowId })
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        flex: `0 0 ${column.width}%`,
-        maxWidth: `${column.width}%`,
+        flex: shouldStack ? '1 1 100%' : `0 0 ${column.width}%`,
+        maxWidth: shouldStack ? '100%' : `${column.width}%`,
+        width: shouldStack ? '100%' : undefined,
         boxSizing: 'border-box',
-        padding: column.settings.padding || '8px',
+        padding: column.settings.padding || (shouldStack ? '4px 8px' : '8px'),
+        textAlign: shouldStack ? 'center' : undefined,
         background: isColGradient ? colBg : undefined,
         backgroundColor: !isColGradient ? (colBg || 'transparent') : undefined,
         borderRadius: column.settings.borderRadius || '0px',
@@ -56,7 +59,7 @@ export const ColumnRenderer: React.FC<ColumnRendererProps> = ({ column, rowId })
           : isOver
           ? '2px dashed #2563eb'
           : '1px solid transparent',
-        minHeight: '80px',
+        minHeight: '60px',
         display: 'flex',
         flexDirection: 'column',
         gap: '4px',

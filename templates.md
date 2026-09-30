@@ -22,210 +22,289 @@ This document contains all HTML email templates configured in SuperMailBox servi
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GetAiPilot Email Template</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Welcome to GetAiPilot</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      width: 100% !important;
+      background-color: #ffffff;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    img {
+      border: 0;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
+    table {
+      border-collapse: collapse !important;
+    }
+    @media screen and (max-width: 620px) {
+      .full-width-table {
+        width: 100% !important;
+      }
+      .mobile-hero-padding {
+        padding: 24px 16px !important;
+      }
+      .mobile-padding {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+      .mobile-stack {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .mobile-center {
+        text-align: center !important;
+      }
+      .mobile-hide {
+        display: none !important;
+      }
+      .cta-button {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+      }
+    }
   </style>
 </head>
 
-<body style="background-color:#f3f4f6; margin:0; padding:10px 16px; font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+<body style="background-color: #ffffff; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
 
-  <!-- PRE-HEADER (seen in inbox preview, hidden in the email body) -->
-  <div style="display:none;max-height:0;overflow:hidden;font-size:1px;color:#ffffff;line-height:1px;">
-    Don't miss out — verify your GetAiPilot account now!
+  <!-- PRE-HEADER -->
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff; line-height:1px;">
+    Verify your GetAiPilot account – unlock Telegram, WhatsApp, SocialPilot & AI automation!
   </div>
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin: 0; padding: 0;">
     <tr>
-      <td align="center" style="padding: 20px 0;">
+      <td align="center" style="padding: 0; margin: 0;">
+        
+        <!-- Main Full Width 600px Container (Flat, No Card Box) -->
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; margin: 0 auto;">
+          
+          <!-- 1. Logo Header -->
+          <tr>
+            <td align="center" style="padding: 20px 16px; background-color: #ffffff;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle; padding-right: 8px;">
+                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 30px; width: auto; display: block;" alt="GetAiPilot Logo">
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <span style="font-weight: 700; color: #111827; font-size: 22px; letter-spacing: -0.5px;">getaipilot</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-        <div style="width:100%; max-width:480px; background-color:#ffffff; border-radius:16px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); overflow:hidden; margin:0 auto; text-align:left; box-sizing:border-box;">
+          <!-- 2. Hero Banner (Flat Full Width, Seamless Gradient) -->
+          <tr>
+            <td class="mobile-hero-padding" style="background: #1e1b4b; background: linear-gradient(135deg, #10183f 0%, #1b2360 50%, #8b3cff 100%); padding: 32px 28px; color: #ffffff; text-align: left;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align: middle;">
+                    <p style="font-size: 15px; margin: 0 0 4px 0; color: rgba(255,255,255,0.85); font-weight: 400;">Hi there,</p>
+                    <h1 style="font-size: 28px; font-weight: 700; line-height: 1.25; margin: 0; color: #ffffff; letter-spacing: -0.3px;">
+                      Welcome to <br />
+                      Get<span style="color: #d8b4fe;">AiPilot</span>!
+                    </h1>
+                    <p style="margin: 8px 0 0 0; font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.4; max-width: 320px;">
+                      You’re one step closer to automating messaging, scaling with SocialPilot, and growing your audience.
+                    </p>
+                  </td>
+                  <!-- Envelope Illustration -->
+                  <td class="mobile-hide" width="130" align="right" style="vertical-align: middle;">
+                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/5.png" width="120" style="display: block;" alt="Envelope">
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-          <!-- Logo -->
-          <div style="padding:16px 0; text-align:center; box-sizing:border-box;">
-            <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="vertical-align:middle; padding-right:8px;">
-                  <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height:28px; display:block;" alt="GetAiPilot Logo">
-                </td>
-                <td style="vertical-align:middle;">
-                  <span style="font-weight:bold; color:#1f2937; font-size:22px;">getaipilot</span>
-                </td>
-              </tr>
-            </table>
-          </div>
+          <!-- 3. Features Section -->
+          <tr>
+            <td class="mobile-padding" style="padding: 28px 28px 12px 28px; background-color: #ffffff;">
+              <h2 style="text-align: center; font-weight: 700; color: #1f2937; margin: 0 0 24px 0; font-size: 18px;">
+                Here’s what you can do with GetAiPilot:
+              </h2>
 
-          <!-- Hero -->
-          <div style="margin:0; overflow:hidden; background: linear-gradient(to bottom right, #10183f, #1b2360, #8b3cff); color:#ffffff; padding:24px 20px; min-height:160px; position:relative; box-sizing:border-box;">
+              <!-- Feature 1: Telegram & WhatsApp -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 18px;">
+                <tr>
+                  <td width="48" style="vertical-align: top;">
+                    <table role="presentation" width="38" height="38" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3e8ff; border-radius: 10px;">
+                      <tr>
+                        <td align="center" style="vertical-align: middle;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/16.png" width="22" height="22" style="display: block;" alt="Icon">
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 10px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 15px; margin: 0 0 2px 0;">Telegram &amp; WhatsApp Automation</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Set up auto-forwarding rules, auto-approve join requests, and broadcast messages across channels seamlessly.
+                    </p>
+                  </td>
+                </tr>
+              </table>
 
-            <p style="font-size:16px; margin:0 0 4px 0; color:rgba(255,255,255,0.8);">Hi there,</p>
+              <!-- Feature 2: SocialPilot Multi-Platform Publishing -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 18px;">
+                <tr>
+                  <td width="48" style="vertical-align: top;">
+                    <table role="presentation" width="38" height="38" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3e8ff; border-radius: 10px;">
+                      <tr>
+                        <td align="center" style="vertical-align: middle;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/34.png" width="22" height="22" style="display: block;" alt="Icon">
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 10px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 15px; margin: 0 0 2px 0;">SocialPilot Multi-Platform Growth</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Schedule, automate, and publish content across Instagram, LinkedIn, X, Facebook, and YouTube with AutoDM.
+                    </p>
+                  </td>
+                </tr>
+              </table>
 
-            <h1 style="font-size:28px; font-weight:bold; line-height:1.2; margin:0;">
-              Your account is <br />
-              almost <span style="color:#d8b4fe;">ready!</span>
-            </h1>
+              <!-- Feature 3: Monetization (Telesub) & AI CRM -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
+                <tr>
+                  <td width="48" style="vertical-align: top;">
+                    <table role="presentation" width="38" height="38" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3e8ff; border-radius: 10px;">
+                      <tr>
+                        <td align="center" style="vertical-align: middle;">
+                          <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/32.png" width="22" height="22" style="display: block;" alt="Icon">
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 10px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 15px; margin: 0 0 2px 0;">Monetize with Telesub &amp; AI CRM</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Launch subscription bots, collect recurring member payments, deploy 24/7 AI bots, and manage contacts in CRM.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-            <p style="margin:8px 0 0 0; font-size:16px; color:rgba(255,255,255,0.8); max-width:210px; line-height:1.2;">
-              Just one quick step left before you can start using GetAiPilot.
-            </p>
+          <!-- 4. CTA Block (Ready to take off?) -->
+          <tr>
+            <td class="mobile-padding" style="padding: 20px 28px 24px 28px; border-top: 1px solid #f3f4f6; background-color: #ffffff;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <!-- Left Illustration -->
+                  <td class="mobile-stack mobile-center" width="140" align="center" style="vertical-align: middle; padding-bottom: 12px;">
+                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/8.png" width="125" style="display: block; margin: 0 auto; height: auto;" alt="GetAiPilot Mascot">
+                  </td>
+                  <!-- Right Text & Button -->
+                  <td class="mobile-stack mobile-center" style="vertical-align: middle; padding-left: 16px;">
+                    <h3 style="font-weight: 700; color: #1f2937; font-size: 18px; margin: 0 0 4px 0;">Ready to take off?</h3>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0 0 16px 0; line-height: 1.4;">
+                      Confirm your email to activate your dashboard and deploy your first automation.
+                    </p>
 
-            <!-- Paper plane -->
-            <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/34.png" alt="Paper plane" style="position:absolute; top:12px; right:12px; width:24px;" >
+                    <!-- Confirmation Button -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" class="mobile-center" style="margin: 0;">
+                      <tr>
+                        <td align="center" style="border-radius: 8px; background: linear-gradient(to right, #f43f5e, #8b5cf6); box-shadow: 0 4px 10px rgba(244, 63, 94, 0.25);">
+                          <a href="{{ .ConfirmationURL }}" class="cta-button" target="_blank" style="display: inline-block; color: #ffffff; font-size: 15px; font-weight: 700; padding: 12px 24px; text-decoration: none; border-radius: 8px;">
+                            Confirm Your Email &rarr;
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-            <!-- Envelope Card -->
-            <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/10.png" style="position:absolute; right:8px; bottom:8px; width:140px; height:120px; border-radius:16px; transform:rotate(-8deg); box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);" >
+          <!-- 5. Help Callout -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 28px 20px 28px; background-color: #ffffff;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #faf5ff; border-radius: 12px; padding: 14px;">
+                <tr>
+                  <td width="24" style="vertical-align: top; padding-top: 2px;">
+                    <span style="font-size: 16px; line-height: 1;">💡</span>
+                  </td>
+                  <td style="vertical-align: top; padding-left: 8px;">
+                    <h4 style="font-weight: 700; color: #1f2937; font-size: 14px; margin: 0 0 2px 0;">Need help getting started?</h4>
+                    <p style="font-size: 13px; color: #6b7280; margin: 0; line-height: 1.4;">
+                      Check out our Help Center or reply directly to this email anytime.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-          </div>
-
-          <!-- Content -->
-          <div style="padding:24px 16px 12px 16px; box-sizing:border-box;">
-            <h2 style="text-align:center; font-weight:bold; color:#1f2937; margin:0 0 16px 0; font-size:16px;">
-              Here's why verifying matters:
-            </h2>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-              <tr>
-                <td style="width:48px; vertical-align:top;">
-                  <div style="width:32px; height:32px; border-radius:12px; background-color:#f3e8ff; text-align:center; line-height:32px; box-sizing:border-box;">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/16.png" style="width:100%; height:100%; object-fit:contain; display:block;">
-                  </div>
-                </td>
-                <td style="vertical-align:top; padding-top:4px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:16px; margin:0;">Unlock full access</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:2px 0 0 0; line-height:1.2;">
-                    Verifying your email unlocks every feature GetAiPilot has to offer.
-                  </p>
-                </td>
-              </tr>
-            </table>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-              <tr>
-                <td style="width:48px; vertical-align:top;">
-                  <div style="width:32px; height:32px; border-radius:12px; background-color:#f3e8ff; text-align:center; padding:6px; box-sizing:border-box;">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/34.png" style="width:100%; height:100%; object-fit:contain; display:block;">
-                  </div>
-                </td>
-                <td style="vertical-align:top; padding-top:4px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:16px; margin:0;">Keep your account secure</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:2px 0 0 0; line-height:1.2;">
-                    Verification helps us keep your data safe and your account protected.
-                  </p>
-                </td>
-              </tr>
-            </table>
-
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
-              <tr>
-                <td style="width:48px; vertical-align:top;">
-                  <div style="width:32px; height:32px; border-radius:12px; background-color:#f3e8ff; text-align:center; line-height:24px;  box-sizing:border-box;">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/32.png" style="width:100%; height:100%; object-fit:contain; display:block;">
-                  </div>
-                </td>
-                <td style="vertical-align:top; padding-top:4px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:16px; margin:0;">It only takes a second</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:2px 0 0 0; line-height:1.2;">
-                    One click is all it takes to confirm your account and get started.
-                  </p>
-                </td>
-              </tr>
-            </table>
-
-          </div>
-
-          <!-- CTA -->
-          <div style="margin:0 16px 24px 16px; padding:24px 0 12px 0; border-top:1px solid #f3f4f6; box-sizing:border-box; display:flex; align-items:center; gap:20px;">
-            <div style="flex:0 0 180px; width:180px; overflow:hidden; box-sizing:border-box;">
-              <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/8.png" style="width:100%; height:auto; object-fit:contain; display:block;">
-            </div>
-
-            <div style="flex:1; text-align:left;">
-              <h3 style="font-weight:bold; color:#1f2937; font-size:22px; margin:0;">Don't miss out!</h3>
-              <p style="font-size:16px; color:#6b7280; margin:8px 0 20px 0; line-height:1.4;">
-                Verify your account now to start exploring everything GetAiPilot has to offer.
+          <!-- 6. Confirmation URL Link Fallback -->
+          <tr>
+            <td class="mobile-padding" style="padding: 0 28px 24px 28px; text-align: center; background-color: #ffffff;">
+              <p style="font-size: 12px; color: #9ca3af; line-height: 1.4; margin: 0; word-break: break-all;">
+                If the button doesn’t work, copy and paste this URL into your browser:<br>
+                <a href="{{ .ConfirmationURL }}" style="color: #8b5cf6; text-decoration: underline;">{{ .ConfirmationURL }}</a>
               </p>
+            </td>
+          </tr>
 
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block; background: linear-gradient(to right, #f43f5e, #8b5cf6); color:#ffffff; font-size:16px; font-weight:bold; padding:12px 24px; border-radius:8px; text-decoration:none; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); box-sizing:border-box;">
-                Verify My Account &rarr;
-              </a>
-            </div>
-          </div>
+          <!-- 7. Footer -->
+          <tr>
+            <td align="center" style="padding: 24px 28px; border-top: 1px solid #f3f4f6; text-align: center; background-color: #ffffff;">
+              <!-- Social Icons -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
+                <tr>
+                  <td style="padding: 0 6px;">
+                    <a href="https://twitter.com" target="_blank" style="text-decoration: none;">
+                      <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/22.png" width="36" height="36" style="display: block; border-radius: 10px;" alt="Twitter">
+                    </a>
+                  </td>
+                  <td style="padding: 0 6px;">
+                    <a href="https://linkedin.com" target="_blank" style="text-decoration: none;">
+                      <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/23.png" width="36" height="36" style="display: block; border-radius: 10px;" alt="LinkedIn">
+                    </a>
+                  </td>
+                  <td style="padding: 0 6px;">
+                    <a href="https://instagram.com" target="_blank" style="text-decoration: none;">
+                      <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/24.png" width="36" height="36" style="display: block; border-radius: 10px;" alt="Instagram">
+                    </a>
+                  </td>
+                </tr>
+              </table>
 
-          <!-- Help -->
-          <div style="margin:0 16px 16px 16px; background-color:#faf5ff; border-radius:12px; padding:16px; box-sizing:border-box;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td style="width:24px; vertical-align:top; padding-top:2px;">
-                  <svg style="width:20px; height:20px; color:#8b5cf6;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                  </svg>
-                </td>
-                <td style="vertical-align:top; padding-left:12px;">
-                  <h3 style="font-weight:bold; color:#1f2937; font-size:15px; margin:0;">Trouble verifying your account?</h3>
-                  <p style="font-size:14px; color:#6b7280; margin:4px 0 0 0; line-height:1.4;">
-                    Check out our <a href="#" style="color:#8b5cf6; text-decoration:none;">Help Center</a> or reply to this email.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </div>
+              <p style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280;">Made with <span style="color: #8b5cf6;">&hearts;</span> by the GetAiPilot team</p>
+              <p style="margin: 0 0 4px 0; font-size: 12px; color: #9ca3af;">You're receiving this email because you signed up for GetAiPilot.</p>
+              <p style="margin: 0; font-size: 11px; color: #9ca3af;">&copy; 2026 GetAiPilot. All rights reserved.</p>
+            </td>
+          </tr>
 
-          <!-- Fallback link -->
-          <div style="margin:0 16px 12px 16px; padding:0 8px; text-align:center; box-sizing:border-box;">
-            <p style="font-size:13px; color:#9ca3af; line-height:1.4; margin:0;">
-              If the button doesn't work, copy and paste this URL into your browser:<br>
-              <a href="{{ .ConfirmationURL }}" style="color:#8b5cf6; word-break:break-all;">{{ .ConfirmationURL }}</a>
-            </p>
-          </div>
-
-        </div>
-
-        <!-- Outside Footer -->
-        <div style="width:100%; max-width:400px; margin:24px auto 0 auto; text-align:center; box-sizing:border-box;">
-
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-            <tr>
-              <td style="text-align:left; vertical-align:middle;">
-                <!-- Social Icons -->
-                <a href="#" style="display:inline-block; margin-right:12px; text-decoration:none;">
-                  <div style="width:48px; height:48px; background-color:#ffffff; border-radius:12px; display:inline-block; text-align:center; line-height:48px; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/22.png" alt="Twitter" style="width:38px; height:38px; vertical-align:middle; display:inline-block;">
-                  </div>
-                </a>
-                <a href="#" style="display:inline-block; margin-right:12px; text-decoration:none;">
-                  <div style="width:48px; height:48px; background-color:#ffffff; border-radius:12px; display:inline-block; text-align:center; line-height:48px; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/23.png" alt="LinkedIn" style="width:38px; height:38px; vertical-align:middle; display:inline-block;">
-                  </div>
-                </a>
-                <a href="#" style="display:inline-block; text-decoration:none;">
-                  <div style="width:48px; height:48px; background-color:#ffffff; border-radius:12px; display:inline-block; text-align:center; line-height:48px; box-shadow:0 2px 5px rgba(0,0,0,0.08);">
-                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/24.png" alt="Instagram" style="width:38px; height:38px; vertical-align:middle; display:inline-block;">
-                  </div>
-                </a>
-              </td>
-              <td style="text-align:right; vertical-align:middle; font-size:13px; color:#6b7280;">
-                Made with <span style="color:#8b5cf6;">&hearts;</span> by GetAiPilot team
-              </td>
-            </tr>
-          </table>
-
-          <p style="font-size:13px; color:#9ca3af; margin:0 0 4px 0; line-height:1.4;">
-            You're receiving this email because you signed up for GetAiPilot and haven't verified your account yet.<br>
-            If you didn't sign up for this, you can safely ignore this email.
-          </p>
-          <p style="font-size:13px; color:#9ca3af; margin:0;">
-            &copy; 2026 GetAiPilot. All rights reserved.
-          </p>
-
-        </div>
+        </table>
 
       </td>
     </tr>
   </table>
+
 </body>
 </html>
 ```

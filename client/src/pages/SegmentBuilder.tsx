@@ -109,7 +109,10 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
     try {
       // We should ideally use the api.ts service here, but falling back to VITE_API_URL directly
       const baseUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://localhost:5050/v1';
-      const res = await fetch(`${baseUrl}/mailer/config`);
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch(`${baseUrl}/mailer/config`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         if (data?.config) {
@@ -244,9 +247,13 @@ export const SegmentBuilder: React.FC<SegmentBuilderProps> = ({
     e.preventDefault();
     try {
       const baseUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://localhost:5050/v1';
+      const token = localStorage.getItem('adminToken');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       await fetch(`${baseUrl}/mailer/config`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           provider: zeptoApiKey || fromEmail ? 'zeptomail' : smtpUser && smtpPass ? 'smtp' : 'ethereal',
           smtpHost,

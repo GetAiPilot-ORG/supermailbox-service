@@ -24,16 +24,18 @@ export async function verifyApiKeyAuth(
     rawToken = xApiKey.trim();
   }
 
-  // Fallback to check ADMIN_API_KEY for local dashboard requests or dev mode
+  // Fallback to check ADMIN_API_KEY or ADMIN_TOKEN for dashboard/admin requests or dev mode
   const adminSecret = process.env.ADMIN_API_KEY;
-  if (rawToken && adminSecret && rawToken === adminSecret) {
+  const adminToken = process.env.ADMIN_TOKEN;
+  if (rawToken && ((adminSecret && rawToken === adminSecret) || (adminToken && rawToken === adminToken))) {
     return true;
   }
 
   if (!rawToken) {
     reply.status(401).send({
       success: false,
-      error: 'Missing API key.'
+      error: 'Missing API key.',
+      code: 'API_KEY_MISSING'
     });
     return false;
   }
@@ -49,23 +51,30 @@ export async function verifyApiKeyAuth(
       .single();
 
     if (error || !keyRecord || !keyRecord.is_active) {
-      // In dev mode, if not found in DB and starts with smb_live_, allow if dev flag enabled or return 401
-      if (process.env.NODE_ENV !== 'production' && rawToken.startsWith('smb_')) {
+      // Allow unverified smb_ keys only if explicitly enabled in local development
+      if (
+        process.env.NODE_ENV === 'development' &&
+        process.env.ALLOW_UNVERIFIED_DEV_API_KEYS === 'true' &&
+        rawToken.startsWith('smb_')
+      ) {
         return true;
       }
       reply.status(401).send({
         success: false,
-        error: 'Invalid or deactivated API key.'
+        error: 'Invalid or deactivated API key.',
+        code: 'API_KEY_INVALID'
       });
       return false;
     }
 
-    // Check scope if scopes array is present
+    // Check scope: empty scopes array denies all access; requires '*' or requiredScope
     const scopes: string[] = Array.isArray(keyRecord.scopes) ? keyRecord.scopes : [];
-    if (scopes.length > 0 && !scopes.includes('*') && !scopes.includes(requiredScope)) {
+    const hasPermission = scopes.includes('*') || scopes.includes(requiredScope);
+    if (!hasPermission) {
       reply.status(403).send({
         success: false,
-        error: `API key missing required scope: ${requiredScope}`
+        error: `API key missing required scope: ${requiredScope}`,
+        code: 'FORBIDDEN_SCOPE'
       });
       return false;
     }

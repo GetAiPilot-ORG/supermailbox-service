@@ -26,14 +26,18 @@ export const Canvas: React.FC = () => {
   const rows = Array.isArray(document?.rows) ? document.rows : [];
   const rowIds = rows.map((r) => r.id);
 
+  const isMobile = activeDevice === 'mobile';
+  const isTablet = activeDevice === 'tablet';
+
   // Calculate viewport width based on active device
   const getCanvasWidth = () => {
-    if (activeDevice === 'mobile') return 360;
-    if (activeDevice === 'tablet') return 480;
-    return document?.bodySettings?.contentWidth || 600;
+    if (isMobile) return '375px';
+    if (isTablet) return '480px';
+    return `${document?.bodySettings?.contentWidth || 600}px`;
   };
 
   const canvasWidth = getCanvasWidth();
+  const numericContentWidth = isMobile ? 375 : isTablet ? 480 : (document?.bodySettings?.contentWidth || 600);
 
   return (
     <div
