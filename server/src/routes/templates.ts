@@ -15,6 +15,11 @@ import {
   softDeleteTemplate,
   updateTemplate,
 } from '../services/emailTemplateRepository.js';
+import {
+  generateSupabaseAuthLink,
+  isSupabaseAuthLinkConfigured,
+  shouldGenerateSupabaseAuthLink
+} from '../services/authLinks.js';
 
 const testSendHits = new Map<string, number[]>();
 
@@ -73,11 +78,31 @@ export async function registerTemplateRoutes(fastify: FastifyInstance) {
     const compiled = await compileTemplateById(request.params.id);
     const critical = compiled.quality.filter((issue) => issue.level === 'error');
     if (critical.length > 0) throw statusError(critical[0].message, 400);
+
+    let sampleData: Record<string, string> = { ...(request.body.sampleData || {}) };
+    if (!sampleData.ConfirmationURL && shouldGenerateSupabaseAuthLink(template.key, template.name) && isSupabaseAuthLinkConfigured()) {
+      const generated = await generateSupabaseAuthLink(email, email.split('@')[0], {
+        templateKey: template.key,
+        campaignName: template.name
+      });
+      if (generated.url) {
+        sampleData = {
+          ...sampleData,
+          ConfirmationURL: generated.url,
+          confirmation_url: generated.url,
+          login_url: generated.url,
+          magic_link: generated.url,
+          onboarding_url: generated.url,
+          action_url: generated.url
+        };
+      }
+    }
+
     const marker = '<div style="padding:8px 12px;background:#fff7ed;color:#9a3412;text-align:center;font:12px Arial">Test email from SuperMailBox</div>';
     const result = await sendEmail({
       to: email,
       subject: request.body.subject || `[TEST] ${template.subject || template.name}`,
-      html: marker + applyMergeTags(compiled.html, request.body.sampleData || {}),
+      html: marker + applyMergeTags(compiled.html, sampleData),
       fromName: 'SuperMailBox Test',
     });
     return result;
