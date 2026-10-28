@@ -79,7 +79,7 @@ export const Canvas: React.FC = () => {
               ref={rows.length === 0 ? setEmptyCanvasRef : undefined}
               style={{
                 width: '100%',
-                maxWidth: `${canvasWidth}px`,
+                maxWidth: canvasWidth,
                 background: isOverEmptyCanvas ? '#eff6ff' : isBodyContentGradient ? bodyContentBg : undefined,
                 backgroundColor: isOverEmptyCanvas ? '#eff6ff' : !isBodyContentGradient ? bodyContentBg : undefined,
                 boxShadow: '0 12px 32px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04)',
@@ -105,7 +105,7 @@ export const Canvas: React.FC = () => {
                       row={row}
                       index={idx}
                       totalRows={rows.length}
-                      contentWidth={canvasWidth}
+                      contentWidth={numericContentWidth}
                     />
                   ))
                 ) : (

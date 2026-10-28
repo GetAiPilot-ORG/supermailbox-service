@@ -28,23 +28,405 @@ const DEMO_TEMPLATES = [
     ]
   },
   {
+    key: 'getaipilot_confirm_email_otp',
+    name: 'GetAiPilot Confirm with Email OTP',
+    category: 'transactional',
+    versions: [
+      {
+        version_number: 1,
+        status: 'live',
+        created_by: 'GetAiPilot Security',
+        subject: 'Confirm Your GetAiPilot Account: {{ .Token }}',
+        html_source: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Your Email - GetAIPilot</title>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap');
+        body { margin: 0; padding: 0; min-width: 100%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fafafa; }
+        table { border-spacing: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        td { padding: 0; }
+        img { border: 0; }
+        a { text-decoration: none; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #fafafa; padding-top: 40px; padding-bottom: 40px; }
+        .webkit { max-width: 600px; margin: 0 auto; }
+        .outer { width: 100%; max-width: 600px; background-color: #ffffff; color: #111827; margin: 0 auto; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); overflow: hidden; }
+        @media screen and (max-width: 600px) {
+            .feedback-table td { display: block; width: 100% !important; text-align: center !important; }
+            .content-padding { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #fafafa;">
+    <center class="wrapper">
+        <div class="webkit">
+            <table class="outer" align="center">
+                <!-- Logo -->
+                <tr>
+                    <td align="center" style="padding: 40px 20px 20px 20px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                            <tr>
+                                <td style="padding-right: 10px;">
+                                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" alt="GetAIPilot Logo" width="36" height="36" style="width: 36px; height: 36px; display: block;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <span style="font-size: 24px; font-weight: 700; color: #111827; letter-spacing: -0.5px;">Get AI Pilot</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Titles -->
+                <tr>
+                    <td align="center" class="content-padding" style="padding: 10px 40px 20px 40px; text-align: center;">
+                        <h1 style="font-size: 32px; font-weight: 700; color: #111827; margin: 0 0 5px 0;">Confirm Email with</h1>
+                        <h2 style="font-size: 22px; font-weight: 700; color: #065f46; margin: 0 0 20px 0;">Verification Code</h2>
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0;">
+                            Welcome to <strong>GetAIPilot</strong>! Enter this verification code in your mobile app to confirm your email and complete your registration:
+                        </p>
+                        <div style="background-color: #f0fdf4; border: 2px dashed #065f46; border-radius: 12px; padding: 18px 24px; margin: 24px auto; display: inline-block; min-width: 200px;">
+                            <div style="font-size: 11px; font-weight: 700; color: #065f46; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">Verification Code</div>
+                            <span style="font-family: 'JetBrains Mono', Monaco, Consolas, monospace; font-size: 34px; font-weight: 800; color: #065f46; letter-spacing: 8px; display: block;">{{ .Token }}</span>
+                        </div>
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0 0 20px 0;">
+                            Or, use this verification code: <strong>{{ .Token }}</strong>
+                        </p>
+                    </td>
+                </tr>
+                <!-- Subtext -->
+                <tr>
+                    <td align="center" class="content-padding" style="padding: 0 40px 25px 40px; text-align: center;">
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0;">
+                            If you did not request this verification code, you can safely ignore this email.
+                        </p>
+                    </td>
+                </tr>
+                <!-- Main CTA -->
+                <tr>
+                    <td align="center" style="padding: 0 40px 30px 40px;">
+                        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #065f46; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 4px; box-shadow: 0 2px 4px rgba(6, 95, 70, 0.2);">Confirm Email</a>
+                    </td>
+                </tr>
+                <!-- Fallback link -->
+                <tr>
+                    <td align="center" style="padding: 0 40px 45px 40px;">
+                        <p style="font-size:13px; color:#9ca3af; line-height:1.4; margin:0;">
+                            If the button doesn't work, copy and paste this URL into your browser:<br>
+                            <a href="{{ .ConfirmationURL }}" style="color:#065f46; word-break:break-all;">{{ .ConfirmationURL }}</a>
+                        </p>
+                    </td>
+                </tr>
+                <!-- Help Section -->
+                <tr>
+                    <td style="background-color: #f0fdf4; padding: 35px 40px; border-top: 1px solid #dcfce7; border-bottom: 1px solid #dcfce7;">
+                        <table class="feedback-table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center" valign="middle" style="text-align: center;">
+                                    <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">Need Help?</h3>
+                                    <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                    </p>
+                                    <a href="tel:8982285510" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Footer Section -->
+                <tr>
+                    <td align="center" class="content-padding" style="background-color: #ffffff; padding: 45px 40px;">
+                        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 10px 0;">Stay Connected</h3>
+                        <p style="font-size: 13px; color: #6b7280; margin: 0 0 25px 0; line-height: 1.5;">
+                            Follow us for the latest AI automation updates and tips.
+                        </p>
+                        <table width="100%" style="max-width: 250px; margin: 0 auto;" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center">
+                                    <a href="https://facebook.com/getaipilot.in" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/facebook-new.png" width="24" alt="Facebook" /></a>
+                                    <a href="https://www.linkedin.com/company/getaipilot" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/linkedin.png" width="24" alt="LinkedIn" /></a>
+                                    <a href="https://www.instagram.com/getaipilot/" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/instagram-new.png" width="24" alt="Instagram" /></a>
+                                    <a href="https://youtube.com/@getaipilot.in" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/youtube-play.png" width="24" alt="YouTube" /></a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="font-size: 12px; color: #9ca3af; margin: 25px 0 0 0;">
+                            &copy; 2026 GetAIPilot. All rights reserved.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </center>
+</body>
+</html>`
+      }
+    ]
+  },
+  {
+    key: 'getaipilot_magic_link_otp',
+    name: 'GetAiPilot Magic Link / OTP (Default)',
+    category: 'transactional',
+    versions: [
+      {
+        version_number: 1,
+        status: 'live',
+        created_by: 'GetAiPilot Security',
+        subject: 'Your GetAiPilot Magic Login Code: {{ .Token }}',
+        html_source: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magic Link Login - GetAIPilot</title>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap');
+        body { margin: 0; padding: 0; min-width: 100%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fafafa; }
+        table { border-spacing: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        td { padding: 0; }
+        img { border: 0; }
+        a { text-decoration: none; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #fafafa; padding-top: 40px; padding-bottom: 40px; }
+        .webkit { max-width: 600px; margin: 0 auto; }
+        .outer { width: 100%; max-width: 600px; background-color: #ffffff; color: #111827; margin: 0 auto; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); overflow: hidden; }
+        @media screen and (max-width: 600px) {
+            .feedback-table td { display: block; width: 100% !important; text-align: center !important; }
+            .content-padding { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #fafafa;">
+    <center class="wrapper">
+        <div class="webkit">
+            <table class="outer" align="center">
+                <!-- Logo -->
+                <tr>
+                    <td align="center" style="padding: 40px 20px 20px 20px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                            <tr>
+                                <td style="padding-right: 10px;">
+                                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" alt="GetAIPilot Logo" width="36" height="36" style="width: 36px; height: 36px; display: block;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <span style="font-size: 24px; font-weight: 700; color: #111827; letter-spacing: -0.5px;">Get AI Pilot</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Titles -->
+                <tr>
+                    <td align="center" class="content-padding" style="padding: 10px 40px 20px 40px; text-align: center;">
+                        <h1 style="font-size: 32px; font-weight: 700; color: #111827; margin: 0 0 5px 0;">Magic Link</h1>
+                        <h2 style="font-size: 22px; font-weight: 700; color: #065f46; margin: 0 0 20px 0;">Secure Login</h2>
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0;">
+                            Click the button below to securely sign in to your <strong>GetAIPilot</strong> account. No password required!
+                        </p>
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 20px 0 0 0;">
+                            Or, use this verification code: <strong>{{ .Token }}</strong>
+                        </p>
+                    </td>
+                </tr>
+                <!-- Subtext -->
+                <tr>
+                    <td align="center" class="content-padding" style="padding: 0 40px 25px 40px; text-align: center;">
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0;">
+                            If you did not request this magic link, you can safely ignore this email.
+                        </p>
+                    </td>
+                </tr>
+                <!-- Main CTA -->
+                <tr>
+                    <td align="center" style="padding: 0 40px 30px 40px;">
+                        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #065f46; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 4px; box-shadow: 0 2px 4px rgba(6, 95, 70, 0.2);">Log In Securely</a>
+                    </td>
+                </tr>
+                <!-- Fallback link -->
+                <tr>
+                    <td align="center" style="padding: 0 40px 45px 40px;">
+                        <p style="font-size:13px; color:#9ca3af; line-height:1.4; margin:0;">
+                            If the button doesn't work, copy and paste this URL into your browser:<br>
+                            <a href="{{ .ConfirmationURL }}" style="color:#065f46; word-break:break-all;">{{ .ConfirmationURL }}</a>
+                        </p>
+                    </td>
+                </tr>
+                <!-- Help Section -->
+                <tr>
+                    <td style="background-color: #f0fdf4; padding: 35px 40px; border-top: 1px solid #dcfce7; border-bottom: 1px solid #dcfce7;">
+                        <table class="feedback-table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center" valign="middle" style="text-align: center;">
+                                    <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">Need Help?</h3>
+                                    <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                    </p>
+                                    <a href="tel:8982285510" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Footer Section -->
+                <tr>
+                    <td align="center" class="content-padding" style="background-color: #ffffff; padding: 45px 40px;">
+                        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 10px 0;">Stay Connected</h3>
+                        <p style="font-size: 13px; color: #6b7280; margin: 0 0 25px 0; line-height: 1.5;">
+                            Follow us for the latest AI automation updates and tips.
+                        </p>
+                        <table width="100%" style="max-width: 250px; margin: 0 auto;" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center">
+                                    <a href="https://facebook.com/getaipilot.in" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/facebook-new.png" width="24" alt="Facebook" /></a>
+                                    <a href="https://www.linkedin.com/company/getaipilot" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/linkedin.png" width="24" alt="LinkedIn" /></a>
+                                    <a href="https://www.instagram.com/getaipilot/" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/instagram-new.png" width="24" alt="Instagram" /></a>
+                                    <a href="https://youtube.com/@getaipilot.in" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/youtube-play.png" width="24" alt="YouTube" /></a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="font-size: 12px; color: #9ca3af; margin: 25px 0 0 0;">
+                            &copy; 2026 GetAIPilot. All rights reserved.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </center>
+</body>
+</html>`
+      }
+    ]
+  },
+  {
     key: 'otp_login',
-    name: 'Two-Factor Authentication / Login OTP',
+    name: 'Magic Link & OTP Instant Login',
     category: 'transactional',
     versions: [
       {
         version_number: 1,
         status: 'live',
         created_by: 'Security Bot',
-        subject: 'Your authentication code is {{otp_code}}',
-        html_source: `<div style="font-family: Inter, sans-serif; max-width: 500px; margin: 0 auto; background: #131315; color: #e5e1e4; padding: 40px; border-radius: 20px; border: 1px solid #353437; text-align: center;">
-  <h2 style="color: #ffffff; font-size: 22px;">Verification Required</h2>
-  <p style="color: #c7c4d7; font-size: 15px;">Hello {{name}}, enter the code below to complete your login attempt:</p>
-  <div style="background: #201f21; padding: 24px; border-radius: 16px; margin: 24px 0; border: 1px solid #464554;">
-    <span style="font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: bold; color: #a855f7; letter-spacing: 6px;">{{otp_code}}</span>
-  </div>
-  <p style="color: #ffb4ab; font-size: 13px;">⚠️ This code expires in <strong>{{expires_in}}</strong>. Never share this code with anyone.</p>
-</div>`
+        subject: 'Your GetAiPilot Magic Login Code: {{ .Token }}',
+        html_source: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Magic Link Login - GetAIPilot</title>
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap');
+        body { margin: 0; padding: 0; min-width: 100%; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fafafa; }
+        table { border-spacing: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        td { padding: 0; }
+        img { border: 0; }
+        a { text-decoration: none; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #fafafa; padding-top: 40px; padding-bottom: 40px; }
+        .webkit { max-width: 600px; margin: 0 auto; }
+        .outer { width: 100%; max-width: 600px; background-color: #ffffff; color: #111827; margin: 0 auto; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); overflow: hidden; }
+        @media screen and (max-width: 600px) {
+            .feedback-table td { display: block; width: 100% !important; text-align: center !important; }
+            .content-padding { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #fafafa;">
+    <center class="wrapper">
+        <div class="webkit">
+            <table class="outer" align="center">
+                <!-- Logo -->
+                <tr>
+                    <td align="center" style="padding: 40px 20px 20px 20px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                            <tr>
+                                <td style="padding-right: 10px;">
+                                    <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" alt="GetAIPilot Logo" width="36" height="36" style="width: 36px; height: 36px; display: block;">
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <span style="font-size: 24px; font-weight: 700; color: #111827; letter-spacing: -0.5px;">Get AI Pilot</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Titles -->
+                <tr>
+                    <td align="center" class="content-padding" style="padding: 10px 40px 20px 40px; text-align: center;">
+                        <h1 style="font-size: 32px; font-weight: 700; color: #111827; margin: 0 0 5px 0;">Magic Link</h1>
+                        <h2 style="font-size: 22px; font-weight: 700; color: #065f46; margin: 0 0 20px 0;">Secure Login</h2>
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0;">
+                            Click the button below to securely sign in to your <strong>GetAIPilot</strong> account. No password required!
+                        </p>
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 20px 0 0 0;">
+                            Or, use this verification code: <strong>{{ .Token }}</strong>
+                        </p>
+                    </td>
+                </tr>
+                <!-- Subtext -->
+                <tr>
+                    <td align="center" class="content-padding" style="padding: 0 40px 25px 40px; text-align: center;">
+                        <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0;">
+                            If you did not request this magic link, you can safely ignore this email.
+                        </p>
+                    </td>
+                </tr>
+                <!-- Main CTA -->
+                <tr>
+                    <td align="center" style="padding: 0 40px 30px 40px;">
+                        <a href="{{ .ConfirmationURL }}" style="display: inline-block; background-color: #065f46; color: #ffffff; font-size: 14px; font-weight: 700; text-decoration: none; padding: 14px 32px; border-radius: 4px; box-shadow: 0 2px 4px rgba(6, 95, 70, 0.2);">Log In Securely</a>
+                    </td>
+                </tr>
+                <!-- Fallback link -->
+                <tr>
+                    <td align="center" style="padding: 0 40px 45px 40px;">
+                        <p style="font-size:13px; color:#9ca3af; line-height:1.4; margin:0;">
+                            If the button doesn't work, copy and paste this URL into your browser:<br>
+                            <a href="{{ .ConfirmationURL }}" style="color:#065f46; word-break:break-all;">{{ .ConfirmationURL }}</a>
+                        </p>
+                    </td>
+                </tr>
+                <!-- Help Section -->
+                <tr>
+                    <td style="background-color: #f0fdf4; padding: 35px 40px; border-top: 1px solid #dcfce7; border-bottom: 1px solid #dcfce7;">
+                        <table class="feedback-table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center" valign="middle" style="text-align: center;">
+                                    <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">Need Help?</h3>
+                                    <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                    </p>
+                                    <a href="tel:8982285510" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Footer Section -->
+                <tr>
+                    <td align="center" class="content-padding" style="background-color: #ffffff; padding: 45px 40px;">
+                        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 10px 0;">Stay Connected</h3>
+                        <p style="font-size: 13px; color: #6b7280; margin: 0 0 25px 0; line-height: 1.5;">
+                            Follow us for the latest AI automation updates and tips.
+                        </p>
+                        <table width="100%" style="max-width: 250px; margin: 0 auto;" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center">
+                                    <a href="https://facebook.com/getaipilot.in" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/facebook-new.png" width="24" alt="Facebook" /></a>
+                                    <a href="https://www.linkedin.com/company/getaipilot" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/linkedin.png" width="24" alt="LinkedIn" /></a>
+                                    <a href="https://www.instagram.com/getaipilot/" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/instagram-new.png" width="24" alt="Instagram" /></a>
+                                    <a href="https://youtube.com/@getaipilot.in" style="text-decoration: none; margin: 0 8px;"><img src="https://img.icons8.com/ios-filled/50/6b7280/youtube-play.png" width="24" alt="YouTube" /></a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="font-size: 12px; color: #9ca3af; margin: 25px 0 0 0;">
+                            &copy; 2026 GetAIPilot. All rights reserved.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </center>
+</body>
+</html>`
       }
     ]
   },
@@ -2041,7 +2423,7 @@ async function runSeed() {
 
   // Get the product ID for getaipilot
   const { data: product } = await supabase.from('products').select('id').eq('code', 'getaipilot').single();
-  
+
   if (!product) {
     console.error('Error: Product getaipilot not found. Cannot seed templates.');
     process.exit(1);

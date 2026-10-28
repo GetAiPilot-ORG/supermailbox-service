@@ -3,6 +3,14 @@ import { createBlock, createDefaultDocument, createUniqueId } from '../utils/blo
 
 function decodeHtmlEntities(str: string): string {
   if (!str) return '';
+  if (typeof DOMParser !== 'undefined') {
+    try {
+      const doc = new DOMParser().parseFromString(str, 'text/html');
+      return doc.body.textContent || str;
+    } catch {
+      // Fall through to regex replacement
+    }
+  }
   return str
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
@@ -27,19 +35,6 @@ function parseCssStyles(styleAttr: string | null | undefined): Record<string, st
     }
   }
   return result;
-}
-
-function decodeHtmlEntities(str: string): string {
-  if (!str) return '';
-  if (typeof DOMParser !== 'undefined') {
-    try {
-      const doc = new DOMParser().parseFromString(str, 'text/html');
-      return doc.body.textContent || str;
-    } catch {
-      return str;
-    }
-  }
-  return str;
 }
 
 function htmlElementToBlocks(node: Element, parentColor?: string): EmailBlock[] {
@@ -348,13 +343,13 @@ export function parseHtmlToDocument(
         // Check if pure spacer row
         const trText = tr.textContent?.trim() || '';
         const cells = Array.from(tr.querySelectorAll(':scope > td, :scope > th'));
-        
+
         const isSpacer = cells.length === 1 && (
           trText === '' || trText === ' ' || trText === '&nbsp;'
         ) && (
-          cells[0].hasAttribute('height') ||
-          (cells[0].getAttribute('style') || '').includes('height')
-        );
+            cells[0].hasAttribute('height') ||
+            (cells[0].getAttribute('style') || '').includes('height')
+          );
 
         if (isSpacer) {
           const hStr = cells[0].getAttribute('height') || parseCssStyles(cells[0].getAttribute('style'))['height'] || '16px';
