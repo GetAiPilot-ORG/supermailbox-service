@@ -343,13 +343,13 @@ export function parseHtmlToDocument(
         // Check if pure spacer row
         const trText = tr.textContent?.trim() || '';
         const cells = Array.from(tr.querySelectorAll(':scope > td, :scope > th'));
-        
+
         const isSpacer = cells.length === 1 && (
           trText === '' || trText === ' ' || trText === '&nbsp;'
         ) && (
-          cells[0].hasAttribute('height') ||
-          (cells[0].getAttribute('style') || '').includes('height')
-        );
+            cells[0].hasAttribute('height') ||
+            (cells[0].getAttribute('style') || '').includes('height')
+          );
 
         if (isSpacer) {
           const hStr = cells[0].getAttribute('height') || parseCssStyles(cells[0].getAttribute('style'))['height'] || '16px';

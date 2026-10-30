@@ -436,7 +436,30 @@ export const CATEGORY_DEFINITIONS: CategoryDefinition[] = [
     description: 'Triggered when a user signs up on getaipilot.in — sends the official verification link to activate their account and access their dashboard.',
     eventTrigger: 'send-auth-email (signup / confirm_email)',
     defaultKey: 'getaipilot_confirm_email',
-    matchKeys: ['getaipilot_confirm_email', 'getaipilot_confirm_email_v2', 'getaipilot_confirm_email_v3', 'getaipilot_confirm_email_v4']
+    matchKeys: [
+      'getaipilot_confirm_email',
+      'getaipilot_confirm_email_v2',
+      'getaipilot_confirm_email_v3',
+      'getaipilot_confirm_email_v4',
+      'getaipilot_confirm_email_otp',
+      'confirm_email_otp'
+    ]
+  },
+  {
+    id: 'confirm_email_otp',
+    name: 'Mobile Signup & Confirm Email OTP',
+    app: 'getaipilot',
+    appName: 'GetAiPilot Core',
+    description: 'Triggered when a user registers from the mobile app — sends a 6-digit OTP code and verification link to activate their account.',
+    eventTrigger: 'send-auth-email (signup / confirm_email_otp)',
+    defaultKey: 'getaipilot_confirm_email_otp',
+    matchKeys: [
+      'getaipilot_confirm_email_otp',
+      'confirm_email_otp',
+      'signup_otp',
+      'verification_otp',
+      'getaipilot_verify_otp'
+    ]
   },
   {
     id: 'reset_password',
@@ -456,7 +479,20 @@ export const CATEGORY_DEFINITIONS: CategoryDefinition[] = [
     description: 'Triggered when a user requests passwordless authentication via 6-digit OTP code or 1-click magic sign-in link.',
     eventTrigger: 'send-auth-email (magiclink / otp_login)',
     defaultKey: 'getaipilot_magic_link_otp',
-    matchKeys: ['getaipilot_magic_link_otp', 'getaipilot_magic_link_otp_v2', 'getaipilot_magic_link_otp_v3', 'otp_login']
+    matchKeys: [
+      'getaipilot_magic_link_otp',
+      'getaipilot_magic_link_otp_v2',
+      'getaipilot_magic_link_otp_v3',
+      'otp_login',
+      'getaipilot_magic_link',
+      'magic_link',
+      'magiclink',
+      'otp',
+      'getaipilot_otp',
+      'auth_otp',
+      'login_otp',
+      'gap_whatsapp_otp'
+    ]
   },
   {
     id: 'change_email',
@@ -763,9 +799,15 @@ export async function setDefaultTemplateForCategory(categoryId: string, template
 }
 
 export async function resolveCategoryDefaultTemplateKey(templateKey: string): Promise<string> {
-  // Check if templateKey is a category default key or category alias
+  const cleanKey = (templateKey || '').toLowerCase().trim();
+  // Check if templateKey is a category default key, category id, or listed in matchKeys
   const matchedCategory = CATEGORY_DEFINITIONS.find((cat) =>
-    !cat.isCatchAll && (cat.id === templateKey || cat.defaultKey === templateKey)
+    !cat.isCatchAll && (
+      cat.id === templateKey ||
+      cat.defaultKey === templateKey ||
+      cat.matchKeys.includes(templateKey) ||
+      cat.matchKeys.some((mk) => mk.toLowerCase() === cleanKey)
+    )
   );
 
   if (matchedCategory) {

@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 type AuthLinkResult = {
   url: string | null;
+  otpCode?: string | null;
   error?: string;
 };
 
@@ -41,7 +42,17 @@ export const isOnboardingTemplate = (templateKey?: string, campaignName?: string
 
 export const isVerificationTemplate = (templateKey?: string, campaignName?: string) => {
   const haystack = `${templateKey || ''} ${campaignName || ''}`.toLowerCase();
-  return ['verify', 'verification', 'confirm', 'confirmation', 'signup'].some((term) => haystack.includes(term));
+  return [
+    'verify',
+    'verification',
+    'confirm',
+    'confirmation',
+    'signup',
+    'magic_link',
+    'magiclink',
+    'otp',
+    'reauthentication'
+  ].some((term) => haystack.includes(term));
 };
 
 export function shouldGenerateSupabaseAuthLink(templateKey?: string, campaignName?: string) {
@@ -100,7 +111,8 @@ export async function generateSupabaseAuthLink(
 
   const properties = data?.properties as any;
   return {
-    url: properties?.action_link || properties?.actionLink || null
+    url: properties?.action_link || properties?.actionLink || null,
+    otpCode: properties?.email_otp || null
   };
 }
 
