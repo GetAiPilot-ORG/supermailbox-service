@@ -181,7 +181,6 @@ export class ApiService {
 
   static logout() {
     localStorage.removeItem('adminToken');
-    window.location.reload();
   }
   static async getCampaignJobStats(campaignId: string): Promise<CampaignJobStats> {
     try {

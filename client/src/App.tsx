@@ -15,6 +15,8 @@ import { EasyEmailEditorPoc } from './features/email-templates/poc/EasyEmailEdit
 import { LoginPage } from './pages/LoginPage';
 import { SegmentBuilder } from './pages/SegmentBuilder';
 import { SuppressionManager } from './pages/SuppressionManager';
+import { WorkspaceChooser } from './pages/WorkspaceChooser';
+import { SalesApp } from './features/sales/SalesApp';
 import { ApiService } from './services/api';
 import type { MetricCardData, QueueJob, ActivityLog, Template, Campaign, SuppressionItem, BounceReportItem } from './services/api';
 import './App.css';
@@ -27,18 +29,50 @@ gsap.registerPlugin(useGSAP);
 
 export const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('adminToken'));
+  const [pathname, setPathname] = useState(() => window.location.pathname);
+  const crmEnabled = import.meta.env.VITE_CRM_ENABLED !== 'false';
+
+  useEffect(() => {
+    const readPath = () => setPathname(window.location.pathname);
+    window.addEventListener('popstate', readPath);
+    return () => window.removeEventListener('popstate', readPath);
+  }, []);
+
+  const navigate = (path: string) => {
+    window.history.pushState(null, '', path);
+    setPathname(path);
+  };
+
+  const logout = () => {
+    ApiService.logout();
+    window.history.replaceState(null, '', '/login');
+    setPathname('/login');
+    setIsAuthenticated(false);
+  };
 
   if (window.location.pathname === '/dev/email-editor/custom') return <CustomEmailEditorPoc />;
   if (window.location.pathname === '/dev/email-editor/easy-email') return <EasyEmailEditorPoc />;
   
   if (!isAuthenticated) {
-    return <LoginPage onLogin={() => setIsAuthenticated(true)} />;
+    return <LoginPage onLogin={() => {
+      setIsAuthenticated(true);
+      if (window.location.pathname === '/' || window.location.pathname === '/login') {
+        const destination = crmEnabled ? '/workspace' : '/dashboard';
+        window.history.replaceState(null, '', destination);
+        setPathname(destination);
+      }
+    }} />;
   }
 
-  return <DashboardApp />;
+  if (pathname.startsWith('/sales') && crmEnabled) return <SalesApp onNavigate={navigate} onLogout={logout} />;
+  if ((pathname === '/' || pathname === '/workspace') && crmEnabled) return <WorkspaceChooser crmEnabled={crmEnabled} onNavigate={navigate} onLogout={logout} />;
+  if ((pathname.startsWith('/sales') || pathname === '/workspace') && !crmEnabled) {
+    window.history.replaceState(null, '', '/dashboard');
+  }
+  return <DashboardApp onLogout={logout} />;
 };
 
-const DashboardApp: React.FC = () => {
+const DashboardApp: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     const path = window.location.pathname;
     if (path.startsWith('/dashboard/templates')) return 'templates';
@@ -231,6 +265,7 @@ const DashboardApp: React.FC = () => {
           }}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onLogout={onLogout}
         />
       )}
 

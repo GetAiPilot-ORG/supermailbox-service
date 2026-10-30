@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test:e2e": "playwright test",
+    "test:sales": "playwright test --config=playwright.sales.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {

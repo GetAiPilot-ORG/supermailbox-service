@@ -3,6 +3,14 @@ import { createBlock, createDefaultDocument, createUniqueId } from '../utils/blo
 
 function decodeHtmlEntities(str: string): string {
   if (!str) return '';
+  if (typeof DOMParser !== 'undefined') {
+    try {
+      const doc = new DOMParser().parseFromString(str, 'text/html');
+      return doc.body.textContent || str;
+    } catch {
+      // Fallback to manual entity replacement
+    }
+  }
   return str
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
@@ -27,19 +35,6 @@ function parseCssStyles(styleAttr: string | null | undefined): Record<string, st
     }
   }
   return result;
-}
-
-function decodeHtmlEntities(str: string): string {
-  if (!str) return '';
-  if (typeof DOMParser !== 'undefined') {
-    try {
-      const doc = new DOMParser().parseFromString(str, 'text/html');
-      return doc.body.textContent || str;
-    } catch {
-      return str;
-    }
-  }
-  return str;
 }
 
 function htmlElementToBlocks(node: Element, parentColor?: string): EmailBlock[] {

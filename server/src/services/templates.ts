@@ -5,6 +5,7 @@ import {
   isSupabaseAuthLinkConfigured,
   shouldGenerateSupabaseAuthLink
 } from './authLinks.js';
+import { resolveCategoryDefaultTemplateKey } from './emailTemplateRepository.js';
 
 export async function renderTemplate(
   templateKey: string,

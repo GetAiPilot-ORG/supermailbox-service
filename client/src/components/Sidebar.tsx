@@ -5,6 +5,7 @@ import {
   ClipboardList,
   FileText,
   LayoutDashboard,
+  LogOut,
   MailCheck,
   Megaphone,
   ShieldCheck,
@@ -19,6 +20,7 @@ interface SidebarProps {
   onSelectTab: (tab: TabType) => void;
   collapsed: boolean;
   onToggleCollapse: () => void;
+  onLogout: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -26,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTab,
   collapsed,
   onToggleCollapse,
+  onLogout,
 }) => {
   const navItems = [
     {
@@ -72,13 +75,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--ink)' }}>SuperMail</span>
             </div>
           )}
-          <button
-            onClick={onToggleCollapse}
-            className="sidebar-collapse-icon"
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px', color: 'var(--ink)' }}><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-          </button>
+          <div className="sidebar-brand-actions">
+            <button className="sidebar-logout-mobile" onClick={onLogout} aria-label="Log out" title="Log out">
+              <LogOut size={19} />
+            </button>
+            <button
+              onClick={onToggleCollapse}
+              className="sidebar-collapse-icon"
+              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px', color: 'var(--ink)' }}><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+          </div>
         </div>
 
 
@@ -106,18 +115,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="sidebar-footer">
-        {!collapsed && (
-          <div className="sidebar-user">
-            <div className="sidebar-user-avatar">
-              <UserRound size={16} />
-            </div>
-            <div className="sidebar-user-copy">
-              <span>Admin User</span>
-              <small>Workspace</small>
-            </div>
-            <span className="sidebar-status-dot" aria-label="Online" />
-          </div>
-        )}
+        <button className={`sidebar-user${collapsed ? ' sidebar-user--collapsed' : ''}`} onClick={onLogout} title="Log out">
+          {collapsed ? <LogOut size={19} /> : (
+            <>
+              <span className="sidebar-user-avatar"><UserRound size={16} /></span>
+              <span className="sidebar-user-copy"><span>Admin User</span><small>Log out of workspace</small></span>
+              <LogOut className="sidebar-user-logout" size={17} aria-hidden="true" />
+            </>
+          )}
+        </button>
       </div>
     </aside>
   );

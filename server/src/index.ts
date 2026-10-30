@@ -28,6 +28,7 @@ import { registerApiRoutes } from './routes/api.js';
 import { registerTemplateRoutes } from './routes/templates.js';
 import { registerBrandRoutes } from './routes/brand.js';
 import { registerAuthRoutes } from './routes/auth.js';
+import { registerCrmRoutes } from './routes/crm.js';
 import { initCampaignWorker } from './workers/campaignWorker.js';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
@@ -62,6 +63,9 @@ await fastify.register(cors, {
 fastify.addHook('preHandler', async (request, reply) => {
   const url = request.url;
   if (!url.startsWith('/v1/') || url.startsWith('/v1/auth/login') || url.startsWith('/v1/webhooks')) {
+    return;
+  }
+  if (url.startsWith('/v1/crm/events') && request.headers['x-product-event-key']) {
     return;
   }
   const authHeader = request.headers.authorization || (request.headers as any)['Authorization'];
@@ -107,6 +111,7 @@ await registerWebhookRoutes(fastify);
 await registerTemplateRoutes(fastify);
 await registerApiRoutes(fastify);
 await registerBrandRoutes(fastify);
+await registerCrmRoutes(fastify);
 
 // Initialize worker and Bull-Board if Redis is alive
 try {
