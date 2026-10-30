@@ -27,8 +27,6 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
   initialAssetType = 'all',
   initialFile,
 }) => {
-  if (!isOpen) return null;
-
   const [activeTab, setActiveTab] = useState<PickerTab>(
     initialAssetType === 'logo' ? 'logo' : initialAssetType === 'banner' ? 'banner' : 'all'
   );
@@ -130,6 +128,8 @@ export const AssetPickerDialog: React.FC<AssetPickerDialogProps> = ({
   const filteredSnippets = snippets.filter(s => 
     !queryLower || s.name.toLowerCase().includes(queryLower) || s.plain_text.toLowerCase().includes(queryLower)
   );
+
+  if (!isOpen) return null;
 
   return (
     <div className="brandLibraryRoot">

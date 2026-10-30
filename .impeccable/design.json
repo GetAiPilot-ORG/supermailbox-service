@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T00:00:00+05:30",
+  "title": "Design System: SupermailBox Operations",
+  "extensions": {
+    "colorMeta": {
+      "mineral-ground": { "role": "neutral", "displayName": "Warm Mineral Ground", "canonical": "#F5F1EC", "tonalRamp": ["#2A2723", "#4D4740", "#70675D", "#958B80", "#B9B0A6", "#D8D1C9", "#E9E4DE", "#F5F1EC"] },
+      "working-surface": { "role": "neutral", "displayName": "Working White", "canonical": "#FFFFFF", "tonalRamp": ["#262626", "#484848", "#6B6B6B", "#8F8F8F", "#B4B4B4", "#D7D7D7", "#EEEEEE", "#FFFFFF"] },
+      "graphite-ink": { "role": "neutral", "displayName": "Graphite Ink", "canonical": "#1C1E21", "tonalRamp": ["#181A1C", "#34373A", "#52565A", "#73777B", "#969A9E", "#BABDC0", "#DCDEE0", "#F1F2F3"] },
+      "sage": { "role": "primary", "displayName": "Control Sage", "canonical": "#769181", "tonalRamp": ["#17221C", "#2C4035", "#425E4F", "#5A7C69", "#769181", "#9EB4A7", "#C5D4CB", "#EAF0EC"] },
+      "sage-deep": { "role": "primary", "displayName": "Deep Control Sage", "canonical": "#5A7163", "tonalRamp": ["#152019", "#29392F", "#3E5345", "#546E5C", "#718B79", "#97AB9D", "#C1CDC5", "#EAF0EC"] },
+      "sage-soft": { "role": "primary", "displayName": "Soft Sage Wash", "canonical": "#DFE9E3", "tonalRamp": ["#1B241F", "#34433B", "#4F6357", "#6C8476", "#8EA598", "#B1C5BA", "#D4E0D9", "#F0F5F2"] },
+      "success": { "role": "semantic", "displayName": "Confirmed Green", "canonical": "#31A24C", "tonalRamp": ["#092711", "#10491F", "#176D2E", "#23913F", "#43AC59", "#75C685", "#ABE0B5", "#E3F5E7"] },
+      "warning": { "role": "semantic", "displayName": "Attention Amber", "canonical": "#F7B928", "tonalRamp": ["#2B1D03", "#573B06", "#855B09", "#B47D11", "#DEA220", "#F5C75C", "#F9DFA0", "#FFF3D7"] },
+      "danger": { "role": "semantic", "displayName": "Urgent Red", "canonical": "#E41E3F", "tonalRamp": ["#2C070D", "#570D19", "#841326", "#B31934", "#DB2C49", "#EA667B", "#F2A3AF", "#FCE1E6"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Workspace Display", "purpose": "Workspace selection and rare entry moments." },
+      "headline": { "displayName": "Command Headline", "purpose": "Page titles in the operational command strip." },
+      "title": { "displayName": "Work Title", "purpose": "Panels, record sections, and actionable groups." },
+      "body": { "displayName": "Operational Body", "purpose": "Forms, instructions, record values, and supporting explanations." },
+      "label": { "displayName": "Operational Label", "purpose": "Natural sentence-case navigation, fields, status, and metadata." }
+    },
+    "shadows": [
+      { "name": "drawer-directional", "value": "-16px 0 44px rgba(13, 20, 16, 0.14)", "purpose": "Separates the contextual customer drawer from the retained work surface." },
+      { "name": "floating-feedback", "value": "0 10px 24px rgba(21, 66, 35, 0.12)", "purpose": "Confirms transient success feedback." },
+      { "name": "entry-panel", "value": "0 18px 42px rgba(24, 31, 27, 0.08)", "purpose": "Gives the workspace chooser a single calm elevated plane." }
+    ],
+    "motion": [
+      { "name": "state-fast", "value": "160ms ease", "purpose": "Button and border state feedback." },
+      { "name": "drawer-enter", "value": "190ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Short directional drawer entry; disabled under reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "rail-compact", "value": "1100px" },
+      { "name": "mobile-operate", "value": "700px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Commits the main operational action within the current context.",
+      "html": "<button class=\"ds-btn-primary\">Save sales stage</button>",
+      "css": ".ds-btn-primary{min-height:38px;display:inline-flex;align-items:center;justify-content:center;padding:0 14px;border:1px solid var(--primary-dark,#5A7163);border-radius:8px;color:#fff;background:var(--primary-dark,#5A7163);font:700 .8rem var(--font-sans,sans-serif);cursor:pointer;transition:background 160ms ease,transform 160ms ease}.ds-btn-primary:hover{background:#486052}.ds-btn-primary:active{transform:scale(.98)}.ds-btn-primary:focus-visible{outline:3px solid var(--focus,rgba(118,145,129,.4));outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Runs a supporting action without competing with the main commit.",
+      "html": "<button class=\"ds-btn-secondary\">Save follow-up</button>",
+      "css": ".ds-btn-secondary{min-height:38px;display:inline-flex;align-items:center;justify-content:center;padding:0 14px;border:1px solid var(--border-strong,#CED0D4);border-radius:8px;color:var(--ink,#1C1E21);background:#fff;font:700 .8rem var(--font-sans,sans-serif);cursor:pointer;transition:background 160ms ease,border-color 160ms ease}.ds-btn-secondary:hover{border-color:var(--primary,#769181);background:var(--primary-light,#DFE9E3)}.ds-btn-secondary:focus-visible{outline:3px solid var(--focus,rgba(118,145,129,.4));outline-offset:2px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A compact, explicit field for finding people or operational records.",
+      "html": "<label class=\"ds-search\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg><input placeholder=\"Search name, email, or phone\" /></label>",
+      "css": ".ds-search{min-height:40px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid var(--border,#DEE3E9);border-radius:8px;background:#FBFBFA}.ds-search svg{width:17px;fill:none;stroke:var(--text-muted,#5D6C7B);stroke-width:2}.ds-search input{width:100%;border:0;outline:0;color:var(--text-primary,#0A1317);background:transparent;font:.79rem var(--font-sans,sans-serif)}.ds-search:focus-within{outline:3px solid var(--focus,rgba(118,145,129,.4));outline-offset:2px}"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "description": "A compact, sentence-case indicator whose color reflects real workflow state.",
+      "html": "<span class=\"ds-status-chip\">Ready to contact</span>",
+      "css": ".ds-status-chip{min-height:24px;display:inline-flex;align-items:center;padding:3px 8px;border:1px solid #B9DFC2;border-radius:6px;color:#17602D;background:#EEF8F0;font:750 .67rem/1.2 var(--font-sans,sans-serif);white-space:nowrap}"
+    },
+    {
+      "name": "Work Panel",
+      "kind": "card",
+      "refersTo": "work-panel",
+      "description": "The flat, bordered working surface used for queues, forms, ledgers, and record sections.",
+      "html": "<section class=\"ds-work-panel\"><h3>Needs attention</h3><p>People and tasks that need action now.</p></section>",
+      "css": ".ds-work-panel{padding:18px;border:1px solid var(--border,#DEE3E9);border-radius:12px;color:var(--text-primary,#0A1317);background:#fff;font-family:var(--font-sans,sans-serif)}.ds-work-panel h3{margin:0;color:var(--ink,#1C1E21);font-size:.98rem;letter-spacing:-.015em}.ds-work-panel p{margin:5px 0 0;color:var(--text-secondary,#4B4C4F);font-size:.76rem;line-height:1.45}"
+    },
+    {
+      "name": "Rail Navigation",
+      "kind": "nav",
+      "description": "Compact persistent navigation with one solid sage active destination.",
+      "html": "<nav class=\"ds-rail\"><button>Today</button><button class=\"ds-active\">People</button><button>Pipeline</button></nav>",
+      "css": ".ds-rail{width:180px;display:grid;gap:4px;padding:12px;background:#F9F7F3;font-family:var(--font-sans,sans-serif)}.ds-rail button{min-height:42px;padding:0 12px;border:0;border-radius:8px;color:var(--text-secondary,#4B4C4F);background:transparent;font:650 .86rem var(--font-sans,sans-serif);text-align:left;cursor:pointer}.ds-rail button:hover{color:var(--ink,#1C1E21);background:#fff}.ds-rail .ds-active{color:#fff;background:var(--primary-dark,#5A7163)}.ds-rail button:focus-visible{outline:3px solid var(--focus,rgba(118,145,129,.4));outline-offset:2px}"
+    },
+    {
+      "name": "Recommended Next Step",
+      "kind": "custom",
+      "description": "A sage-tinted guidance inset that turns account evidence into one concrete action.",
+      "html": "<section class=\"ds-next-step\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg><div><small>Recommended next step</small><strong>Contact this user soon</strong><p>Recent product activity shows strong interest. Set a clear next step.</p></div></section>",
+      "css": ".ds-next-step{display:grid;grid-template-columns:auto 1fr;align-items:start;gap:13px;padding:15px 16px;border:1px solid #C7D9CF;border-radius:12px;color:var(--primary-dark,#5A7163);background:#F1F6F3;font-family:var(--font-sans,sans-serif)}.ds-next-step svg{width:20px;fill:none;stroke:currentColor;stroke-width:2}.ds-next-step small{color:var(--text-secondary,#4B4C4F);font-size:.7rem;font-weight:700}.ds-next-step strong{display:block;margin-top:4px;color:var(--ink,#1C1E21);font-size:.88rem}.ds-next-step p{margin:4px 0 0;color:var(--text-secondary,#4B4C4F);font-size:.73rem;line-height:1.45}"
+    },
+    {
+      "name": "Drawer Tabs",
+      "kind": "nav",
+      "description": "Sticky equal-width tabs separating overview, sales work, and immutable history.",
+      "html": "<nav class=\"ds-drawer-tabs\"><button class=\"ds-active\">Overview</button><button>Sales work</button><button>History</button></nav>",
+      "css": ".ds-drawer-tabs{display:grid;grid-template-columns:repeat(3,1fr);padding:0 14px;border-bottom:1px solid var(--border,#DEE3E9);background:#F8F7F4}.ds-drawer-tabs button{min-height:46px;border:0;border-bottom:2px solid transparent;color:var(--text-secondary,#4B4C4F);background:transparent;font:700 .78rem var(--font-sans,sans-serif);cursor:pointer}.ds-drawer-tabs button:hover{color:var(--ink,#1C1E21)}.ds-drawer-tabs .ds-active{color:var(--primary-dark,#5A7163);border-bottom-color:var(--primary-dark,#5A7163)}.ds-drawer-tabs button:focus-visible{outline:3px solid var(--focus,rgba(118,145,129,.4));outline-offset:-3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Calm Control Desk",
+    "overview": "SupermailBox is an Operate-mode product surface: disciplined, compact, and calm under operational pressure. Its warm mineral ground and white working planes keep dense records approachable, while graphite text and restrained sage states make the current action obvious without marketing-style spectacle. The interface behaves like a well-run desk rather than a passive report. Action queues lead; metrics and funnels support decisions. Plain-language labels, contact facts, recommended next steps, and progress checklists reduce interpretation work. Decoration is subordinate to scanability, recoverability, and accessible repeated use.",
+    "keyCharacteristics": ["Warm mineral canvas with crisp white work surfaces.", "Sage is the single interaction accent; semantic colors communicate real state.", "Dense ledgers, tables, and hairline divisions preserve information without visual noise.", "Actions stay close to the person, record, or state they affect.", "Lucide-style line icons and tabular numerals provide a consistent operational vocabulary."],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Sage carries interaction and selection; do not introduce another decorative accent.", "section": "colors" },
+      { "name": "The Semantic Honesty Rule", "body": "Green, amber, and red appear only when the underlying state earns that meaning.", "section": "colors" },
+      { "name": "The Plain Language Rule", "body": "Prefer “User status,” “Sales stage,” and “Recommended next step” over internal system terminology or abbreviations.", "section": "typography" },
+      { "name": "The Queue Before Report Rule", "body": "The first working viewport must answer “what needs action now?” before it explains aggregate performance.", "section": "layout" },
+      { "name": "The Flat-by-Default Rule", "body": "Do not add ambient card shadows to ordinary panels; use a hairline border and material contrast first.", "section": "elevation" }
+    ],
+    "dos": ["Do lead repeated-use screens with the next operational action.", "Do use plain-language sentence-case labels and short explanatory copy.", "Do keep contact details, plan, user status, interest, sales stage, and follow-up visible near the person.", "Do use tabular numerals for metrics, scores, and counts.", "Do provide 44px mobile targets and visible keyboard focus.", "Do remove nonessential transitions and drawer animation when reduced motion is requested."],
+    "donts": ["Don't turn the interface into a grid of equal KPI cards with no action hierarchy.", "Don't use forced all-caps labels, decorative gradients, glass effects, or promotional illustration in operational surfaces.", "Don't use semantic colors as decoration or rely on color alone to communicate state.", "Don't hide critical contact or account facts behind additional navigation.", "Don't add shadows to ordinary panels when a border and tonal layer are sufficient."]
+  }
+}

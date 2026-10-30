@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { createClient } from '@supabase/supabase-js';
 import { getMailerConfig, updateMailerConfig, sendEmail } from '../providers/mailer.js';
 import { verifyApiKeyAuth } from '../middleware/auth.js';
 import { enqueueCampaignJobs, enqueueTransactionalJob, campaignQueue } from '../queues/campaignQueue.js';
@@ -422,6 +423,113 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
       });
     }
 
+    // Detect if client device is mobile via Platform.OS (variables, user_metadata, headers, or Supabase user record)
+    const rawVars = (variables as any) || {};
+    const userMeta = (rawVars.user_metadata || rawVars.raw_user_meta_data || {}) as Record<string, any>;
+
+    const checkPlatformVal = (val: any) => {
+      const str = String(val || '').toLowerCase().trim();
+      return str === 'ios' || str === 'android' || str === 'mobile';
+    };
+
+    let isMobileDevice =
+      checkPlatformVal(rawVars.platform) ||
+      checkPlatformVal(rawVars.device_os) ||
+      checkPlatformVal(rawVars.deviceOS) ||
+      checkPlatformVal(userMeta.platform) ||
+      checkPlatformVal(userMeta.device_os) ||
+      checkPlatformVal(userMeta.deviceOS) ||
+      rawVars.signup_source === 'mobile_app' ||
+      rawVars.client_source === 'getaipilot_mobile' ||
+      userMeta.signup_source === 'mobile_app' ||
+      userMeta.client_source === 'getaipilot_mobile' ||
+      rawVars.is_mobile === true ||
+      userMeta.is_mobile === true ||
+      checkPlatformVal(request.headers['x-platform']) ||
+      checkPlatformVal(request.headers['x-device-os']) ||
+      checkPlatformVal(request.headers['x-device-platform']);
+
+    let effectiveTemplateKey = templateKey || 'transactional_default';
+    const reqKeyLower = String(effectiveTemplateKey).toLowerCase();
+
+    // Map common OTP & Magic link keys directly to getaipilot_confirm_email_otp or getaipilot_magic_link_otp
+    if (
+      reqKeyLower === 'confirm_email_otp' ||
+      reqKeyLower === 'getaipilot_confirm_email_otp' ||
+      reqKeyLower === 'signup_otp'
+    ) {
+      effectiveTemplateKey = 'getaipilot_confirm_email_otp';
+    } else if (
+      reqKeyLower === 'otp' ||
+      reqKeyLower === 'otp_login' ||
+      reqKeyLower === 'magic_link' ||
+      reqKeyLower === 'magiclink' ||
+      reqKeyLower === 'magic_link_otp' ||
+      reqKeyLower === 'getaipilot_magic_link' ||
+      reqKeyLower === 'getaipilot_otp' ||
+      reqKeyLower === 'auth_otp' ||
+      reqKeyLower === 'login_otp'
+    ) {
+      effectiveTemplateKey = 'getaipilot_magic_link_otp';
+    }
+
+    // If template is verification/signup confirmation, check if recipient is from mobile via Supabase metadata
+    if (
+      !isMobileDevice &&
+      to &&
+      (reqKeyLower.includes('confirm_email') ||
+        reqKeyLower.includes('verify_account') ||
+        reqKeyLower.includes('verification') ||
+        reqKeyLower === 'getaipilot_confirm_email') &&
+      isSupabaseAuthLinkConfigured()
+    ) {
+      try {
+        const supabaseUrl = process.env.GETAIPILOT_SUPABASE_URL;
+        const serviceRoleKey = process.env.GETAIPILOT_SUPABASE_SERVICE_ROLE_KEY;
+        if (supabaseUrl && serviceRoleKey) {
+          const authClient = createClient(supabaseUrl, serviceRoleKey, {
+            auth: { persistSession: false, autoRefreshToken: false }
+          });
+          const { data: usersData } = await authClient.auth.admin.listUsers({ page: 1, perPage: 100 });
+          const matchedUser = usersData?.users?.find(
+            (u) => u.email?.toLowerCase().trim() === String(to).toLowerCase().trim()
+          );
+          if (matchedUser) {
+            const m = (matchedUser.user_metadata || {}) as Record<string, any>;
+            if (
+              checkPlatformVal(m.platform) ||
+              checkPlatformVal(m.device_os) ||
+              m.signup_source === 'mobile_app' ||
+              m.is_mobile === true
+            ) {
+              isMobileDevice = true;
+            }
+          }
+        }
+      } catch (err) {
+        // Non-blocking metadata check
+      }
+    }
+
+    // When client is verified as mobile Platform.OS (ios/android), automatically use the Confirm Email OTP template
+    if (
+      isMobileDevice &&
+      (reqKeyLower.includes('confirm_email') ||
+        reqKeyLower.includes('verify_account') ||
+        reqKeyLower.includes('verification') ||
+        reqKeyLower.includes('signup') ||
+        reqKeyLower.includes('otp') ||
+        reqKeyLower.includes('magic_link') ||
+        reqKeyLower === 'getaipilot_confirm_email' ||
+        reqKeyLower === 'confirm_email' ||
+        reqKeyLower === 'getaipilot_verify_account')
+    ) {
+      fastify.log.info(
+        `[Transactional Engine] Switching template from ${effectiveTemplateKey} to getaipilot_confirm_email_otp (client device verified as mobile Platform.OS)`
+      );
+      effectiveTemplateKey = 'getaipilot_confirm_email_otp';
+    }
+
     let authLink =
       variables?.ConfirmationURL ||
       variables?.confirmation_url ||
@@ -434,151 +542,84 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
       variables?.onboarding_url ||
       null;
 
-    if (!authLink && shouldGenerateSupabaseAuthLink(templateKey, variables?.campaign_name || variables?.subject)) {
-      if (isSupabaseAuthLinkConfigured()) {
-        const genRes = await generateSupabaseAuthLink(to, variables?.full_name || variables?.userName, {
-          templateKey,
-          campaignName: variables?.campaign_name || variables?.subject
-        });
-        if (genRes.url) {
-          authLink = genRes.url;
+    let authOtp =
+      variables?.otp_code ||
+      variables?.Token ||
+      variables?.token ||
+      variables?.otp ||
+      variables?.OTP ||
+      variables?.code ||
+      variables?.security_code ||
+      null;
+
+      if ((!authLink || !authOtp) && shouldGenerateSupabaseAuthLink(effectiveTemplateKey, variables?.campaign_name || variables?.subject)) {
+        if (isSupabaseAuthLinkConfigured()) {
+          const genRes = await generateSupabaseAuthLink(to, variables?.full_name || variables?.userName, {
+            templateKey: effectiveTemplateKey,
+            campaignName: variables?.campaign_name || variables?.subject,
+            type: (effectiveTemplateKey === 'getaipilot_confirm_email_otp' || effectiveTemplateKey === 'getaipilot_magic_link_otp') ? 'signup' : undefined
+          });
+          if (genRes.url && !authLink) {
+            authLink = genRes.url;
+          }
+          if (genRes.otpCode && !authOtp) {
+            authOtp = genRes.otpCode;
+          }
         }
       }
-    }
 
-    const resolvedVariables = {
-      ...(variables || {}),
-      ...(authLink ? {
-        ConfirmationURL: authLink,
-        confirmation_url: authLink,
-        confirmationUrl: authLink,
-        verify_url: authLink,
-        verifyUrl: authLink,
-        login_url: authLink,
-        login_link: authLink,
-        magic_link: authLink,
-        onboarding_url: authLink,
-        action_url: authLink
-      } : {})
-    };
+      const resolvedVariables = {
+        ...(variables || {}),
+        ...(authOtp ? {
+          Token: authOtp,
+          token: authOtp,
+          otp: authOtp,
+          OTP: authOtp,
+          otp_code: authOtp,
+          otpCode: authOtp,
+          code: authOtp,
+          security_code: authOtp
+        } : {}),
+        ...(authLink ? {
+          ConfirmationURL: authLink,
+          confirmation_url: authLink,
+          confirmationUrl: authLink,
+          verify_url: authLink,
+          verifyUrl: authLink,
+          login_url: authLink,
+          login_link: authLink,
+          magic_link: authLink,
+          onboarding_url: authLink,
+          action_url: authLink
+        } : {})
+      };
 
-    let resolvedProductCode = productCode || resolvedVariables?.productCode;
-    if (!resolvedProductCode) {
-      const tk = String(templateKey || '').toLowerCase();
-      if (tk.includes('whatsapp') || tk.includes('wap_') || tk === 'broadcast_success') {
-        resolvedProductCode = 'gap_whatsapp';
-      } else if (
-        tk.includes('getaipilot') ||
-        tk.includes('review') ||
-        tk.includes('waitlist') ||
-        tk.includes('newsletter') ||
-        tk.includes('password_reset') ||
-        tk.includes('verification') ||
-        tk.includes('auth_email')
-      ) {
-        resolvedProductCode = 'getaipilot';
-      } else {
-        resolvedProductCode = 'socialpilot';
+      let resolvedProductCode = productCode || resolvedVariables?.productCode;
+      if (!resolvedProductCode) {
+        const tk = String(templateKey || '').toLowerCase();
+        if (tk.includes('whatsapp') || tk.includes('wap_') || tk === 'broadcast_success') {
+          resolvedProductCode = 'gap_whatsapp';
+        } else if (
+          tk.includes('getaipilot') ||
+          tk.includes('review') ||
+          tk.includes('waitlist') ||
+          tk.includes('newsletter') ||
+          tk.includes('password_reset') ||
+          tk.includes('verification') ||
+          tk.includes('auth_email')
+        ) {
+          resolvedProductCode = 'getaipilot';
+        } else {
+          resolvedProductCode = 'socialpilot';
+        }
       }
-    }
-    const finalIdempotencyKey = idempotencyKey || `[${resolvedProductCode}]_${to}_${Date.now()}`;
-    let dbEmailJobId = finalIdempotencyKey;
-    let jobId = `tx_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    let contactId: string | null = null;
-    let sourceCampaignId: string | null = null;
+      const finalIdempotencyKey = idempotencyKey || `[${resolvedProductCode}]_${to}_${Date.now()}`;
+      let dbEmailJobId = finalIdempotencyKey;
+      let jobId = `tx_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+      let contactId: string | null = null;
+      let sourceCampaignId: string | null = null;
 
-    try {
-      const { data: existingJob } = await supabase
-        .from('email_jobs')
-        .select('id, status')
-        .eq('idempotency_key', finalIdempotencyKey)
-        .maybeSingle();
-
-      if (existingJob?.id) {
-        return reply.status(202).send({
-          success: true,
-          jobId: existingJob.id,
-          queued: false,
-          duplicate: true,
-          status: existingJob.status,
-          message: 'Transactional email was already accepted for this idempotencyKey.'
-        });
-      }
-
-      const normalizedEmail = String(to).toLowerCase().trim();
-      const productName = resolvedVariables?.productName || toTitle(resolvedProductCode);
-
-      const { data: productRow } = await supabase
-        .from('products')
-        .upsert(
-          {
-            code: resolvedProductCode,
-            name: productName,
-            status: 'active'
-          },
-          { onConflict: 'code' }
-        )
-        .select('id')
-        .single();
-
-      const { data: contactRow } = await supabase
-        .from('contacts')
-        .upsert(
-          {
-            primary_email: normalizedEmail,
-            full_name: resolvedVariables?.full_name || resolvedVariables?.userName || normalizedEmail.split('@')[0]
-          },
-          { onConflict: 'primary_email' }
-        )
-        .select('id')
-        .single();
-
-      contactId = contactRow?.id || null;
-
-      const { data: templateRow } = await supabase
-        .from('email_templates')
-        .select('id')
-        .eq('key', templateKey || 'transactional_default')
-        .limit(1)
-        .maybeSingle();
-
-      if (productRow?.id && templateRow?.id) {
-        const { data: campaignRow } = await supabase
-          .from('campaigns')
-          .insert({
-            product_id: productRow.id,
-            template_id: templateRow.id,
-            name: resolvedVariables?.subject || resolvedVariables?.campaign_name || `Transactional: ${productName}`,
-            status: 'sending',
-            sent_count: 1
-          })
-          .select('id')
-          .single();
-
-        sourceCampaignId = campaignRow?.id || null;
-      }
-
-      const { data: jobRow, error: jobInsertError } = await supabase
-        .from('email_jobs')
-        .insert({
-          type: 'transactional',
-          campaign_id: sourceCampaignId,
-          contact_id: contactId,
-          idempotency_key: finalIdempotencyKey,
-          status: 'queued'
-        })
-        .select('id')
-        .single();
-
-      if (jobInsertError) {
-        throw jobInsertError;
-      }
-        
-      if (jobRow?.id) {
-        dbEmailJobId = jobRow.id;
-      }
-    } catch (err: any) {
-      if (err?.code === '23505') {
+      try {
         const { data: existingJob } = await supabase
           .from('email_jobs')
           .select('id, status')
@@ -595,74 +636,165 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
             message: 'Transactional email was already accepted for this idempotencyKey.'
           });
         }
+
+        const normalizedEmail = String(to).toLowerCase().trim();
+        const productName = resolvedVariables?.productName || toTitle(resolvedProductCode);
+
+        const { data: productRow } = await supabase
+          .from('products')
+          .upsert(
+            {
+              code: resolvedProductCode,
+              name: productName,
+              status: 'active'
+            },
+            { onConflict: 'code' }
+          )
+          .select('id')
+          .single();
+
+        const { data: contactRow } = await supabase
+          .from('contacts')
+          .upsert(
+            {
+              primary_email: normalizedEmail,
+              full_name: resolvedVariables?.full_name || resolvedVariables?.userName || normalizedEmail.split('@')[0]
+            },
+            { onConflict: 'primary_email' }
+          )
+          .select('id')
+          .single();
+
+        contactId = contactRow?.id || null;
+
+        const { data: templateRow } = await supabase
+          .from('email_templates')
+          .select('id')
+          .eq('key', effectiveTemplateKey)
+          .limit(1)
+          .maybeSingle();
+
+        if (productRow?.id && templateRow?.id) {
+          const { data: campaignRow } = await supabase
+            .from('campaigns')
+            .insert({
+              product_id: productRow.id,
+              template_id: templateRow.id,
+              name: resolvedVariables?.subject || resolvedVariables?.campaign_name || `Transactional: ${productName}`,
+              status: 'sending',
+              sent_count: 1
+            })
+            .select('id')
+            .single();
+
+          sourceCampaignId = campaignRow?.id || null;
+        }
+
+        const { data: jobRow, error: jobInsertError } = await supabase
+          .from('email_jobs')
+          .insert({
+            type: 'transactional',
+            campaign_id: sourceCampaignId,
+            contact_id: contactId,
+            idempotency_key: finalIdempotencyKey,
+            status: 'queued'
+          })
+          .select('id')
+          .single();
+
+        if (jobInsertError) {
+          throw jobInsertError;
+        }
+
+        if (jobRow?.id) {
+          dbEmailJobId = jobRow.id;
+        }
+      } catch (err: any) {
+        if (err?.code === '23505') {
+          const { data: existingJob } = await supabase
+            .from('email_jobs')
+            .select('id, status')
+            .eq('idempotency_key', finalIdempotencyKey)
+            .maybeSingle();
+
+          if (existingJob?.id) {
+            return reply.status(202).send({
+              success: true,
+              jobId: existingJob.id,
+              queued: false,
+              duplicate: true,
+              status: existingJob.status,
+              message: 'Transactional email was already accepted for this idempotencyKey.'
+            });
+          }
+        }
+
+        fastify.log.warn(`[Transactional Engine] DB Insert Warning for ${finalIdempotencyKey}: ${err?.message || err}`);
       }
 
-      fastify.log.warn(`[Transactional Engine] DB Insert Warning for ${finalIdempotencyKey}: ${err?.message || err}`);
-    }
+      let queuedToBullMQ = false;
 
-    let queuedToBullMQ = false;
+      try {
+        jobId = await enqueueTransactionalJob({
+          emailJobId: dbEmailJobId,
+          campaignId: sourceCampaignId ? `camp_db_${sourceCampaignId}` : 'tx_instant',
+          recipientEmail: to,
+          recipientName: resolvedVariables?.full_name || resolvedVariables?.userName || to.split('@')[0],
+          templateKey: effectiveTemplateKey,
+          productCode: resolvedProductCode,
+          variables: resolvedVariables || {}
+        });
+        queuedToBullMQ = true;
+        fastify.log.info(`[Transactional Engine] Enqueued high-priority job [${jobId}] into BullMQ for ${to}`);
+      } catch (err) {
+        fastify.log.warn(`[Transactional Engine] BullMQ offline, falling back to direct send for ${to}`);
+        const { subject, html } = await renderTemplate(effectiveTemplateKey, resolvedVariables || {});
+        const sendResult = await sendEmail({ to, subject, html });
+        if (dbEmailJobId && dbEmailJobId !== finalIdempotencyKey) {
+          await supabase
+            .from('email_jobs')
+            .update({
+              status: sendResult.success ? 'sent' : 'failed',
+              provider: sendResult.provider,
+              provider_message_id: sendResult.messageId || null,
+              attempts: 1
+            })
+            .eq('id', dbEmailJobId);
 
-    try {
-      jobId = await enqueueTransactionalJob({
-        emailJobId: dbEmailJobId,
-        campaignId: sourceCampaignId ? `camp_db_${sourceCampaignId}` : 'tx_instant',
-        recipientEmail: to,
-        recipientName: resolvedVariables?.full_name || resolvedVariables?.userName || to.split('@')[0],
-        templateKey: templateKey || 'transactional_default',
-        productCode: resolvedProductCode,
-        variables: resolvedVariables || {}
-      });
-      queuedToBullMQ = true;
-      fastify.log.info(`[Transactional Engine] Enqueued high-priority job [${jobId}] into BullMQ for ${to}`);
-    } catch (err) {
-      fastify.log.warn(`[Transactional Engine] BullMQ offline, falling back to direct send for ${to}`);
-      const { subject, html } = await renderTemplate(templateKey || 'transactional_default', resolvedVariables || {});
-      const sendResult = await sendEmail({ to, subject, html });
-      if (dbEmailJobId && dbEmailJobId !== finalIdempotencyKey) {
-        await supabase
-          .from('email_jobs')
-          .update({
-            status: sendResult.success ? 'sent' : 'failed',
-            provider: sendResult.provider,
-            provider_message_id: sendResult.messageId || null,
-            attempts: 1
-          })
-          .eq('id', dbEmailJobId);
+          await supabase.from('email_events').insert({
+            email_job_id: dbEmailJobId,
+            event_type: sendResult.success ? 'sent' : 'failed',
+            event_data: {
+              provider: sendResult.provider,
+              messageId: sendResult.messageId,
+              previewUrl: sendResult.previewUrl || null,
+              error: sendResult.error || null
+            }
+          });
+        }
 
-        await supabase.from('email_events').insert({
-          email_job_id: dbEmailJobId,
-          event_type: sendResult.success ? 'sent' : 'failed',
-          event_data: {
-            provider: sendResult.provider,
-            messageId: sendResult.messageId,
-            previewUrl: sendResult.previewUrl || null,
-            error: sendResult.error || null
-          }
+        if (sourceCampaignId) {
+          await supabase
+            .from('campaigns')
+            .update({ status: sendResult.success ? 'completed' : 'cancelled' })
+            .eq('id', sourceCampaignId);
+        }
+
+        return reply.status(sendResult.success ? 200 : 202).send({
+          success: sendResult.success,
+          jobId,
+          messageId: sendResult.messageId,
+          message: sendResult.success ? 'Transactional email delivered successfully.' : `Direct send fallback (${sendResult.error || 'N/A'})`
         });
       }
 
-      if (sourceCampaignId) {
-        await supabase
-          .from('campaigns')
-          .update({ status: sendResult.success ? 'completed' : 'cancelled' })
-          .eq('id', sourceCampaignId);
-      }
-
-      return reply.status(sendResult.success ? 200 : 202).send({
-        success: sendResult.success,
+      return reply.status(202).send({
+        success: true,
         jobId,
-        messageId: sendResult.messageId,
-        message: sendResult.success ? 'Transactional email delivered successfully.' : `Direct send fallback (${sendResult.error || 'N/A'})`
+        queued: true,
+        message: 'Transactional email enqueued into BullMQ with High Priority (priority: 1).'
       });
-    }
-
-    return reply.status(202).send({
-      success: true,
-      jobId,
-      queued: true,
-      message: 'Transactional email enqueued into BullMQ with High Priority (priority: 1).'
     });
-  });
 
   // POST /v1/send/manual - Trigger manual admin email send
   fastify.post('/v1/send/manual', async (request: FastifyRequest<{ Body: any }>, reply: FastifyReply) => {
