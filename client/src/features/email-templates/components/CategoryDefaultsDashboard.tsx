@@ -169,8 +169,8 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
           <div className="cat-kpi-sub">
             <span className="kpi-tag getaipilot">{summary.apps.find(a => a.id === 'getaipilot')?.count ?? 0} Core</span>
             <span className="kpi-tag campaign">{summary.apps.find(a => a.id === 'campaign')?.count ?? 0} Campaigns</span>
-            <span className="kpi-tag gap">{summary.apps.find(a => a.id === 'gap_whatsapp')?.count || 1} WhatsApp</span>
-            <span className="kpi-tag social">{summary.apps.find(a => a.id === 'socialpilot')?.count || 1} Social</span>
+            <span className="kpi-tag gap">{summary.apps.find(a => a.id === 'gap_whatsapp')?.count ?? 0} WhatsApp</span>
+            <span className="kpi-tag social">{summary.apps.find(a => a.id === 'socialpilot')?.count ?? 0} Social</span>
           </div>
         </div>
 
@@ -254,7 +254,7 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
             onClick={() => setSelectedApp('gap_whatsapp')}
           >
             <span className="app-dot gap" />
-            GAP WhatsApp ({summary.apps.find(a => a.id === 'gap_whatsapp')?.count || 1})
+            GAP WhatsApp ({summary.apps.find(a => a.id === 'gap_whatsapp')?.count ?? 0})
           </button>
           <button
             type="button"
@@ -262,7 +262,7 @@ export const CategoryDefaultsDashboard: React.FC<Props> = ({
             onClick={() => setSelectedApp('socialpilot')}
           >
             <span className="app-dot social" />
-            SocialPilot ({summary.apps.find(a => a.id === 'socialpilot')?.count || 1})
+            SocialPilot ({summary.apps.find(a => a.id === 'socialpilot')?.count ?? 0})
           </button>
         </div>
 

@@ -767,8 +767,11 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
             event_data: {
               provider: sendResult.provider,
               messageId: sendResult.messageId,
+              subject,
+              html,
               previewUrl: sendResult.previewUrl || null,
-              error: sendResult.error || null
+              error: sendResult.error || null,
+              variables: resolvedVariables || {}
             }
           });
         }

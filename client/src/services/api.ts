@@ -73,6 +73,36 @@ export interface SuppressionItem {
   description?: string;
 }
 
+export interface EmailEvent {
+  id: string;
+  eventType: string;
+  occurredAt: string;
+  data: any;
+}
+
+export interface EmailDetail {
+  id: string;
+  type: string;
+  status: string;
+  provider: string;
+  providerMessageId?: string | null;
+  idempotencyKey?: string | null;
+  attempts: number;
+  createdAt: string;
+  recipient: string;
+  recipientName?: string;
+  senderName: string;
+  senderEmail: string;
+  subject: string;
+  templateKey?: string | null;
+  templateName?: string | null;
+  productCode?: string;
+  productName?: string;
+  html: string;
+  events: EmailEvent[];
+  variables?: Record<string, any>;
+}
+
 export interface BounceReportItem {
   id: string;
   email: string;
@@ -126,7 +156,8 @@ export interface CampaignJobStats {
   suppressed: number;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://127.0.0.1:5050/v1';
+const cleanApiUrl = import.meta.env.VITE_API_URL ? String(import.meta.env.VITE_API_URL).trim().replace(/\/+$/, '') : '';
+const API_BASE = cleanApiUrl ? `${cleanApiUrl}/v1` : 'http://127.0.0.1:5050/v1';
 const REQUEST_TIMEOUT_MS = 15000;
 
 const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {
@@ -245,6 +276,19 @@ export class ApiService {
       console.warn('API getProjectLogs failed:', err);
     }
     return {};
+  }
+
+  static async getEmailDetails(id: string): Promise<EmailDetail | null> {
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/emails/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.email) return data.email;
+      }
+    } catch (err) {
+      console.warn('API getEmailDetails failed:', err);
+    }
+    return null;
   }
 
   static async getTemplates(): Promise<Template[]> {

@@ -490,8 +490,7 @@ export const CATEGORY_DEFINITIONS: CategoryDefinition[] = [
       'otp',
       'getaipilot_otp',
       'auth_otp',
-      'login_otp',
-      'gap_whatsapp_otp'
+      'login_otp'
     ]
   },
   {
@@ -569,26 +568,113 @@ export const CATEGORY_DEFINITIONS: CategoryDefinition[] = [
     matchKeys: ['newsletter_notification']
   },
 
-  // SATELLITE APPLICATIONS
+  // SATELLITE APPLICATIONS: GAP WHATSAPP (Per-Event Routing)
   {
-    id: 'gap_whatsapp',
-    name: 'WhatsApp Broadcasts & Automations',
+    id: 'gap_whatsapp_welcome',
+    name: 'GAP WhatsApp Onboarding & Welcome',
     app: 'gap_whatsapp',
     appName: 'GAP WhatsApp',
-    description: 'Triggered by GAP WhatsApp engine for broadcast completion alerts, failure notices, and WhatsApp OTP verification.',
-    eventTrigger: 'broadcast_published / broadcast_failed / whatsapp_otp',
+    description: 'Triggered when an organization activates or onboards onto the GAP WhatsApp Automation platform.',
+    eventTrigger: 'whatsapp-onboarding -> gap_whatsapp_welcome',
     defaultKey: 'gap_whatsapp_welcome',
-    matchKeys: ['gap_whatsapp_otp', 'gap_whatsapp_welcome', 'broadcast_success', 'broadcast_failed', 'team_invite']
+    matchKeys: ['gap_whatsapp_welcome', 'whatsapp_welcome', 'gap_whatsapp']
   },
   {
-    id: 'socialpilot',
-    name: 'SocialPilot & AutoDM Notifications',
+    id: 'gap_whatsapp_otp',
+    name: 'GAP WhatsApp OTP Security Code',
+    app: 'gap_whatsapp',
+    appName: 'GAP WhatsApp',
+    description: 'Triggered when a 6-digit WhatsApp OTP verification code is requested for number connection or login.',
+    eventTrigger: 'whatsapp-verify -> gap_whatsapp_otp',
+    defaultKey: 'gap_whatsapp_otp',
+    matchKeys: ['gap_whatsapp_otp', 'whatsapp_otp']
+  },
+  {
+    id: 'gap_whatsapp_broadcast_success',
+    name: 'GAP WhatsApp Broadcast Published Success',
+    app: 'gap_whatsapp',
+    appName: 'GAP WhatsApp',
+    description: 'Triggered when a WhatsApp broadcast campaign completes and delivers successfully.',
+    eventTrigger: 'whatsapp-broadcast -> broadcast_success',
+    defaultKey: 'broadcast_success',
+    matchKeys: ['broadcast_success', 'gap_whatsapp_broadcast_success']
+  },
+  {
+    id: 'gap_whatsapp_broadcast_failed',
+    name: 'GAP WhatsApp Broadcast Execution Failed Alert',
+    app: 'gap_whatsapp',
+    appName: 'GAP WhatsApp',
+    description: 'Triggered when a WhatsApp broadcast campaign encounters a delivery or token failure.',
+    eventTrigger: 'whatsapp-broadcast -> broadcast_failed',
+    defaultKey: 'broadcast_failed',
+    matchKeys: ['broadcast_failed', 'gap_whatsapp_broadcast_failed']
+  },
+  {
+    id: 'gap_whatsapp_team_invite',
+    name: 'GAP WhatsApp Team Member Invitation',
+    app: 'gap_whatsapp',
+    appName: 'GAP WhatsApp',
+    description: 'Triggered when an admin invites a team member to collaborate on WhatsApp automations.',
+    eventTrigger: 'whatsapp-team -> team_invite',
+    defaultKey: 'team_invite',
+    matchKeys: ['team_invite', 'gap_whatsapp_team_invite']
+  },
+
+  // SATELLITE APPLICATIONS: SOCIALPILOT (Per-Event Routing)
+  {
+    id: 'socialpilot_welcome',
+    name: 'SocialPilot Welcome & Onboarding',
     app: 'socialpilot',
     appName: 'SocialPilot',
-    description: 'Triggered by SocialPilot for social account connections, auto-DM automation setup alerts, and welcome triggers.',
-    eventTrigger: 'account_connected / automation_created / auth_welcome',
+    description: 'Triggered when a new user signs up or registers on SocialPilot to introduce publishing workflows.',
+    eventTrigger: 'send-auth-email / signup -> auth_welcome',
     defaultKey: 'auth_welcome',
-    matchKeys: ['account_connected', 'auth_welcome', 'automation_created', 'broadcast_notification']
+    matchKeys: ['auth_welcome', 'socialpilot_welcome', 'quickpost_welcome', 'socialpilot']
+  },
+  {
+    id: 'socialpilot_broadcast',
+    name: 'SocialPilot Post Published Notification',
+    app: 'socialpilot',
+    appName: 'SocialPilot',
+    description: 'Triggered when a post or campaign is successfully published across connected social channels.',
+    eventTrigger: 'publish-broadcast -> broadcast_notification',
+    defaultKey: 'broadcast_notification',
+    matchKeys: [
+      'broadcast_notification',
+      'socialpilot_broadcast',
+      'socialpilot_broadcast_published',
+      'quickpost_publish_success',
+      'quickpost_broadcast'
+    ]
+  },
+  {
+    id: 'socialpilot_account_connected',
+    name: 'SocialPilot Social Account Connected',
+    app: 'socialpilot',
+    appName: 'SocialPilot',
+    description: 'Triggered when an Instagram, LinkedIn, X/Twitter, or Facebook account is connected to SocialPilot.',
+    eventTrigger: 'oauth-callback -> account_connected',
+    defaultKey: 'account_connected',
+    matchKeys: [
+      'account_connected',
+      'socialpilot_account_connected',
+      'quickpost_account_connected'
+    ]
+  },
+  {
+    id: 'socialpilot_automation',
+    name: 'SocialPilot AutoDM Automation Created',
+    app: 'socialpilot',
+    appName: 'SocialPilot',
+    description: 'Triggered when a user creates or activates an auto-DM or comment-trigger automation.',
+    eventTrigger: 'automation-created -> automation_created',
+    defaultKey: 'automation_created',
+    matchKeys: [
+      'automation_created',
+      'socialpilot_automation_created',
+      'socialpilot_automation',
+      'quickpost_automation_created'
+    ]
   },
   {
     id: 'campaigns',
@@ -657,7 +743,7 @@ export async function getCategoryGroupsWithDefaults() {
     let activeDefaultTemplate = supportsDefault ? matchingTemplates.find((t) => {
       const pJson = (t.projectJson as any) || {};
       if (storedDefaults[def.id] && (t.id === storedDefaults[def.id] || t.key === storedDefaults[def.id])) return true;
-      if (pJson.is_category_default) return true;
+      if (pJson.is_category_default && (!pJson.category_id || pJson.category_id === def.id)) return true;
       return false;
     }) : null;
 
@@ -816,6 +902,22 @@ export async function resolveCategoryDefaultTemplateKey(templateKey: string): Pr
     if (configuredDefaultId) {
       return configuredDefaultId;
     }
+
+    try {
+      const { data: defaultFromDb } = await supabase
+        .from('email_templates')
+        .select('id, key')
+        .is('deleted_at', null)
+        .contains('project_json', { is_category_default: true, category_id: matchedCategory.id })
+        .maybeSingle();
+
+      if (defaultFromDb) {
+        return defaultFromDb.id;
+      }
+    } catch {
+      // ignore
+    }
+
     return matchedCategory.defaultKey;
   }
 
