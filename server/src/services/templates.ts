@@ -957,13 +957,13 @@ export async function renderTemplate(
             <tr>
               <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
               <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
-                <strong style="color: #0f172a;">GAP WhatsApp API:</strong> Hook up WhatsApp Business API to send broadcasts and auto-replies.
+                <strong style="color: #0f172a;">GAP-WhatsApp Pilot:</strong> Hook up WhatsApp Business API to send broadcasts and auto-replies.
               </td>
             </tr>
             <tr>
               <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
               <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
-                <strong style="color: #0f172a;">QuickPost (SocialPilot):</strong> Schedule, broadcast, and auto-publish content across Instagram, LinkedIn, X, and Facebook.
+                <strong style="color: #0f172a;">GAP-Social Pilot:</strong> Schedule, broadcast, and auto-publish content across Instagram, LinkedIn, X, and Facebook.
               </td>
             </tr>
           </table>
