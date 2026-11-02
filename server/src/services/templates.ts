@@ -943,21 +943,27 @@ export async function renderTemplate(
           </div>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
             <tr>
-              <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #334155;">
-                <span style="color: #2563eb; font-size: 16px; margin-right: 8px;">&bull;</span>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
                 <strong style="color: #0f172a;">GAP Telegram Automation:</strong> Monetize, track, and automate your Telegram groups and channels.
               </td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #334155;">
-                <span style="color: #2563eb; font-size: 16px; margin-right: 8px;">&bull;</span>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
                 <strong style="color: #0f172a;">GAP Custom CRM:</strong> Deploy an all-in-one CRM engine with invoicing, payroll, and leads management.
               </td>
             </tr>
             <tr>
-              <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #334155;">
-                <span style="color: #2563eb; font-size: 16px; margin-right: 8px;">&bull;</span>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
                 <strong style="color: #0f172a;">GAP WhatsApp API:</strong> Hook up WhatsApp Business API to send broadcasts and auto-replies.
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
+                <strong style="color: #0f172a;">QuickPost (SocialPilot):</strong> Schedule, broadcast, and auto-publish content across Instagram, LinkedIn, X, and Facebook.
               </td>
             </tr>
           </table>
