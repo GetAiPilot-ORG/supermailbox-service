@@ -919,18 +919,57 @@ export async function renderTemplate(
   } else if (k === 'ai_welcome_followup' || k.includes('followup')) {
     finalSubject = normalizedVariables.subject || 'Welcome to GetAiPilot! 🚀';
     finalHtml = normalizedVariables.html || `
-      <div style="font-family: sans-serif; padding: 24px; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff;">
-        <h2 style="color: #2563eb; margin-top: 0;">Welcome to GetAiPilot! 👋</h2>
-        <p>Hi ${name},</p>
-        <p>Thanks for joining GetAiPilot! Your autonomous automation superpowers are ready.</p>
-        <div style="margin: 24px 0; text-align: center;">
-          <a href="https://getaipilot.in/dashboard" style="background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
-            Go to Dashboard &rarr;
-          </a>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px 16px; background-color: #f8fafc; color: #334155;">
+        <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); padding: 44px 38px; text-align: left;">
+          <div style="margin-bottom: 28px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="vertical-align: middle; padding-right: 10px;">
+                  <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="GetAiPilot Logo" />
+                </td>
+                <td style="vertical-align: middle;">
+                  <span style="font-weight: 700; color: #0f172a; font-size: 20px; letter-spacing: -0.4px;">get<span style="color: #2563eb;">aipilot</span></span>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <h1 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: #0f172a; letter-spacing: -0.4px; line-height: 1.3;">
+            Welcome to GetAiPilot! 👋
+          </h1>
+          <div style="font-size: 15px; line-height: 1.65; color: #334155; margin-bottom: 24px;">
+            <p style="margin: 0 0 16px 0;">Hey ${name},</p>
+            <p style="margin: 0 0 16px 0;">Thanks for signing up for GetAiPilot! We are thrilled to help you automate and grow your business operations.</p>
+            <p style="margin: 0;">Here are the key platforms you can explore right now:</p>
+          </div>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                <span style="color: #2563eb; font-size: 16px; margin-right: 8px;">&bull;</span>
+                <strong style="color: #0f172a;">GAP Telegram Automation:</strong> Monetize, track, and automate your Telegram groups and channels.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                <span style="color: #2563eb; font-size: 16px; margin-right: 8px;">&bull;</span>
+                <strong style="color: #0f172a;">GAP Custom CRM:</strong> Deploy an all-in-one CRM engine with invoicing, payroll, and leads management.
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-size: 14px; line-height: 1.6; color: #334155;">
+                <span style="color: #2563eb; font-size: 16px; margin-right: 8px;">&bull;</span>
+                <strong style="color: #0f172a;">GAP WhatsApp API:</strong> Hook up WhatsApp Business API to send broadcasts and auto-replies.
+              </td>
+            </tr>
+          </table>
+          <div style="text-align: center; margin-bottom: 36px;">
+            <a href="https://getaipilot.in/dashboard" style="background-color: #2563eb; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 13px 36px; border-radius: 8px; display: inline-block; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);">
+              Go to Dashboard &rarr;
+            </a>
+          </div>
+          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; text-align: center; font-size: 13px; color: #94a3b8; line-height: 1.5;">
+            GetAiPilot Team &copy; 2026
+          </div>
         </div>
-        <p style="font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 24px;">
-          GetAiPilot &bull; SuperMailBox CPaaS
-        </p>
       </div>
     `;
   } else {
