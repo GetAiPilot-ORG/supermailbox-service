@@ -125,6 +125,20 @@ export async function renderTemplate(
     console.warn('[renderTemplate] Database lookup exception:', err);
   }
 
+  // If pre-rendered HTML was directly supplied in variables (e.g. from GetAiPilot edge functions)
+  if (normalizedVariables.html && typeof normalizedVariables.html === 'string' && normalizedVariables.html.trim().length > 0) {
+    const rawSubject = normalizedVariables.subject || normalizedVariables.campaign_name || 'GetAiPilot Notification';
+    const interpolatedSubject = interpolateVariables(rawSubject, normalizedVariables);
+    let interpolatedHtml = interpolateVariables(normalizedVariables.html, normalizedVariables);
+    if (normalizedVariables.ConfirmationURL) {
+      interpolatedHtml = injectActionLinkFallback(interpolatedHtml, normalizedVariables.ConfirmationURL);
+    }
+    return {
+      subject: interpolatedSubject,
+      html: addResponsiveEmailFixes(interpolatedHtml)
+    };
+  }
+
   // Fallback Templates if not found in DB
   let finalSubject = '';
   let finalHtml = '';
@@ -978,6 +992,132 @@ export async function renderTemplate(
         </div>
       </div>
     `;
+  } else if (
+    k === 'demo_meeting' ||
+    k === 'demo_meeting_calendly' ||
+    k === 'demo_booking_confirmation' ||
+    k === 'demo_admin_notification' ||
+    k === 'getaipilot_demo_meeting' ||
+    k === 'getaipilot_demo' ||
+    k === 'book_demo' ||
+    k.includes('calendly') ||
+    k.includes('demo_meeting') ||
+    k.includes('demo_booking') ||
+    k.includes('demo') ||
+    k.includes('meeting')
+  ) {
+    const compName = normalizedVariables.company_name || 'GetAiPilot';
+    const calUrl = normalizedVariables.calendly_url || 'https://calendly.com';
+    const dur = normalizedVariables.duration || '30 Minutes';
+    const plat = normalizedVariables.platform || 'Google Meet / Zoom';
+    const hName = normalizedVariables.host_name || 'GetAiPilot Solutions Team';
+
+    finalSubject = `Schedule your 1-on-1 demo with ${compName}`;
+    finalHtml = `
+      <div style="font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 24px 12px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); margin: 0 auto;">
+          <tr>
+            <td style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%); padding: 36px 32px 32px; color: #ffffff;">
+              <div style="display: inline-block; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 14px; border-radius: 999px; margin-bottom: 20px;">
+                <span style="font-size: 12px; font-weight: 700; color: #ffffff; letter-spacing: 0.04em; text-transform: uppercase;">
+                  🗓️ 1-on-1 Live Demo
+                </span>
+              </div>
+              <h1 style="font-size: 26px; font-weight: 800; line-height: 1.25; margin: 0 0 10px 0; color: #ffffff;">
+                Let’s Schedule Your Live Walkthrough
+              </h1>
+              <p style="font-size: 15px; line-height: 1.5; color: #c7d2fe; margin: 0;">
+                See how ${compName} automates messaging, WhatsApp broadcasts, and CPaaS pipelines for fast-growing teams.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px;">
+              <p style="font-size: 16px; color: #1e293b; line-height: 1.6; margin: 0 0 20px 0;">
+                Hi <strong>${name}</strong>,
+              </p>
+              <p style="font-size: 15px; color: #475467; line-height: 1.6; margin: 0 0 24px 0;">
+                Thanks for your interest in <strong>${compName}</strong>! We’d love to connect with you for a live interactive demo tailored to your use case.
+              </p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 28px;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                          <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Duration</span>
+                          <span style="font-size: 14px; font-weight: 700; color: #0f172a;">⏱️ ${dur}</span>
+                        </td>
+                        <td style="width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                          <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Format</span>
+                          <span style="font-size: 14px; font-weight: 700; color: #0f172a;">📹 ${plat}</span>
+                        </td>
+                        <td style="width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                          <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Host</span>
+                          <span style="font-size: 14px; font-weight: 700; color: #0f172a;">👤 ${hName}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 0 0 14px 0; letter-spacing: -0.2px;">
+                What we’ll cover during the session:
+              </h3>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 30px;">
+                <tr>
+                  <td style="width: 24px; vertical-align: top; padding: 6px 0; color: #2563eb; font-size: 16px;">✦</td>
+                  <td style="padding: 6px 0 6px 8px; vertical-align: top; font-size: 14px; color: #334155; line-height: 1.5;">
+                    <strong style="color: #0f172a;">Live Product Walkthrough:</strong> Hands-on demo of GAP-WhatsApp Pilot, SocialPilot broadcast automations, and CRM workflows.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 24px; vertical-align: top; padding: 6px 0; color: #2563eb; font-size: 16px;">✦</td>
+                  <td style="padding: 6px 0 6px 8px; vertical-align: top; font-size: 14px; color: #334155; line-height: 1.5;">
+                    <strong style="color: #0f172a;">Custom Integration Review:</strong> Deep dive into our REST APIs, webhooks, and SuperMailBox CPaaS delivery speed.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 24px; vertical-align: top; padding: 6px 0; color: #2563eb; font-size: 16px;">✦</td>
+                  <td style="padding: 6px 0 6px 8px; vertical-align: top; font-size: 14px; color: #334155; line-height: 1.5;">
+                    <strong style="color: #0f172a;">Q&A & Tailored Pricing:</strong> Address your specific team architecture and build a custom rollout roadmap.
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
+                <tr>
+                  <td align="center">
+                    <a href="${calUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #006bff 0%, #2563eb 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 16px 38px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0, 107, 255, 0.35); text-align: center;">
+                      Select a Date & Time on Calendly &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="font-size: 13px; color: #64748b; line-height: 1.5; text-align: center; margin: 0 0 16px 0;">
+                Or open this link directly in your browser:<br />
+                <a href="${calUrl}" style="color: #006bff; word-break: break-all; text-decoration: underline;">${calUrl}</a>
+              </p>
+              <div style="background-color: #f1f5f9; border-radius: 10px; padding: 12px 18px; text-align: center;">
+                <p style="font-size: 13px; color: #475467; margin: 0; line-height: 1.5;">
+                  💡 <strong>Can’t find a slot that fits?</strong> Just reply directly to this email with 2–3 times that work for you, and we’ll accommodate.
+                </p>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center;">
+              <p style="font-size: 13px; font-weight: 600; color: #334155; margin: 0 0 6px 0;">
+                ${compName} &bull; SuperMailBox CPaaS
+              </p>
+              <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+                You received this invitation regarding your product demo request.<br />
+                Need help? Contact <a href="mailto:support@getaipilot.in" style="color: #64748b; text-decoration: underline;">support@getaipilot.in</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `;
   } else {
     // Default fallback
     finalSubject = `${campaignName}`;
@@ -1053,6 +1193,38 @@ function withDefaultTemplateVariables(variables: Record<string, any>): Record<st
     variables.security_code ||
     variables.code;
 
+  const calendlyUrl =
+    variables.calendly_url ||
+    variables.calendlyUrl ||
+    variables.booking_url ||
+    variables.bookingUrl ||
+    variables.meeting_url ||
+    variables.meetingUrl ||
+    variables.schedule_url ||
+    variables.scheduleUrl ||
+    process.env.GETAIPILOT_CALENDLY_URL ||
+    process.env.CALENDLY_URL ||
+    'https://calendly.com/getaipilot/demo';
+
+  const hostName =
+    variables.host_name ||
+    variables.hostName ||
+    variables.host ||
+    'GetAiPilot Solutions Team';
+
+  const duration =
+    variables.duration ||
+    '30 Minutes';
+
+  const companyName =
+    variables.company_name ||
+    variables.companyName ||
+    'GetAiPilot';
+
+  const platform =
+    variables.platform ||
+    'Google Meet / Zoom';
+
   return {
     ...variables,
     Token: otpToken,
@@ -1077,6 +1249,20 @@ function withDefaultTemplateVariables(variables: Record<string, any>): Record<st
     onboarding_url: confirmationUrl,
     onboardingUrl: confirmationUrl,
     action_url: confirmationUrl,
-    actionUrl: confirmationUrl
+    actionUrl: confirmationUrl,
+    calendly_url: calendlyUrl,
+    calendlyUrl: calendlyUrl,
+    booking_url: calendlyUrl,
+    bookingUrl: calendlyUrl,
+    meeting_url: calendlyUrl,
+    meetingUrl: calendlyUrl,
+    schedule_url: calendlyUrl,
+    scheduleUrl: calendlyUrl,
+    host_name: hostName,
+    hostName: hostName,
+    duration: duration,
+    company_name: companyName,
+    companyName: companyName,
+    platform: platform
   };
 }

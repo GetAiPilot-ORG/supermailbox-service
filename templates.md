@@ -12,6 +12,7 @@ This document contains all HTML email templates configured in SuperMailBox servi
 5. [Auth Welcome Template (`auth_welcome`)](#5-auth-welcome-template-auth_welcome)
 6. [Billing Receipt Template (`billing_receipt`)](#6-billing-receipt-template-billing_receipt)
 7. [Product Update Announcement (`product_announcement`)](#7-product-update-announcement-product_announcement)
+8. [Demo Meeting Invitation via Calendly (`demo_meeting_calendly`)](#8-demo-meeting-invitation-via-calendly-demo_meeting_calendly)
 
 ---
 
@@ -540,3 +541,210 @@ This document contains all HTML email templates configured in SuperMailBox servi
   </div>
 </div>
 ```
+
+---
+
+## 8. Demo Meeting Invitation via Calendly (`demo_meeting_calendly`)
+* **Category:** Meetings / Sales
+* **Subject:** `Schedule your 1-on-1 demo with GetAiPilot`
+* **Variables:** `{{name}}`, `{{first_name}}`, `{{calendly_url}}`, `{{host_name}}`, `{{duration}}`, `{{company_name}}`, `{{platform}}`
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Schedule your demo with GetAiPilot</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+    body {
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-text-size-adjust: 100% !important;
+      -ms-text-size-adjust: 100% !important;
+      width: 100% !important;
+      background-color: #f8fafc;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    img {
+      border: 0;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
+    table {
+      border-collapse: collapse !important;
+    }
+    @media screen and (max-width: 620px) {
+      .full-width-table {
+        width: 100% !important;
+      }
+      .mobile-padding {
+        padding: 24px 16px !important;
+      }
+      .mobile-stack {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .cta-button {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+      }
+    }
+  </style>
+</head>
+<body style="background-color: #f8fafc; margin: 0; padding: 24px 12px; font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  
+  <!-- PRE-HEADER -->
+  <div style="display:none; max-height:0; overflow:hidden; font-size:1px; color:#ffffff; line-height:1px;">
+    Pick a convenient time on Calendly to explore GetAiPilot, GAP-WhatsApp Pilot, and CPaaS workflows live.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc;">
+    <tr>
+      <td align="center" style="padding: 12px 0;">
+        <table class="full-width-table" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width: 600px; max-width: 600px; background-color: #ffffff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06); margin: 0 auto;">
+          
+          <!-- Hero Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%); padding: 36px 32px 32px; color: #ffffff;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td>
+                    <!-- Brand & Badge -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                      <tr>
+                        <td style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 14px; border-radius: 999px;">
+                          <span style="font-size: 12px; font-weight: 700; color: #ffffff; letter-spacing: 0.04em; text-transform: uppercase;">
+                            🗓️ 1-on-1 Live Demo
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <h1 style="font-size: 26px; font-weight: 800; line-height: 1.25; margin: 0 0 10px 0; color: #ffffff;">
+                      Let’s Schedule Your Live Walkthrough
+                    </h1>
+                    <p style="font-size: 15px; line-height: 1.5; color: #c7d2fe; margin: 0;">
+                      See how GetAiPilot automates messaging, WhatsApp broadcasts, and CPaaS pipelines for fast-growing teams.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td class="mobile-padding" style="padding: 32px;">
+              <p style="font-size: 16px; color: #1e293b; line-height: 1.6; margin: 0 0 20px 0;">
+                Hi <strong>{{name}}</strong>,
+              </p>
+              <p style="font-size: 15px; color: #475467; line-height: 1.6; margin: 0 0 24px 0;">
+                Thanks for your interest in <strong>{{company_name}}</strong>! We’d love to connect with you for a live interactive demo tailored to your use case.
+              </p>
+
+              <!-- Session Details Card -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 28px;">
+                <tr>
+                  <td style="padding: 20px 24px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td class="mobile-stack" style="width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                          <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Duration</span>
+                          <span style="font-size: 14px; font-weight: 700; color: #0f172a;">⏱️ {{duration}}</span>
+                        </td>
+                        <td class="mobile-stack" style="width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                          <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Format</span>
+                          <span style="font-size: 14px; font-weight: 700; color: #0f172a;">📹 {{platform}}</span>
+                        </td>
+                        <td class="mobile-stack" style="width: 33.33%; padding: 6px 8px; vertical-align: top;">
+                          <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Host</span>
+                          <span style="font-size: 14px; font-weight: 700; color: #0f172a;">👤 {{host_name}}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Agenda / Value Points -->
+              <h3 style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 0 0 14px 0; letter-spacing: -0.2px;">
+                What we’ll cover during the session:
+              </h3>
+              
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 30px;">
+                <tr>
+                  <td style="width: 24px; vertical-align: top; padding: 6px 0; color: #2563eb; font-size: 16px;">✦</td>
+                  <td style="padding: 6px 0 6px 8px; vertical-align: top; font-size: 14px; color: #334155; line-height: 1.5;">
+                    <strong style="color: #0f172a;">Live Product Walkthrough:</strong> Hands-on demo of GAP-WhatsApp Pilot, SocialPilot broadcast automations, and CRM workflows.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 24px; vertical-align: top; padding: 6px 0; color: #2563eb; font-size: 16px;">✦</td>
+                  <td style="padding: 6px 0 6px 8px; vertical-align: top; font-size: 14px; color: #334155; line-height: 1.5;">
+                    <strong style="color: #0f172a;">Custom Integration Review:</strong> Deep dive into our REST APIs, webhooks, and SuperMailBox CPaaS delivery speed.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="width: 24px; vertical-align: top; padding: 6px 0; color: #2563eb; font-size: 16px;">✦</td>
+                  <td style="padding: 6px 0 6px 8px; vertical-align: top; font-size: 14px; color: #334155; line-height: 1.5;">
+                    <strong style="color: #0f172a;">Q&A & Tailored Pricing:</strong> Address your specific team architecture and build a custom rollout roadmap.
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Calendly CTA Button -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
+                <tr>
+                  <td align="center">
+                    <a href="{{calendly_url}}" target="_blank" class="cta-button" style="display: inline-block; background: linear-gradient(135deg, #006bff 0%, #2563eb 100%); color: #ffffff; font-size: 15px; font-weight: 700; text-decoration: none; padding: 16px 38px; border-radius: 10px; box-shadow: 0 4px 16px rgba(0, 107, 255, 0.35); text-align: center;">
+                      Select a Date & Time on Calendly &rarr;
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Link Fallback & Custom Time Note -->
+              <p style="font-size: 13px; color: #64748b; line-height: 1.5; text-align: center; margin: 0 0 16px 0;">
+                Or open this link directly in your browser:<br />
+                <a href="{{calendly_url}}" style="color: #006bff; word-break: break-all; text-decoration: underline;">{{calendly_url}}</a>
+              </p>
+
+              <div style="background-color: #f1f5f9; border-radius: 10px; padding: 12px 18px; text-align: center;">
+                <p style="font-size: 13px; color: #475467; margin: 0; line-height: 1.5;">
+                  💡 <strong>Can’t find a slot that fits?</strong> Just reply directly to this email with 2–3 times that work for you, and we’ll accommodate.
+                </p>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 24px 32px; text-align: center;">
+              <p style="font-size: 13px; font-weight: 600; color: #334155; margin: 0 0 6px 0;">
+                {{company_name}} &bull; SuperMailBox CPaaS
+              </p>
+              <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+                You received this invitation regarding your product demo request.<br />
+                Need help? Contact <a href="mailto:support@getaipilot.in" style="color: #64748b; text-decoration: underline;">support@getaipilot.in</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+```
+

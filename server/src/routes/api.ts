@@ -950,6 +950,8 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
             templateKey = 'getaipilot_magic_link_otp';
           } else if (lowerKey.includes('whatsapp') || lowerKey.includes('wap')) {
             templateKey = 'gap_whatsapp_welcome';
+          } else if (lowerKey.includes('demo') || lowerKey.includes('meeting') || lowerKey.includes('calendly')) {
+            templateKey = 'demo_meeting_calendly';
           } else {
             templateKey = 'ai_welcome_followup';
           }

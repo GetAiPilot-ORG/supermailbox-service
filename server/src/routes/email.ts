@@ -606,7 +606,10 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
           tk.includes('newsletter') ||
           tk.includes('password_reset') ||
           tk.includes('verification') ||
-          tk.includes('auth_email')
+          tk.includes('auth_email') ||
+          tk.includes('demo') ||
+          tk.includes('meeting') ||
+          tk.includes('calendly')
         ) {
           resolvedProductCode = 'getaipilot';
         } else {
