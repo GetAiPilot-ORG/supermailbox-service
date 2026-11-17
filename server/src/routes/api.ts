@@ -4,6 +4,7 @@ import { campaignQueue, transactionalQueue } from '../queues/campaignQueue.js';
 import { addResponsiveEmailFixes } from '../services/responsiveEmail.js';
 import { fetchGetAiPilotUsers } from '../services/getaipilotUsers.js';
 import { addSuppression, removeSuppression } from '../services/suppression.js';
+import { renderTemplate } from '../services/templates.js';
 
 const normalizeProjectCode = (value?: string | null) => {
   if (!value) return 'unknown';
@@ -36,7 +37,7 @@ const extractProjectFromIdempotencyKey = (idempotencyKey?: string | null) => {
   const lower = idempotencyKey.toLowerCase();
   if (lower.includes('socialpilot') || lower.includes('quickpost')) return 'socialpilot';
   if (lower.includes('gap_whatsapp') || lower.includes('whatsapp') || lower.includes('wap')) return 'GAP_WHATSAPP';
-  if (lower.includes('getaipilot')) return 'getaipilot';
+  if (lower.includes('getaipilot') || lower.startsWith('tx_gap') || lower.includes('_gap_')) return 'getaipilot';
   return 'unknown';
 };
 
@@ -862,6 +863,143 @@ export async function registerApiRoutes(fastify: FastifyInstance) {
       });
 
       return reply.send({ success: true, projects: grouped });
+    } catch (err: any) {
+      fastify.log.error(err);
+      return reply.status(500).send({ success: false, error: err.message });
+    }
+  });
+
+  // ==========================
+  // EMAIL DETAILS (ZeptoMail-style Inspector)
+  // ==========================
+  fastify.get('/v1/emails/:id', async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+    const { id } = request.params;
+    try {
+      // 1. Fetch job from email_jobs
+      const { data: job, error: jobError } = await supabase
+        .from('email_jobs')
+        .select(`
+          id, type, provider, provider_message_id, status, attempts, created_at, idempotency_key,
+          campaigns (
+            id, name, product_id, template_id,
+            products ( code, name ),
+            email_templates ( id, key, name, subject, compiled_html )
+          ),
+          contacts ( id, primary_email, full_name )
+        `)
+        .eq('id', id)
+        .maybeSingle();
+
+      if (jobError) throw jobError;
+      const j = job as any;
+
+      // 2. Fetch associated delivery events
+      const { data: rawEvents } = await supabase
+        .from('email_events')
+        .select('*')
+        .eq('email_job_id', id)
+        .order('occurred_at', { ascending: true });
+
+      const events = (rawEvents || []).map((e: any) => ({
+        id: e.id,
+        eventType: e.event_type,
+        occurredAt: e.occurred_at,
+        data: e.event_data || {}
+      }));
+
+      // Extract basic fields
+      const contactObj = Array.isArray(j?.contacts) ? j.contacts[0] : j?.contacts;
+      const campaignObj = Array.isArray(j?.campaigns) ? j.campaigns[0] : j?.campaigns;
+      const productObj = Array.isArray(campaignObj?.products) ? campaignObj.products[0] : campaignObj?.products;
+      const templateObj = Array.isArray(campaignObj?.email_templates) ? campaignObj.email_templates[0] : campaignObj?.email_templates;
+
+      let recipient = contactObj?.primary_email || extractEmailFromIdempotencyKey(j?.idempotency_key) || 'unknown@recipient.com';
+      let recipientName = contactObj?.full_name || recipient.split('@')[0];
+      let productCode = productObj?.code || extractProjectFromIdempotencyKey(j?.idempotency_key) || 'getaipilot';
+      let productName = productObj?.name || (productCode === 'GAP_WHATSAPP' ? 'GAP WhatsApp' : productCode === 'socialpilot' ? 'SocialPilot' : 'GetAiPilot Core Platform');
+      let provider = j?.provider || 'ZeptoMail (.IN API)';
+      let providerMessageId = j?.provider_message_id || events.find((e: any) => e.data?.messageId)?.data?.messageId || null;
+      let status = formatDashboardJobStatus(j?.status || events[events.length - 1]?.eventType || 'Delivered');
+      let createdAt = j?.created_at || events[0]?.occurredAt || new Date().toISOString();
+      let attempts = j?.attempts || 1;
+
+      // Find saved subject, html, variables from events or campaign
+      const eventWithHtml = events.find((e: any) => e.data?.html);
+      let subject = eventWithHtml?.data?.subject || campaignObj?.name;
+      let html = eventWithHtml?.data?.html || null;
+      let variables = eventWithHtml?.data?.variables || {};
+
+      // If no rendered HTML saved in events, reconstruct it dynamically
+      if (!html) {
+        let templateKey = templateObj?.key;
+        if (!templateKey) {
+          const lowerKey = String(j?.idempotency_key || '').toLowerCase();
+          if (lowerKey.includes('broadcast') || lowerKey.includes('post_live') || lowerKey.includes('quickpost') || lowerKey.includes('socialpost')) {
+            templateKey = 'broadcast_notification';
+          } else if (lowerKey.includes('account_connected') || lowerKey.includes('social_account')) {
+            templateKey = 'account_connected';
+          } else if (lowerKey.includes('automation') || lowerKey.includes('autodm')) {
+            templateKey = 'automation_created';
+          } else if (lowerKey.includes('social') && (lowerKey.includes('welcome') || lowerKey.includes('signup'))) {
+            templateKey = 'auth_welcome';
+          } else if (lowerKey.includes('welcome') || lowerKey.includes('followup') || (subject && subject.toLowerCase().includes('welcome'))) {
+            templateKey = 'ai_welcome_followup';
+          } else if (lowerKey.includes('confirm') || lowerKey.includes('verify')) {
+            templateKey = 'getaipilot_confirm_email_otp';
+          } else if (lowerKey.includes('otp') || lowerKey.includes('magic')) {
+            templateKey = 'getaipilot_magic_link_otp';
+          } else if (lowerKey.includes('whatsapp') || lowerKey.includes('wap')) {
+            templateKey = 'gap_whatsapp_welcome';
+          } else {
+            templateKey = 'ai_welcome_followup';
+          }
+        }
+
+        const renderRes = await renderTemplate(templateKey, {
+          email: recipient,
+          full_name: recipientName,
+          name: recipientName,
+          subject: subject || undefined,
+          ...variables
+        });
+        html = renderRes.html;
+        if (!subject) subject = renderRes.subject;
+      }
+
+      if (!subject) {
+        subject = 'GetAiPilot Notification';
+      }
+
+      const senderEmail = process.env.ZEPTOMAIL_FROM_EMAIL || 'support@getaipilot.com';
+      const senderName = productCode && productCode.toUpperCase() === 'GETAIPILOT'
+        ? 'GETAIPILOT Team'
+        : (productCode ? `${productCode.toUpperCase()} Team` : 'GetAiPilot Team');
+
+      return reply.send({
+        success: true,
+        email: {
+          id: j?.id || id,
+          type: j?.type === 'campaign' ? 'Campaign' : 'Transactional',
+          status,
+          provider,
+          providerMessageId,
+          idempotencyKey: j?.idempotency_key,
+          attempts,
+          createdAt,
+          recipient,
+          recipientName,
+          senderName,
+          senderEmail,
+          subject,
+          templateKey: templateObj?.key,
+          templateName: templateObj?.name,
+          productCode,
+          productName,
+          html,
+          events,
+          variables
+        }
+      });
     } catch (err: any) {
       fastify.log.error(err);
       return reply.status(500).send({ success: false, error: err.message });

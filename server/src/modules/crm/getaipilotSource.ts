@@ -281,6 +281,23 @@ const listAllSubscriptions = async (client: ReturnType<typeof createGetAiPilotCl
   }
 };
 
+const listAllDemoBookings = async (client: ReturnType<typeof createGetAiPilotClient>) => {
+  try {
+    const { data, error } = await client
+      .from('demo_bookings')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.warn('Could not fetch demo_bookings:', error.message);
+      return [];
+    }
+    return (data || []) as AnyRow[];
+  } catch (err: any) {
+    console.warn('Demo bookings fetch notice:', err?.message);
+    return [];
+  }
+};
+
 const listAllAuthUsers = async (client: ReturnType<typeof createGetAiPilotClient>) => {
   const rows: AnyRow[] = [];
   for (let page = 1; ; page += 1) {
@@ -305,7 +322,7 @@ export const listStaffProfiles = async () => {
   return data || [];
 };
 
-const snapshotFrom = (profileInput: AnyRow, authUser?: AnyRow, sub?: AnyRow): GetAiPilotUserSnapshot => {
+const snapshotFrom = (profileInput: AnyRow, authUser?: AnyRow, sub?: AnyRow, demoBooking?: AnyRow): GetAiPilotUserSnapshot => {
   const profile = normaliseProfile({ ...profileInput });
   const metadata = authUser?.user_metadata || {};
   const rawMetadata = profile.raw_user_meta_data || {};
@@ -314,13 +331,13 @@ const snapshotFrom = (profileInput: AnyRow, authUser?: AnyRow, sub?: AnyRow): Ge
   const truecallerPhone = isTruecaller && profile.email?.includes('@') ? profile.email.split('@')[0] : null;
 
   // Phone number resolution
-  let phone = String(profile.mobile_number || profile.phone || authUser?.phone || rawMetadata.phone || truecallerPhone || '').trim() || null;
+  let phone = String(profile.mobile_number || profile.phone || authUser?.phone || rawMetadata.phone || truecallerPhone || demoBooking?.phone || '').trim() || null;
 
   // Email resolution (empty/null for Truecaller dummy emails)
-  let email = isTruecaller ? null : (usableEmail(profile.email) || usableEmail(profile.business_email) || usableEmail(authUser?.email) || usableEmail(rawMetadata.email));
+  let email = isTruecaller ? null : (usableEmail(profile.email) || usableEmail(profile.business_email) || usableEmail(authUser?.email) || usableEmail(rawMetadata.email) || usableEmail(demoBooking?.email));
 
   // Full name
-  let fullName = profile.full_name || profile.username || metadata.full_name || metadata.name || '';
+  let fullName = profile.full_name || profile.username || metadata.full_name || metadata.name || demoBooking?.name || '';
   if (!fullName || fullName === 'New User') {
     fullName = email?.split('@')[0] || (phone ? `+${phone}` : 'Customer');
   }
@@ -330,18 +347,18 @@ const snapshotFrom = (profileInput: AnyRow, authUser?: AnyRow, sub?: AnyRow): Ge
 
   // Subscription plan & status resolution
   const subDetail = getSubStatusDetail(sub, profile);
-  const planLabel = formatPlanLabel(profile.subscription || sub?.plan_label, sub?.plan_id) || profile.account_type || 'Free Tier';
+  const planLabel = formatPlanLabel(profile.subscription || sub?.plan_label, sub?.plan_id) || profile.account_type || (demoBooking ? 'Demo Strategy Walkthrough' : 'Free Tier');
   const serviceInfo = detectService(planLabel, sub?.plan_id || profile.subscription);
 
-  const registeredAt = asIso(profile.created_at || authUser?.created_at, new Date().toISOString())!;
-  const onboardingStarted = Boolean(profile.tour_seen || profile.tour_completed || Number(profile.tour_step || 0) > 0 || profile.onboarding_started_at || profile.onboarding_completed);
-  const lastActivity = asIso(profile.last_activity_at || profile.last_seen_at || profile.updated_at || authUser?.last_sign_in_at, registeredAt);
+  const registeredAt = asIso(profile.created_at || authUser?.created_at || demoBooking?.created_at, new Date().toISOString())!;
+  const onboardingStarted = Boolean(profile.tour_seen || profile.tour_completed || Number(profile.tour_step || 0) > 0 || profile.onboarding_started_at || profile.onboarding_completed || demoBooking);
+  const lastActivity = asIso(demoBooking?.created_at || profile.last_activity_at || profile.last_seen_at || profile.updated_at || authUser?.last_sign_in_at, registeredAt);
 
-  const isExtracted = profile.is_extracted ?? Boolean(profile.extracted_at);
-  const leadStatus = profile.lead_status || (isExtracted ? 'extracted' : 'new');
+  const isExtracted = profile.is_extracted ?? Boolean(profile.extracted_at || demoBooking);
+  const leadStatus = (demoBooking ? 'demo_booked' : profile.lead_status) || (isExtracted ? 'extracted' : 'new');
 
   return {
-    externalUserId: String(profile.id || authUser?.id),
+    externalUserId: String(profile.id || authUser?.id || `demo_${demoBooking?.id}`),
     email,
     phone,
     fullName,
@@ -367,30 +384,46 @@ const snapshotFrom = (profileInput: AnyRow, authUser?: AnyRow, sub?: AnyRow): Ge
       isTrial: subDetail.isTrial,
       leadStatus,
       isExtracted,
-      extractedAt: profile.extracted_at || null,
+      extractedAt: profile.extracted_at || demoBooking?.created_at || null,
       assignedTo: profile.assigned_to || null,
-      notes: profile.notes || null,
+      notes: profile.notes || demoBooking?.notes || null,
       lastContactedAt: profile.last_contacted_at || null,
-      nextFollowupAt: profile.next_followup_at || null,
+      nextFollowupAt: profile.next_followup_at || demoBooking?.scheduled_time || null,
       tourSeen: profile.tour_seen === true,
       tourCompleted: profile.tour_completed === true,
       tourStep: Number(profile.tour_step || 0),
       accountStatus: profile.account_status || (subDetail.status === 'active' ? 'active' : 'free'),
       rawAccountType: profile.account_type || null,
+      // Demo Booking Specifics
+      demo_booked: Boolean(demoBooking),
+      demo_scheduled_time: demoBooking?.scheduled_time || null,
+      demo_notes: demoBooking?.notes || null,
+      demo_booking_id: demoBooking?.id || null,
+      demo_status: demoBooking?.status || null,
+      demo_requested_at: demoBooking?.created_at || null,
     },
   };
 };
 
 export async function fetchAllGetAiPilotUsers(): Promise<GetAiPilotUserSnapshot[]> {
   const client = createGetAiPilotClient();
-  const [profiles, authUsers, subscriptions] = await Promise.all([
+  const [profiles, authUsers, subscriptions, demoBookings] = await Promise.all([
     listAllProfiles(client),
     listAllAuthUsers(client),
     listAllSubscriptions(client),
+    listAllDemoBookings(client),
   ]);
 
   const authById = new Map(authUsers.map((user) => [String(user.id), user]));
   const authByEmail = new Map(authUsers.filter((user) => usableEmail(user.email)).map((user) => [usableEmail(user.email)!, user]));
+
+  const bookingByEmail = new Map<string, AnyRow>();
+  for (const b of demoBookings) {
+    const bEmail = usableEmail(b.email);
+    if (bEmail && !bookingByEmail.has(bEmail)) {
+      bookingByEmail.set(bEmail, b);
+    }
+  }
 
   // Prioritize active paid subscriptions > active trial > latest expired
   const subById = new Map<string, AnyRow>();
@@ -419,6 +452,7 @@ export async function fetchAllGetAiPilotUsers(): Promise<GetAiPilotUserSnapshot[
   }
 
   const seenIds = new Set<string>();
+  const seenEmails = new Set<string>();
   const snapshots: GetAiPilotUserSnapshot[] = [];
 
   // Exclude admin profiles just like GetAiPilot does
@@ -428,10 +462,37 @@ export async function fetchAllGetAiPilotUsers(): Promise<GetAiPilotUserSnapshot[
     const profileEmail = usableEmail(profile.email) || usableEmail(profile.business_email);
     const authUser = authById.get(String(profile.id)) || (profileEmail ? authByEmail.get(profileEmail) : undefined);
     const sub = subById.get(String(profile.id));
-    const snapshot = snapshotFrom(profile, authUser, sub);
+    const effectiveEmail = profileEmail || usableEmail(authUser?.email);
+    const booking = effectiveEmail ? bookingByEmail.get(effectiveEmail) : undefined;
+    const snapshot = snapshotFrom(profile, authUser, sub, booking);
     if (!snapshot.externalUserId || seenIds.has(snapshot.externalUserId)) continue;
     seenIds.add(snapshot.externalUserId);
+    if (snapshot.email) seenEmails.add(snapshot.email);
     snapshots.push(snapshot);
+  }
+
+  // Include any demo bookings that do not have a registered profile yet
+  for (const b of demoBookings) {
+    const bEmail = usableEmail(b.email);
+    if (!bEmail || seenEmails.has(bEmail)) continue;
+    seenEmails.add(bEmail);
+
+    const syntheticSnapshot = snapshotFrom(
+      {
+        id: `demo_${b.id}`,
+        full_name: b.name || bEmail.split('@')[0],
+        email: bEmail,
+        phone: b.phone || null,
+        created_at: b.created_at,
+        is_extracted: true,
+        extracted_at: b.created_at,
+        lead_status: 'demo_booked',
+      },
+      undefined,
+      undefined,
+      b
+    );
+    snapshots.push(syntheticSnapshot);
   }
 
   return snapshots.sort((a, b) => b.registeredAt.localeCompare(a.registeredAt));

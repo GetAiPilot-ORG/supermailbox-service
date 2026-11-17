@@ -13,6 +13,19 @@ export async function renderTemplate(
 ): Promise<{ subject: string; html: string }> {
   let normalizedVariables = withDefaultTemplateVariables(variables);
 
+  // If raw compiled HTML is explicitly provided in variables, render and interpolate it directly
+  if (normalizedVariables.html && typeof normalizedVariables.html === 'string' && normalizedVariables.html.trim().length > 20) {
+    const interpolatedSub = interpolateVariables(normalizedVariables.subject || 'Your GetAIPilot Demo is Confirmed! 🚀', normalizedVariables);
+    let interpolatedHtml = interpolateVariables(normalizedVariables.html, normalizedVariables);
+    if (normalizedVariables.ConfirmationURL) {
+      interpolatedHtml = injectActionLinkFallback(interpolatedHtml, normalizedVariables.ConfirmationURL);
+    }
+    return {
+      subject: interpolatedSub,
+      html: addResponsiveEmailFixes(interpolatedHtml),
+    };
+  }
+
   if (
     (!normalizedVariables.ConfirmationURL || !normalizedVariables.Token) &&
     normalizedVariables.email &&
@@ -41,8 +54,17 @@ export async function renderTemplate(
   }
 
   let resolvedKey = templateKey;
+  if (
+    templateKey === 'demo_link_created' ||
+    templateKey === 'demo_meeting_rescheduled' ||
+    templateKey === 'getaipilot_demo_link_created' ||
+    templateKey === 'getaipilot_demo_meeting_rescheduled'
+  ) {
+    resolvedKey = 'demo_booking_confirmation';
+  }
+
   try {
-    resolvedKey = await resolveCategoryDefaultTemplateKey(templateKey);
+    resolvedKey = await resolveCategoryDefaultTemplateKey(resolvedKey);
   } catch (err) {
     console.warn('[renderTemplate] resolveCategoryDefaultTemplateKey warning:', err);
   }
@@ -513,9 +535,9 @@ export async function renderTemplate(
                                     <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">
                                         Need Help?</h3>
                                     <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
-                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>7777891004</strong>.
                                     </p>
-                                    <a href="tel:8982285510"
+                                    <a href="tel:7777891004"
                                         style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact
                                         Support</a>
                                 </td>
@@ -760,9 +782,9 @@ export async function renderTemplate(
                                     <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">
                                         Need Help?</h3>
                                     <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
-                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>7777891004</strong>.
                                     </p>
-                                    <a href="tel:8982285510"
+                                    <a href="tel:7777891004"
                                         style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact
                                         Support</a>
                                 </td>
@@ -919,20 +941,207 @@ export async function renderTemplate(
   } else if (k === 'ai_welcome_followup' || k.includes('followup')) {
     finalSubject = normalizedVariables.subject || 'Welcome to GetAiPilot! 🚀';
     finalHtml = normalizedVariables.html || `
-      <div style="font-family: sans-serif; padding: 24px; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff;">
-        <h2 style="color: #2563eb; margin-top: 0;">Welcome to GetAiPilot! 👋</h2>
-        <p>Hi ${name},</p>
-        <p>Thanks for joining GetAiPilot! Your autonomous automation superpowers are ready.</p>
-        <div style="margin: 24px 0; text-align: center;">
-          <a href="https://getaipilot.in/dashboard" style="background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
-            Go to Dashboard &rarr;
-          </a>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 40px 16px; background-color: #f8fafc; color: #334155;">
+        <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); padding: 44px 38px; text-align: left;">
+          <div style="margin-bottom: 28px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="vertical-align: middle; padding-right: 10px;">
+                  <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" style="height: 28px; width: auto; display: block;" alt="GetAiPilot Logo" />
+                </td>
+                <td style="vertical-align: middle;">
+                  <span style="font-weight: 700; color: #0f172a; font-size: 20px; letter-spacing: -0.4px;">get<span style="color: #2563eb;">aipilot</span></span>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <h1 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 700; color: #0f172a; letter-spacing: -0.4px; line-height: 1.3;">
+            Welcome to GetAiPilot! 👋
+          </h1>
+          <div style="font-size: 15px; line-height: 1.65; color: #334155; margin-bottom: 24px;">
+            <p style="margin: 0 0 16px 0;">Hey ${name},</p>
+            <p style="margin: 0 0 16px 0;">Thanks for signing up for GetAiPilot! We are thrilled to help you automate and grow your business operations.</p>
+            <p style="margin: 0;">Here are the key platforms you can explore right now:</p>
+          </div>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
+            <tr>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
+                <strong style="color: #0f172a;">GAP Telegram Automation:</strong> Monetize, track, and automate your Telegram groups and channels.
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
+                <strong style="color: #0f172a;">GAP Custom CRM:</strong> Deploy an all-in-one CRM engine with invoicing, payroll, and leads management.
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
+                <strong style="color: #0f172a;">GAP-WhatsApp Pilot:</strong> Hook up WhatsApp Business API to send broadcasts and auto-replies.
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 16px; vertical-align: top; padding: 6px 0; font-size: 16px; color: #2563eb; line-height: 1.6;">&bull;</td>
+              <td style="vertical-align: top; padding: 6px 0 6px 8px; font-size: 14px; line-height: 1.6; color: #334155;">
+                <strong style="color: #0f172a;">GAP-Social Pilot:</strong> Schedule, broadcast, and auto-publish content across Instagram, LinkedIn, X, and Facebook.
+              </td>
+            </tr>
+          </table>
+          <div style="text-align: center; margin-bottom: 36px;">
+            <a href="https://getaipilot.in/dashboard" style="background-color: #2563eb; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 13px 36px; border-radius: 8px; display: inline-block; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);">
+              Go to Dashboard &rarr;
+            </a>
+          </div>
+          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; text-align: center; font-size: 13px; color: #94a3b8; line-height: 1.5;">
+            GetAiPilot Team &copy; 2026
+          </div>
         </div>
-        <p style="font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 24px;">
-          GetAiPilot &bull; SuperMailBox CPaaS
-        </p>
       </div>
     `;
+  } else if (
+    k === 'demo_booking_confirmation' ||
+    k === 'getaipilot_demo_booking_confirmation' ||
+    k.includes('demo_booking') ||
+    k.includes('demo_confirmation')
+  ) {
+    finalSubject = normalizedVariables.subject || 'Your GetAIPilot Demo is Confirmed! 🚀';
+    finalHtml = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your GetAIPilot Demo is Confirmed</title>
+  <style type="text/css">
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { margin: 0; padding: 0; background-color: #f1f5f9; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; -webkit-font-smoothing: antialiased; }
+    table { border-spacing: 0; }
+    td { padding: 0; }
+    img { border: 0; }
+    a { text-decoration: none; }
+    .wrapper { width: 100%; table-layout: fixed; background-color: #f1f5f9; padding: 40px 12px; }
+    .outer { width: 100%; max-width: 600px; background-color: #ffffff; margin: 0 auto; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 30px rgba(10, 71, 55, 0.08); border: 1px solid #e2e8f0; }
+    @media screen and (max-width: 600px) {
+      .mobile-pad { padding-left: 20px !important; padding-right: 20px !important; }
+      .mobile-stack { display: block !important; width: 100% !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9;">
+  <center class="wrapper">
+    <table class="outer" align="center" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td style="height: 5px; background: linear-gradient(90deg, #0A4737 0%, #10b981 50%, #064E3B 100%);"></td>
+      </tr>
+      <tr>
+        <td style="background: linear-gradient(145deg, #0A4737 0%, #064E3B 60%, #043828 100%); padding: 42px 32px; text-align: center;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 18px auto;">
+            <tr>
+              <td style="padding-right: 10px; vertical-align: middle;">
+                <img src="https://uklxlappjcuvdqjvecfh.supabase.co/storage/v1/object/public/Emails%20images/logo.png" alt="GetAIPilot" width="36" height="36" style="display: block; border-radius: 8px;">
+              </td>
+              <td style="vertical-align: middle;">
+                <span style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">GetAIPilot</span>
+              </td>
+            </tr>
+          </table>
+          <div style="display: inline-block; padding: 6px 16px; background-color: rgba(255, 255, 255, 0.12); border-radius: 9999px; margin-bottom: 14px; border: 1px solid rgba(255, 255, 255, 0.2);">
+            <span style="color: #6ee7b7; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;">
+              ● 1-on-1 Strategy Call &bull; Confirmed
+            </span>
+          </div>
+          <h1 style="color: #ffffff; font-size: 26px; font-weight: 800; margin: 0 0 10px 0; letter-spacing: -0.02em; line-height: 1.3;">
+            Your Live Demo is Booked! 🚀
+          </h1>
+          <p style="color: #d1fae5; font-size: 14px; margin: 0; font-weight: 400; line-height: 1.5; max-width: 480px; margin: 0 auto;">
+            We've locked in your session on our engineering calendar. Here is your video room and agenda details.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td class="mobile-pad" style="padding: 36px 32px 24px 32px;">
+          <p style="font-size: 15px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
+            Hi <strong>{{ .Name }}</strong>,
+          </p>
+          <p style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0 0 24px 0;">
+            Thank you for connecting with us! Your personalized 1-on-1 walkthrough with our solutions and product engineering team has been scheduled.
+          </p>
+
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; margin-bottom: 26px;">
+            <tr>
+              <td style="padding: 22px;">
+                <div style="font-size: 11px; font-weight: 800; color: #0A4737; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;">
+                  📋 Confirmed Appointment Summary
+                </div>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size: 13px; color: #1e293b; line-height: 1.9;">
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">📅</td>
+                    <td><strong>Scheduled Time:</strong> {{ .ScheduledTime }}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">⏱️</td>
+                    <td><strong>Session Length:</strong> {{ .Duration }} Minutes Interactive Walkthrough</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">👤</td>
+                    <td><strong>Invitee:</strong> {{ .UserEmail }}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">📱</td>
+                    <td><strong>Contact Phone:</strong> {{ .Phone }}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">🏢</td>
+                    <td><strong>Company / Workspace:</strong> {{ .Company }}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">👨‍💻</td>
+                    <td><strong>Host Lead:</strong> {{ .HostName }}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">🌐</td>
+                    <td><strong>Timezone:</strong> {{ .Timezone }}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">📹</td>
+                    <td>
+                      <strong>Meeting Link:</strong><br />
+                      <span style="color: #0A4737; font-weight: 600;">Will be sent directly by our support team before your session</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">📝</td>
+                    <td><strong>Discussion Focus:</strong> {{ .Notes }}</td>
+                  </tr>
+                  <tr>
+                    <td style="width: 28px; vertical-align: top;">🔖</td>
+                    <td><strong>Booking Reference:</strong> <span style="font-family: monospace; font-size: 12px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">{{ .BookingID }}</span></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+          
+          <div style="border: 1px solid #bbf7d0; background-color: #f0fdf4; border-radius: 12px; padding: 16px 20px; text-align: center; font-size: 13px; color: #166534; line-height: 1.5;">
+            Need to reschedule or have a quick pre-call question?
+            <a href="https://wa.me/917777891004?text=Hi%20GetAIPilot%2C%20I%20have%20questions%20about%20my%20scheduled%20demo." target="_blank" style="color: #0A4737; font-weight: 700; text-decoration: underline; margin-left: 4px;">
+              WhatsApp our Specialist (+91 89822 85510)
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="background-color: #f8fafc; padding: 26px 30px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; line-height: 1.6;">
+          <p style="margin: 0 0 6px 0; font-weight: 700; color: #1e293b;">GetAIPilot &bull; AI Automation & Growth Systems</p>
+          <p style="margin: 0 0 10px 0;">100% Free Consultation &bull; No Credit Card Required</p>
+          <p style="margin: 0; font-size: 11px; color: #94a3b8;">Dispatched via SuperMailBox CPaaS &bull; <a href="https://getaipilot.in" target="_blank" style="color: #64748b; text-decoration: underline;">getaipilot.in</a></p>
+        </td>
+      </tr>
+    </table>
+  </center>
+</body>
+</html>`;
   } else {
     // Default fallback
     finalSubject = `${campaignName}`;
@@ -975,8 +1184,44 @@ function injectActionLinkFallback(html: string, actionUrl: string): string {
 }
 
 function interpolateVariables(source: string, variables: Record<string, any>): string {
-  return source.replace(/\{\{\s*\.?\s*([a-zA-Z0-9_]+)\s*\}\}/g, (match, key) => {
-    return variables[key] !== undefined ? String(variables[key]) : match;
+  // 1. Process conditional blocks: {{ if .Key }}...{{ end }}, {{ if Key }}...{{ end }}, {{#if key}}...{{/if}}
+  let processed = source.replace(
+    /\{\{\s*#?if\s*\.?\s*([a-zA-Z0-9_]+)\s*\}\}([\s\S]*?)\{\{\s*(\/if|\/|end)\s*\}\}/gi,
+    (match, key, block) => {
+      const val =
+        variables[key] ??
+        variables[key.toLowerCase()] ??
+        variables[key.toUpperCase()] ??
+        variables[key.charAt(0).toUpperCase() + key.slice(1)];
+
+      if (
+        val !== undefined &&
+        val !== null &&
+        String(val).trim().length > 0 &&
+        String(val).trim() !== "false" &&
+        String(val).trim() !== "undefined" &&
+        String(val).trim() !== "null"
+      ) {
+        return block;
+      }
+      return "";
+    }
+  );
+
+  // 2. Remove any remaining or orphan {{ if ... }} or {{ end }} tags so they never appear in the email
+  processed = processed
+    .replace(/\{\{\s*#?if[\s\S]*?\}\}/gi, "")
+    .replace(/\{\{\s*(\/if|\/|end)\s*\}\}/gi, "");
+
+  // 3. Interpolate standard variables {{ .Key }}, {{ Key }}, {{key}}
+  return processed.replace(/\{\{\s*\.?\s*([a-zA-Z0-9_]+)\s*\}\}/gi, (match, key) => {
+    const val =
+      variables[key] ??
+      variables[key.toLowerCase()] ??
+      variables[key.toUpperCase()] ??
+      variables[key.charAt(0).toUpperCase() + key.slice(1)];
+
+    return val !== undefined && val !== null ? String(val) : "";
   });
 }
 

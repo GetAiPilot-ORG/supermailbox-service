@@ -12,6 +12,9 @@ This document contains all HTML email templates configured in SuperMailBox servi
 5. [Auth Welcome Template (`auth_welcome`)](#5-auth-welcome-template-auth_welcome)
 6. [Billing Receipt Template (`billing_receipt`)](#6-billing-receipt-template-billing_receipt)
 7. [Product Update Announcement (`product_announcement`)](#7-product-update-announcement-product_announcement)
+8. [GetAiPilot Demo Booking Confirmation (`demo_booking_confirmation`)](#8-getaipilot-demo-booking-confirmation-demo_booking_confirmation)
+9. [GetAiPilot Demo Link Created (`demo_link_created`)](#9-getaipilot-demo-link-created-demo_link_created)
+10. [GetAiPilot Demo Meeting Rescheduled (`demo_meeting_rescheduled`)](#10-getaipilot-demo-meeting-rescheduled-demo_meeting_rescheduled)
 
 ---
 
@@ -540,3 +543,36 @@ This document contains all HTML email templates configured in SuperMailBox servi
   </div>
 </div>
 ```
+
+---
+
+## 8. GetAiPilot Demo Booking Confirmation (`demo_booking_confirmation`)
+* **Category:** Transactional
+* **Subject:** `Your Live Demo is Booked! 🚀`
+* **Preheader:** `Your 1-on-1 strategy call with GetAIPilot engineering is confirmed.`
+* **Variables:** `{{name}}`, `{{email}}`, `{{scheduled_time}}`, `{{meet_url}}`, `{{notes}}`
+* **Aliases:** `getaipilot_demo_booking_confirmation`, `demo_booking_confirmation`
+
+Used by GetAIPilot Demo Studio & Support whenever an attendee reserves a demo slot. Includes 1-on-1 walkthrough confirmation, session summary, direct Google Meet room link, preparation checklist, and WhatsApp specialist support.
+
+---
+
+## 9. GetAiPilot Demo Link Created (`demo_link_created`)
+* **Category:** Transactional
+* **Subject:** `Your Demo Booking Link is Live! 🚀`
+* **Preheader:** `Share your personalized live calendar with clients and automate appointments.`
+* **Variables:** `{{host_name}}`, `{{booking_url}}`, `{{event_title}}`, `{{duration}}`, `{{working_days}}`, `{{working_hours}}`, `{{timezone}}`, `{{custom_message}}`
+* **Aliases:** `getaipilot_demo_link_created`, `demo_link_created`
+
+Used by the native Calendly tool when a host creates or shares a demo booking link. Includes live calendar configuration details, 4-grid feature breakdown, and website embed snippet.
+
+---
+
+## 10. GetAiPilot Demo Meeting Rescheduled (`demo_meeting_rescheduled`)
+* **Category:** Transactional
+* **Subject:** `Your Demo Meeting Has Been Rescheduled 🗓️`
+* **Preheader:** `Our support team has updated your video call session and generated a new link.`
+* **Variables:** `{{name}}`, `{{new_scheduled_time}}`, `{{meet_url}}`, `{{reschedule_reason}}`, `{{host_name}}`, `{{timezone}}`
+* **Aliases:** `getaipilot_demo_meeting_rescheduled`, `demo_meeting_rescheduled`
+
+Used by the support team when a meeting link needs to be regenerated or rescheduled because the user was busy at the initial time.

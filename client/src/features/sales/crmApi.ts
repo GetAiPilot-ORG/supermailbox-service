@@ -1,6 +1,21 @@
 import type { AdminProfile, CrmActivity, CrmTask, LeadDetail, SalesLead, SalesOverview, SupportTicket } from './types';
 
-const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://127.0.0.1:5050/v1';
+export const getCrmApiBase = (): string => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('SUPERMAILBOX_API_TARGET');
+    if (saved === 'production') return 'https://gapmail.getaipilot.in/v1';
+    if (saved === 'local') return 'http://localhost:5050/v1';
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) {
+      const localUrl = (import.meta as any).env?.VITE_LOCAL_API_URL || 'http://localhost:5050';
+      return `${localUrl.replace(/\/+$/, '')}/v1`;
+    }
+  }
+
+  const envUrl = (import.meta as any).env?.VITE_API_URL || 'https://gapmail.getaipilot.in';
+  return `${envUrl.replace(/\/+$/, '')}/v1`;
+};
 
 const request = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
   const controller = new AbortController();
@@ -10,7 +25,8 @@ const request = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
   if (token) headers.set('Authorization', `Bearer ${token}`);
   if (init.body) headers.set('Content-Type', 'application/json');
   try {
-    const response = await fetch(`${API_BASE}${path}`, { ...init, headers, signal: controller.signal });
+    const apiBase = getCrmApiBase();
+    const response = await fetch(`${apiBase}${path}`, { ...init, headers, signal: controller.signal });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data?.error || `Request failed (${response.status}).`);
     return data as T;

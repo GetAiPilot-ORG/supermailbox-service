@@ -73,6 +73,36 @@ export interface SuppressionItem {
   description?: string;
 }
 
+export interface EmailEvent {
+  id: string;
+  eventType: string;
+  occurredAt: string;
+  data: any;
+}
+
+export interface EmailDetail {
+  id: string;
+  type: string;
+  status: string;
+  provider: string;
+  providerMessageId?: string | null;
+  idempotencyKey?: string | null;
+  attempts: number;
+  createdAt: string;
+  recipient: string;
+  recipientName?: string;
+  senderName: string;
+  senderEmail: string;
+  subject: string;
+  templateKey?: string | null;
+  templateName?: string | null;
+  productCode?: string;
+  productName?: string;
+  html: string;
+  events: EmailEvent[];
+  variables?: Record<string, any>;
+}
+
 export interface BounceReportItem {
   id: string;
   email: string;
@@ -126,7 +156,24 @@ export interface CampaignJobStats {
   suppressed: number;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/v1` : 'http://127.0.0.1:5050/v1';
+export const getApiBase = (): string => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('SUPERMAILBOX_API_TARGET');
+    if (saved === 'production') return 'https://gapmail.getaipilot.in/v1';
+    if (saved === 'local') return 'http://localhost:5050/v1';
+
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocalhost) {
+      const localUrl = (import.meta as any).env?.VITE_LOCAL_API_URL || 'http://localhost:5050';
+      return `${localUrl.replace(/\/+$/, '')}/v1`;
+    }
+  }
+
+  const envUrl = (import.meta as any).env?.VITE_API_URL || 'https://gapmail.getaipilot.in';
+  return `${envUrl.replace(/\/+$/, '')}/v1`;
+};
+
+const API_BASE = getApiBase();
 const REQUEST_TIMEOUT_MS = 15000;
 
 const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {
@@ -139,8 +186,10 @@ const fetchWithTimeout = async (url: string, init: RequestInit = {}) => {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
+  const finalUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `${getApiBase()}${url.startsWith('/') ? '' : '/'}${url}`;
+
   try {
-    const res = await fetch(url, { ...init, headers, signal: controller.signal });
+    const res = await fetch(finalUrl, { ...init, headers, signal: controller.signal });
     if (res.status === 401 && !url.includes('/auth/login')) {
       try {
         const body = await res.clone().json();
@@ -245,6 +294,19 @@ export class ApiService {
       console.warn('API getProjectLogs failed:', err);
     }
     return {};
+  }
+
+  static async getEmailDetails(id: string): Promise<EmailDetail | null> {
+    try {
+      const res = await fetchWithTimeout(`${API_BASE}/emails/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.email) return data.email;
+      }
+    } catch (err) {
+      console.warn('API getEmailDetails failed:', err);
+    }
+    return null;
   }
 
   static async getTemplates(): Promise<Template[]> {

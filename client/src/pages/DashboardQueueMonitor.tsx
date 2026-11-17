@@ -31,6 +31,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { ActivityLog, MetricCardData, QueueJob } from '../services/api';
+import { EmailDetailModal } from '../components/EmailDetailModal';
 
 const statusColors: Record<string, string> = {
   Delivered: '#24754E',
@@ -147,6 +148,7 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedJob, setSelectedJob] = useState<QueueJob | null>(null);
+  const [selectedEmailLog, setSelectedEmailLog] = useState<ActivityLog | null>(null);
   const [timeRange, setTimeRange] = useState<'today' | '7days' | '14days' | '30days'>('7days');
   const itemsPerPage = 6;
 
@@ -570,7 +572,14 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
                   </tr>
                 ) : (
                   pagedLogs.map((log) => (
-                    <tr key={log.id}>
+                    <tr 
+                      key={log.id}
+                      onClick={() => setSelectedEmailLog(log)}
+                      style={{ cursor: 'pointer', transition: 'background-color 0.15s ease' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      title="Click to view full email details & preview"
+                    >
                       <td className="muted-cell">{log.timestamp}</td>
                       <td className="recipient-cell">{cleanRecipient(log.recipient)}</td>
                       <td>
@@ -646,6 +655,20 @@ export const DashboardQueueMonitor: React.FC<DashboardProps> = ({
             <pre>{JSON.stringify(selectedJob.payload ?? selectedJob, null, 2)}</pre>
           </aside>
         </div>
+      )}
+
+      {selectedEmailLog && (
+        <EmailDetailModal
+          emailId={selectedEmailLog.id}
+          initialData={{
+            recipient: cleanRecipient(selectedEmailLog.recipient),
+            type: selectedEmailLog.type,
+            provider: selectedEmailLog.provider,
+            status: selectedEmailLog.status,
+            timestamp: selectedEmailLog.createdAt || selectedEmailLog.timestamp
+          }}
+          onClose={() => setSelectedEmailLog(null)}
+        />
       )}
     </div>
   );

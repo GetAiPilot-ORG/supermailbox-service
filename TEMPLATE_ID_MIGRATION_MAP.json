@@ -78,5 +78,13 @@
     "newId": null,
     "newKey": null,
     "newName": "Deleted draft"
+  },
+  {
+    "oldId": "demo_booking_confirmation",
+    "oldKey": "demo_booking_confirmation",
+    "oldName": "Demo Booking Confirmation",
+    "newId": "cd068da5-628b-4ad1-85b6-d657fb30e60a",
+    "newKey": "getaipilot_demo_booking_confirmation",
+    "newName": "GetAiPilot Demo Booking Confirmation (Default)"
   }
 ]

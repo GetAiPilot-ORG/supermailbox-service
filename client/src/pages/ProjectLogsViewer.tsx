@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle2, Clock3, Mail, RefreshCw, Server, ShieldCheck } from 'lucide-react';
 import { ApiService, type ActivityLog } from '../services/api';
+import { EmailDetailModal } from '../components/EmailDetailModal';
 
 export const ProjectLogsViewer: React.FC = () => {
   const [projectLogs, setProjectLogs] = useState<Record<string, ActivityLog[]>>({});
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<string>('');
+  const [selectedEmailLog, setSelectedEmailLog] = useState<ActivityLog | null>(null);
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -237,7 +239,14 @@ export const ProjectLogsViewer: React.FC = () => {
                   </thead>
                   <tbody>
                     {selectedLogs.map((log, idx) => (
-                      <tr key={log.id || idx} style={{ transition: 'background-color 0.15s ease', borderBottom: '1px solid var(--border)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F8FAFC'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                      <tr 
+                        key={log.id || idx} 
+                        onClick={() => setSelectedEmailLog(log)}
+                        style={{ cursor: 'pointer', transition: 'background-color 0.15s ease', borderBottom: '1px solid var(--border)' }} 
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')} 
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                        title="Click to view full email details & preview"
+                      >
                         <td style={{ padding: '16px' }}>
                           <span className={getStatusClass(log.status)}>
                             {log.status}
@@ -265,6 +274,20 @@ export const ProjectLogsViewer: React.FC = () => {
           </div>
         )}
       </div>
+
+      {selectedEmailLog && (
+        <EmailDetailModal
+          emailId={selectedEmailLog.id}
+          initialData={{
+            recipient: selectedEmailLog.recipient ? selectedEmailLog.recipient.replace(/^camp_[a-z0-9]+_/i, '') : '',
+            type: selectedEmailLog.type,
+            provider: selectedEmailLog.provider,
+            status: selectedEmailLog.status,
+            timestamp: selectedEmailLog.createdAt || selectedEmailLog.timestamp
+          }}
+          onClose={() => setSelectedEmailLog(null)}
+        />
+      )}
     </section>
   );
 };

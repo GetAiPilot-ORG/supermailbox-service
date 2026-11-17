@@ -183,7 +183,7 @@ export async function syncGetAiPilotLeads(force = false) {
       const externalIds = chunk.map((user) => user.externalUserId);
       const { data: existing, error: existingError } = await supabase
         .from('crm_leads')
-        .select('external_user_id, sales_stage, converted_at, conversion_source, subscription_status')
+        .select('external_user_id, sales_stage, converted_at, conversion_source, subscription_status, next_follow_up_at')
         .eq('product_code', productCode)
         .in('external_user_id', externalIds);
       if (existingError) throw existingError;
@@ -206,6 +206,13 @@ export async function syncGetAiPilotLeads(force = false) {
           stage = 'won';
           convertedAt = snap.startedAt || convertedAt || startedAt;
           conversionSource = 'product_event';
+        } else if (snap.demo_booked) {
+          // Scheduled a live product demo / strategy walkthrough!
+          if (!currentStage || currentStage === 'unreviewed' || currentStage === 'qualified' || currentStage === 'contacting') {
+            stage = 'demo_trial';
+          } else {
+            stage = currentStage;
+          }
         } else if (detail === 'active_trial') {
           // In active free trial
           if (!currentStage || currentStage === 'unreviewed' || currentStage === 'qualified') {
@@ -243,9 +250,18 @@ export async function syncGetAiPilotLeads(force = false) {
           last_product_activity_at: user.lastProductActivityAt,
           subscription_status: detail === 'active_paid' ? 'active' : (detail === 'expired_paid' ? 'cancelled' : 'none'),
           sales_stage: stage,
+          next_follow_up_at: snap.demo_scheduled_time || existingRow?.next_follow_up_at || null,
           converted_at: convertedAt,
           conversion_source: conversionSource,
-          source_snapshot: user.sourceSnapshot,
+          source_snapshot: {
+            ...(existingRow?.source_snapshot || {}),
+            ...user.sourceSnapshot,
+            demo_booked: Boolean(snap.demo_booked || existingRow?.source_snapshot?.demo_booked),
+            demo_scheduled_time: snap.demo_scheduled_time || existingRow?.source_snapshot?.demo_scheduled_time || null,
+            demo_notes: snap.demo_notes || existingRow?.source_snapshot?.demo_notes || null,
+            demo_booking_id: snap.demo_booking_id || existingRow?.source_snapshot?.demo_booking_id || null,
+            demo_status: snap.demo_status || existingRow?.source_snapshot?.demo_status || (snap.demo_booked ? 'confirmed' : null),
+          },
           last_synced_at: startedAt,
         };
       });

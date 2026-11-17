@@ -78,8 +78,11 @@ async function processEmailJob(job: any, workerLabel: string) {
       event_data: {
         provider: sendResult.provider,
         messageId: sendResult.messageId,
+        subject: rendered.subject,
+        html: rendered.html,
         previewUrl: sendResult.previewUrl || null,
-        error: sendResult.error || null
+        error: sendResult.error || null,
+        variables: variables || {}
       }
     });
   }
