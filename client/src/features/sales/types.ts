@@ -41,7 +41,7 @@ export const ALL_LEAD_STATUSES: LeadStatus[] = [
 
 export type SubscriptionStatus = 'free' | 'active' | 'trial' | 'expired' | 'none' | 'cancelled';
 
-export type SalesTab = 'all' | 'new' | 'extracted' | 'active' | 'truecaller';
+export type SalesTab = 'all' | 'new' | 'demo' | 'extracted' | 'active' | 'truecaller';
 
 export interface AdminProfile {
   id: string;

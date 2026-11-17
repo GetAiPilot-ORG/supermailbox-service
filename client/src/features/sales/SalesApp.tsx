@@ -161,6 +161,23 @@ export const SalesApp: React.FC<{ onNavigate: (path: string) => void; onLogout: 
   const [toast, setToast] = useState('');
   const [draggedLead, setDraggedLead] = useState<SalesLead | null>(null);
 
+  const [apiTarget, setApiTarget] = useState<'local' | 'production'>(() => {
+    const saved = localStorage.getItem('SUPERMAILBOX_API_TARGET');
+    if (saved === 'production') return 'production';
+    if (saved === 'local') return 'local';
+    return (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'local' : 'production';
+  });
+
+  const toggleApiTarget = () => {
+    const next = apiTarget === 'local' ? 'production' : 'local';
+    localStorage.setItem('SUPERMAILBOX_API_TARGET', next);
+    setApiTarget(next);
+    showToast(`Switched API to ${next === 'local' ? 'Local Server (http://localhost:5050)' : 'Production Cloud (https://gapmail.getaipilot.in)'}`);
+    window.setTimeout(() => {
+      window.location.reload();
+    }, 300);
+  };
+
   const loadData = async (options: { sync?: boolean; force?: boolean } = {}) => {
     setLoading(true);
     setError('');
@@ -301,6 +318,26 @@ export const SalesApp: React.FC<{ onNavigate: (path: string) => void; onLogout: 
           
           </div>
           <div className="sales-command-actions">
+            <button
+              type="button"
+              onClick={toggleApiTarget}
+              className="sales-btn-xs sales-btn-outline"
+              style={{
+                height: '28px',
+                fontSize: '0.72rem',
+                gap: '6px',
+                borderRadius: '6px',
+                borderColor: apiTarget === 'local' ? '#86efac' : '#cbd5e1',
+                backgroundColor: apiTarget === 'local' ? '#f0fdf4' : '#f8fafc',
+                color: apiTarget === 'local' ? '#166534' : '#475569',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+              title="Click to toggle between Local API (port 5050) and Production Cloud (gapmail.getaipilot.in)"
+            >
+              <span style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: apiTarget === 'local' ? '#22c55e' : '#3b82f6' }} />
+              API: {apiTarget === 'local' ? 'Local (:5050)' : 'Production (Cloud)'} ⇄
+            </button>
             <span className={`sales-sync-state${overview?.sync?.stale ? ' is-stale' : ''}`}>
               <CircleDot size={14} />
               {overview?.sync?.lastSuccessAt ? `Synced ${dateTime(overview.sync.lastSuccessAt)}` : 'Not synced yet'}
@@ -463,11 +500,12 @@ const PeopleView: React.FC<PeopleViewProps> = ({
   // Compute live tab counts
   const counts = useMemo(() => {
     const total = allLeads.length;
+    const demoCount = allLeads.filter((r) => Boolean((r.sourceSnapshot as any)?.demo_booked) || r.salesStage === 'demo_trial').length;
     const newCount = allLeads.filter((r) => !r.isExtracted || r.leadStatus === 'new' || r.salesStage === 'unreviewed').length;
     const extractedCount = allLeads.filter((r) => r.isExtracted || (r.leadStatus && r.leadStatus !== 'new') || r.salesStage !== 'unreviewed').length;
     const activeCount = allLeads.filter((r) => r.subscriptionStatus === 'active').length;
     const truecallerCount = allLeads.filter((r) => r.signupMethod === 'truecaller').length;
-    return { total, newCount, extractedCount, activeCount, truecallerCount };
+    return { total, demoCount, newCount, extractedCount, activeCount, truecallerCount };
   }, [allLeads]);
 
   // Client-side filtering
@@ -477,7 +515,23 @@ const PeopleView: React.FC<PeopleViewProps> = ({
     // 1. Primary Tab filter
     switch (activeTab) {
       case 'new':
-        list = list.filter((r) => !r.isExtracted || r.leadStatus === 'new' || r.salesStage === 'unreviewed');
+        list = list.filter((r) => !r.isExtracted || r.leadStatus === 'new' || r.salesStage === 'unreviewed' || Boolean((r.sourceSnapshot as any)?.demo_booked));
+        // Prioritize demo bookings right at the top of Fresh Leads so support team never misses them!
+        list = [...list].sort((a, b) => {
+          const aDemo = Boolean((a.sourceSnapshot as any)?.demo_booked);
+          const bDemo = Boolean((b.sourceSnapshot as any)?.demo_booked);
+          if (aDemo && !bDemo) return -1;
+          if (!aDemo && bDemo) return 1;
+          return 0;
+        });
+        break;
+      case 'demo':
+        list = list.filter((r) => Boolean((r.sourceSnapshot as any)?.demo_booked) || r.salesStage === 'demo_trial');
+        list = [...list].sort((a, b) => {
+          const timeA = (a.sourceSnapshot as any)?.demo_scheduled_time || (a.sourceSnapshot as any)?.demo_requested_at || a.registeredAt;
+          const timeB = (b.sourceSnapshot as any)?.demo_scheduled_time || (b.sourceSnapshot as any)?.demo_requested_at || b.registeredAt;
+          return String(timeB).localeCompare(String(timeA));
+        });
         break;
       case 'extracted':
         list = list.filter((r) => r.isExtracted || (r.leadStatus && r.leadStatus !== 'new') || r.salesStage !== 'unreviewed');
@@ -711,6 +765,15 @@ const PeopleView: React.FC<PeopleViewProps> = ({
 
           <button
             type="button"
+            onClick={() => { setActiveTab('demo'); setPage(1); }}
+            className={`sales-leads-tab-btn ${activeTab === 'demo' ? 'is-active' : ''}`}
+            style={activeTab === 'demo' ? { backgroundColor: '#ecfdf5', color: '#065f46', borderColor: '#86efac' } : undefined}
+          >
+            🎯 Demo Requests <span className="sales-leads-tab-count" style={activeTab === 'demo' ? { backgroundColor: '#a7f3d0', color: '#065f46' } : undefined}>{counts.demoCount}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => { setActiveTab('extracted'); setPage(1); }}
             className={`sales-leads-tab-btn ${activeTab === 'extracted' ? 'is-active' : ''}`}
           >
@@ -782,6 +845,54 @@ const PeopleView: React.FC<PeopleViewProps> = ({
 
       
       <div className="sales-leads-subbar"></div>
+
+      {/* ─── Demo Booking Alert Banner (from demo_bookings table) ─── */}
+      {counts.demoCount > 0 && activeTab !== 'demo' && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: '#ecfdf5',
+            border: '1px solid #86efac',
+            borderRadius: '8px',
+            padding: '10px 16px',
+            margin: '0 0 12px 0',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.25rem' }}>🎯</span>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#14532d' }}>
+                {counts.demoCount} Demo Walkthrough {counts.demoCount === 1 ? 'Request' : 'Requests'} from demo_bookings
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#166534', marginTop: '1px' }}>
+                Synced directly from GetAIPilot database. No user email reply required — ready for support team review and WhatsApp follow-up.
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => { setActiveTab('demo'); setPage(1); }}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '6px',
+              fontSize: '0.74rem',
+              fontWeight: 600,
+              backgroundColor: '#16a34a',
+              color: '#ffffff',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            Review Demo Requests ({counts.demoCount}) →
+          </button>
+        </div>
+      )}
 
       {/* ─── 3. Search & Filter Bar (Single-Line Compact Executive Toolbar) ─── */}
       <div className="sales-leads-filter-grid">
@@ -1003,6 +1114,33 @@ const PeopleView: React.FC<PeopleViewProps> = ({
                             </button>
                             <SignupMethodBadge method={lead.signupMethod} />
                           </div>
+                          {Boolean((lead.sourceSnapshot as any)?.demo_booked) && (
+                            <div
+                              onClick={() => onOpenLead(lead.id)}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '2px 7px',
+                                borderRadius: '4px',
+                                fontSize: '0.67rem',
+                                fontWeight: 700,
+                                backgroundColor: '#ecfdf5',
+                                color: '#047857',
+                                border: '1px solid #a7f3d0',
+                                marginTop: '4px',
+                                cursor: 'pointer',
+                              }}
+                              title={`Scheduled: ${(lead.sourceSnapshot as any)?.demo_scheduled_time ? dateTime((lead.sourceSnapshot as any)?.demo_scheduled_time) : 'Confirmed'}`}
+                            >
+                              <span>🎯 Demo Booked</span>
+                              {(lead.sourceSnapshot as any)?.demo_scheduled_time && (
+                                <span style={{ fontWeight: 500, color: '#065f46' }}>
+                                  ({dateTime((lead.sourceSnapshot as any)?.demo_scheduled_time)})
+                                </span>
+                              )}
+                            </div>
+                          )}
                           <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px' }}>
                             {lead.registeredAt ? `Joined ${new Date(lead.registeredAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}
                           </div>
@@ -1117,6 +1255,27 @@ const PeopleView: React.FC<PeopleViewProps> = ({
                           <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontStyle: 'italic' }}>
                             No phone on file
                           </span>
+                        )}
+
+                        {Boolean((lead.sourceSnapshot as any)?.demo_notes) && (
+                          <div
+                            style={{
+                              fontSize: '0.68rem',
+                              color: '#475569',
+                              backgroundColor: '#f8fafc',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              border: '1px solid #e2e8f0',
+                              maxWidth: '180px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              marginTop: '2px',
+                            }}
+                            title={`Discussion Focus: ${(lead.sourceSnapshot as any)?.demo_notes}`}
+                          >
+                            💬 {(lead.sourceSnapshot as any)?.demo_notes}
+                          </div>
                         )}
                       </div>
                     </td>

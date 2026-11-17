@@ -670,6 +670,160 @@ export const LeadDetailsSheet: React.FC<LeadDetailsSheetProps> = ({
               {/* TAB 1: OVERVIEW & NOTES */}
               {activeTab === 'overview' && (
                 <>
+                  {/* Scheduled Demo Walkthrough Card */}
+                  {Boolean((lead.sourceSnapshot as any)?.demo_booked || (lead.sourceSnapshot as any)?.demo_scheduled_time) && (
+                    <div
+                      style={{
+                        backgroundColor: '#f0fdf4',
+                        border: '1px solid #86efac',
+                        borderRadius: '8px',
+                        padding: '14px 16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '1.1rem' }}>🎯</span>
+                          <div>
+                            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#14532d' }}>
+                              Scheduled Demo Walkthrough
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: '#166534' }}>
+                              Requested via GetAIPilot Support &amp; Demo Widget
+                            </div>
+                          </div>
+                        </div>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            backgroundColor: '#dcfce7',
+                            color: '#15803d',
+                            border: '1px solid #bbf7d0',
+                          }}
+                        >
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#22c55e' }} />
+                          {(lead.sourceSnapshot as any)?.demo_status || 'Confirmed'}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr',
+                          gap: '8px',
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #bbf7d0',
+                          borderRadius: '6px',
+                          padding: '10px 12px',
+                          fontSize: '0.74rem',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                          <Calendar size={14} style={{ color: '#16a34a', marginTop: '2px', flexShrink: 0 }} />
+                          <div>
+                            <span style={{ color: '#64748b', fontWeight: 600 }}>Scheduled Slot:</span>{' '}
+                            <strong style={{ color: '#0f172a' }}>
+                              {dateTime((lead.sourceSnapshot as any)?.demo_scheduled_time)}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {(lead.sourceSnapshot as any)?.demo_notes && (
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                            <MessageSquareText size={14} style={{ color: '#16a34a', marginTop: '2px', flexShrink: 0 }} />
+                            <div>
+                              <span style={{ color: '#64748b', fontWeight: 600 }}>Discussion Focus:</span>{' '}
+                              <span style={{ color: '#0f172a', fontWeight: 500 }}>
+                                {(lead.sourceSnapshot as any)?.demo_notes}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {(lead.phone || (lead.sourceSnapshot as any)?.demo_booking_id) && (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', paddingTop: '4px', borderTop: '1px dashed #dcfce7' }}>
+                            {lead.phone && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Phone size={12} style={{ color: '#16a34a' }} />
+                                <span style={{ fontFamily: 'monospace', color: '#1e293b' }}>{lead.phone}</span>
+                              </div>
+                            )}
+                            {(lead.sourceSnapshot as any)?.demo_booking_id && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontSize: '0.68rem' }}>
+                                <span>Ref:</span>
+                                <code style={{ fontSize: '0.66rem', backgroundColor: '#f1f5f9', padding: '1px 4px', borderRadius: '3px' }}>
+                                  {String((lead.sourceSnapshot as any)?.demo_booking_id).slice(0, 8)}...
+                                </code>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action shortcuts */}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {cleanPhone.length >= 10 && (
+                          <a
+                            href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi ${lead.fullName || ''}, this is GetAIPilot Support team following up on your scheduled live demo walkthrough at ${dateTime((lead.sourceSnapshot as any)?.demo_scheduled_time)}.`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="sales-btn-xs"
+                            style={{
+                              height: '30px',
+                              padding: '0 12px',
+                              fontSize: '0.74rem',
+                              gap: '6px',
+                              borderRadius: '6px',
+                              textDecoration: 'none',
+                              color: '#ffffff',
+                              backgroundColor: '#16a34a',
+                              border: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              fontWeight: 600,
+                            }}
+                          >
+                            <MessageCircle size={13} />
+                            WhatsApp Invitee ↗
+                          </a>
+                        )}
+                        {(lead.sourceSnapshot as any)?.demo_booking_id && (
+                          <a
+                            href={`https://meet.jit.si/GetAiPilot-ProductDemoAIStr-${String((lead.sourceSnapshot as any)?.demo_booking_id).slice(0, 8)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="sales-btn-xs sales-btn-outline"
+                            style={{
+                              height: '30px',
+                              padding: '0 12px',
+                              fontSize: '0.74rem',
+                              gap: '6px',
+                              borderRadius: '6px',
+                              textDecoration: 'none',
+                              color: '#0f172a',
+                              borderColor: '#86efac',
+                              backgroundColor: '#ffffff',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              fontWeight: 600,
+                            }}
+                          >
+                            <Headphones size={13} style={{ color: '#16a34a' }} />
+                            Join Video Room ↗
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Quick Action: Contacted / WhatsApp */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                     <button

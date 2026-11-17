@@ -407,10 +407,16 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
     const authValid = await verifyApiKeyAuth(request, reply, 'email:transactional');
     if (!authValid) return;
 
-    const { to, templateKey, idempotencyKey, variables, productCode } = (request.body as any) || {};
+    const { to, templateKey, idempotencyKey, variables: rawBodyVars, productCode, subject: bodySubject, html: bodyHtml } = (request.body as any) || {};
     if (!to) {
       return reply.status(400).send({ success: false, error: 'Recipient email "to" is required' });
     }
+
+    const variables = {
+      ...(rawBodyVars || {}),
+      ...(bodySubject ? { subject: bodySubject } : {}),
+      ...(bodyHtml ? { html: bodyHtml } : {}),
+    };
 
     // Check suppression list
     const { suppressed, reason } = await checkSuppression(to);
@@ -730,6 +736,95 @@ export async function registerEmailRoutes(fastify: FastifyInstance) {
         }
 
         fastify.log.warn(`[Transactional Engine] DB Insert Warning for ${finalIdempotencyKey}: ${err?.message || err}`);
+      }
+
+      // If this is a demo booking confirmation, ensure CRM lead reflects demo status immediately
+      const isDemoBooking =
+        effectiveTemplateKey.includes('demo') ||
+        Boolean(resolvedVariables?.bookingId || resolvedVariables?.booking_id || resolvedVariables?.meetingUrl || resolvedVariables?.date);
+
+      if (isDemoBooking) {
+        try {
+          const normalizedEmail = String(to).toLowerCase().trim();
+          const guestPhone = resolvedVariables?.phone || resolvedVariables?.mobile_number || null;
+          const guestName = resolvedVariables?.name || resolvedVariables?.full_name || resolvedVariables?.userName || to.split('@')[0];
+          const demoScheduledTime = resolvedVariables?.scheduledTime || (resolvedVariables?.date && resolvedVariables?.time ? `${resolvedVariables.date} ${resolvedVariables.time}` : null);
+          const demoNotes = resolvedVariables?.notes || resolvedVariables?.topic || resolvedVariables?.discussionTopic || 'Live support & demo request';
+          const bookingId = resolvedVariables?.bookingId || resolvedVariables?.booking_id || null;
+
+          const { data: existingLead } = await supabase
+            .from('crm_leads')
+            .select('id, sales_stage, source_snapshot')
+            .eq('product_code', 'getaipilot')
+            .eq('email', normalizedEmail)
+            .maybeSingle();
+
+          const updatedSnapshot = {
+            ...(existingLead?.source_snapshot || {}),
+            demo_booked: true,
+            demo_scheduled_time: demoScheduledTime,
+            demo_notes: demoNotes,
+            demo_booking_id: bookingId,
+            demo_status: 'confirmed',
+            demo_requested_at: new Date().toISOString(),
+          };
+
+          const targetStage =
+            existingLead?.sales_stage === 'won'
+              ? 'won'
+              : 'demo_trial';
+
+          let leadId = existingLead?.id;
+          if (existingLead) {
+            await supabase
+              .from('crm_leads')
+              .update({
+                sales_stage: targetStage,
+                next_follow_up_at: demoScheduledTime || undefined,
+                source_snapshot: updatedSnapshot,
+                phone: guestPhone || undefined,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', existingLead.id);
+          } else {
+            const { data: newLead } = await supabase
+              .from('crm_leads')
+              .insert({
+                product_code: 'getaipilot',
+                external_user_id: `demo_${bookingId || Date.now()}`,
+                email: normalizedEmail,
+                phone: guestPhone,
+                full_name: guestName,
+                account_type: 'Demo Strategy Walkthrough',
+                sales_stage: 'demo_trial',
+                next_follow_up_at: demoScheduledTime,
+                registered_at: new Date().toISOString(),
+                source_snapshot: updatedSnapshot,
+                last_synced_at: new Date().toISOString(),
+              })
+              .select('id')
+              .single();
+            leadId = newLead?.id;
+          }
+
+          if (leadId) {
+            await supabase.from('crm_activities').insert({
+              lead_id: leadId,
+              activity_type: 'demo_booked',
+              body: `Demo walkthrough booked: ${demoScheduledTime || 'Scheduled'} (${demoNotes})`,
+              metadata: {
+                bookingId,
+                scheduledTime: demoScheduledTime,
+                notes: demoNotes,
+                template: effectiveTemplateKey,
+              },
+              actor: 'system',
+              occurred_at: new Date().toISOString(),
+            });
+          }
+        } catch (crmErr: any) {
+          fastify.log.warn(`[Transactional Engine] Failed to record demo lead: ${crmErr?.message || crmErr}`);
+        }
       }
 
       let queuedToBullMQ = false;

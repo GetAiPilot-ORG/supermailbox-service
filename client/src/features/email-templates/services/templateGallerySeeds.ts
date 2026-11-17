@@ -3,6 +3,7 @@ import type { GalleryTemplate } from '../types/template.types';
 type Seed = Pick<GalleryTemplate, 'key' | 'name' | 'category' | 'industry' | 'subject' | 'preheader' | 'featured'> & { accent: string; layout: string };
 
 const seeds: Seed[] = [
+  ["demo_booking_confirmation", "Demo Booking Confirmation", "Transactional", "SaaS", "Your Live Demo is Booked! 🚀", "Your 1-on-1 strategy call with GetAIPilot engineering is confirmed.", "#0A4737", "hero", true],
   ['blank_template', 'Blank Template', 'Blank', 'General', 'Untitled email template', 'Start with a clean responsive MJML canvas.', '#769181', 'blank', true],
   ['saas_welcome', 'SaaS Welcome', 'Welcome', 'SaaS', 'Welcome to {{company_name}}', 'Help new users take their first useful action.', '#4f6f5b', 'hero', true],
   ['account_verification', 'Account Verification', 'Verification', 'Technology', 'Verify your account', 'Confirm identity with a clear secure call to action.', '#365c8d', 'letter'],

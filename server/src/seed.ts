@@ -126,9 +126,9 @@ const DEMO_TEMPLATES = [
                                 <td align="center" valign="middle" style="text-align: center;">
                                     <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">Need Help?</h3>
                                     <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
-                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>7777891004</strong>.
                                     </p>
-                                    <a href="tel:8982285510" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
+                                    <a href="tel:7777891004" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
                                 </td>
                             </tr>
                         </table>
@@ -259,9 +259,9 @@ const DEMO_TEMPLATES = [
                                 <td align="center" valign="middle" style="text-align: center;">
                                     <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">Need Help?</h3>
                                     <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
-                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>7777891004</strong>.
                                     </p>
-                                    <a href="tel:8982285510" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
+                                    <a href="tel:7777891004" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
                                 </td>
                             </tr>
                         </table>
@@ -392,9 +392,9 @@ const DEMO_TEMPLATES = [
                                 <td align="center" valign="middle" style="text-align: center;">
                                     <h3 style="font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 8px 0;">Need Help?</h3>
                                     <p style="font-size: 13px; color: #4b5563; margin: 0 0 15px 0; line-height: 1.5;">
-                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>8982285510</strong>.
+                                        Check out our <a href="#" style="color:#065f46; text-decoration:none; font-weight:bold;">Help Center</a> or contact support directly if you have any questions. Call us at <strong>7777891004</strong>.
                                     </p>
-                                    <a href="tel:8982285510" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
+                                    <a href="tel:7777891004" style="display: inline-block; background-color: #ffffff; color: #065f46; font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 20px; border-radius: 4px; border: 1px solid #065f46;">Contact Support</a>
                                 </td>
                             </tr>
                         </table>
