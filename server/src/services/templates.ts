@@ -1114,10 +1114,6 @@ export async function renderTemplate(
                     <td style="width: 28px; vertical-align: top;">📝</td>
                     <td><strong>Discussion Focus:</strong> {{ .Notes }}</td>
                   </tr>
-                  <tr>
-                    <td style="width: 28px; vertical-align: top;">🔖</td>
-                    <td><strong>Booking Reference:</strong> <span style="font-family: monospace; font-size: 12px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">{{ .BookingID }}</span></td>
-                  </tr>
                 </table>
               </td>
             </tr>
